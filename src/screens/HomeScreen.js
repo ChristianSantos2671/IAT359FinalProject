@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+{/*import { useState, useEffect } from "react";
 import { Button, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { saveUserPrefs, loadUserPrefs, removeUserPrefs } from "../utils/storage";
+import { saveUserPrefs, loadUserPrefs, removeUserPrefs } from "./utils/storage";
 
 export default function HomeScreen({ navigation }) {
   const [name, setName] = useState("");
@@ -70,4 +70,15 @@ const styles = StyleSheet.create ({
     borderWidth: "#111",
     borderRadius: 8,
   },
-});
+}); */}
+
+import { View, Text, StyleSheet, Button } from "react-native";
+import { useState } from "react";
+
+export default function HomeScreen() {
+    return (
+        <View>
+            <Text>HomeScreen</Text>
+        </View>
+    );
+}
