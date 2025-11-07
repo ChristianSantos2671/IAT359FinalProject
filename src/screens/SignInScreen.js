@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '700',
   },
+  
   secondaryButtonText: {
     color: 'green',
     fontWeight: '700',
