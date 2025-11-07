@@ -1,7 +1,7 @@
 import { FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 
-import rootStyles from '../utils/rootStyles';
+import globalStyles from '../utils/globalStyles';
 
 export default function AddRecipeScreen() {
   const [ingredients, setIngredients] = useState([]);
@@ -14,19 +14,19 @@ export default function AddRecipeScreen() {
   }
   
   return (
-    <View style={styles.mainView}>
+    <View style={globalStyles.mainView}>
       <ScrollView>
         <View>
           {/* Camera access or upload photo here */}
         </View>
 
-        <View style={styles.view}>
-          <Text style={styles.header}>Recipe Name</Text>
-          <TextInput style={styles.textInput} placeholder="eg. Beef Wellington"/>
+        <View style={globalStyles.view}>
+          <Text style={globalStyles.headerText2}>Recipe Name</Text>
+          <TextInput style={globalStyles.textInput} placeholder="eg. Beef Wellington"/>
         </View>
 
-        <View style={styles.view}>
-          <Text style={styles.header}>Ingrdients</Text>
+        <View style={globalStyles.view}>
+          <Text style={globalStyles.headerText2}>Ingrdients</Text>
           <FlatList
             style={styles.ingredientsList}
             scrollEnabled={false}
@@ -46,10 +46,10 @@ export default function AddRecipeScreen() {
           />
         </View>
 
-        <View style={styles.view}>
-          <Text style={styles.header}>Instructions</Text>
+        <View style={globalStyles.view}>
+          <Text style={globalStyles.headerText2}>Instructions</Text>
           <TextInput
-            style={styles.textInput}
+            style={globalStyles.textInput}
             multiline={true}
             placeholder="Step 1: ..."
           />
@@ -66,41 +66,24 @@ export default function AddRecipeScreen() {
 }
 
 const styles = StyleSheet.create({
-  mainView: {
-    flex: 1,
-    backgroundColor: rootStyles.colors.background,
-  },
-  view: {
-    margin: rootStyles.section.margin,
-  },
-  header: {
-    fontSize: rootStyles.headerText.fontSize,
-    fontWeight: rootStyles.headerText.fontWeight,
-  },
-  textInput: {
-    borderColor: rootStyles.colors.text,
-    borderWidth: rootStyles.section.borderWidth,
-    padding: rootStyles.section.padding,
-    marginTop: 5,
-  },
   ingredientsList: {
-    borderWidth: rootStyles.section.borderWidth,
-    backgroundColor: rootStyles.colors.backgroundSecondary,
+    borderWidth: globalStyles.section.borderWidth,
+    backgroundColor: globalStyles.colors.backgroundSecondary,
     marginTop: 10,
-    padding: rootStyles.section.padding,
+    padding: globalStyles.section.padding,
   },
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
     borderRadius: 16,
-    backgroundColor: rootStyles.colors.primary,
+    backgroundColor: globalStyles.colors.primary,
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 10,
   },
   ingridientName: {
-    fontSize: rootStyles.tagText.fontSize,
+    fontSize: globalStyles.tagText.fontSize,
     marginRight: 5,
   },
   closeButton: {
@@ -116,16 +99,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   uploadButton: {
-    backgroundColor: rootStyles.colors.primary,
-    borderWidth: rootStyles.button.borderWidth,
-    borderRadius: rootStyles.button.borderRadius,
-    paddingVertical: rootStyles.button.padding,
+    backgroundColor: globalStyles.colors.primary,
+    borderWidth: globalStyles.button.borderWidth,
+    borderRadius: globalStyles.button.borderRadius,
+    paddingVertical: globalStyles.button.padding,
     paddingHorizontal: 100,
     alignItems: 'center',
     justifyContent: 'center',
   },
   uploadText: {
-    fontSize: rootStyles.headerText.fontSize,
-    fontWeight: rootStyles.headerText.fontWeight,
+    fontSize: globalStyles.headerText.fontSize,
+    fontWeight: globalStyles.headerText.fontWeight,
   },
 });

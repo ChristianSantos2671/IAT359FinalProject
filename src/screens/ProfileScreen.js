@@ -1,7 +1,7 @@
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 
-import rootStyles from '../utils/rootStyles';
+import globalStyles from '../utils/globalStyles';
 
 export default function ProfileScreen({navigation}) {
   const [optionBarType, setOptionBarType] = useState('My Meals');
@@ -10,19 +10,19 @@ export default function ProfileScreen({navigation}) {
   const [favourites, setFavourites] = useState([]);
   
   return (
-    <View style={styles.mainView}>
+    <View style={globalStyles.mainView}>
       <View style={styles.profileSection}>
         <View style={styles.profileCircle}>
           <Text style={styles.profileInitials}>__</Text>
         </View>
 
         <View>
-          <Text style={styles.header}>Name</Text>
+          <Text style={globalStyles.headerText}>Name</Text>
 
           <View style={styles.profileSpecs}>
-            <Text><Text style={styles.profileStatsValues}>{meals.length}</Text> Meals</Text>
+            <Text><Text style={globalStyles.headerText.fontWeight}>{meals.length}</Text> Meals</Text>
             <Text>•</Text>
-            <Text><Text style={styles.profileStatsValues}>{recipes.length}</Text> Recipes</Text>
+            <Text><Text style={globalStyles.headerText.fontWeight}>{recipes.length}</Text> Recipes</Text>
           </View>
         </View>
       </View>
@@ -37,7 +37,7 @@ export default function ProfileScreen({navigation}) {
         >
           <Text
             style={
-              optionBarType === 'My Meals' ? styles.optionButtonTextActive : styles.optionButtonText
+              optionBarType === 'My Meals' ? globalStyles.tagText : { color: globalStyles.colors.text }
             }
           >My Meals</Text>
         </TouchableOpacity>
@@ -51,7 +51,7 @@ export default function ProfileScreen({navigation}) {
         >
           <Text
             style={
-              optionBarType === 'My Recipes' ? styles.optionButtonTextActive : styles.optionButtonText
+              optionBarType === 'My Recipes' ? globalStyles.tagText : { color: globalStyles.colors.text }
             }
           >My Recipes</Text>
         </TouchableOpacity>
@@ -65,7 +65,7 @@ export default function ProfileScreen({navigation}) {
         >
           <Text
             style={
-              optionBarType === 'Favourites' ? styles.optionButtonTextActive : styles.optionButtonText
+              optionBarType === 'Favourites' ? globalStyles.tagText : { color: globalStyles.colors.text }
             }
           >Favourites</Text>
         </TouchableOpacity>
@@ -89,12 +89,12 @@ export default function ProfileScreen({navigation}) {
                     />
 
                     <View>
-                      <View style={styles.mealHeader}>
-                        <Text style={styles.mealHeaderText}>{item.name}</Text>
-                        <Text style={styles.mealHeaderText}>-</Text>
-                        <Text style={styles.mealHeaderText}>{item.date}</Text>
+                      <View style={globalStyles.headerText2}>
+                        <Text style={globalStyles.headerText2}>{item.name}</Text>
+                        <Text style={globalStyles.headerText2}>-</Text>
+                        <Text style={globalStyles.headerText2}>{item.date}</Text>
                       </View>
-                      <Text style={styles.mealHeaderText}>Recipe</Text>
+                      <Text style={globalStyles.headerText2}>Recipe</Text>
                       <Text style={styles.mealDescription}>{item.description}</Text>
                     </View>
                   </View>
@@ -117,8 +117,8 @@ export default function ProfileScreen({navigation}) {
                     />
 
                     <View>
-                      <Text style={styles.recipeHeaderText}>{item.name}</Text>
-                      <Text style={styles.recipeDescription}>{item.description}</Text>
+                      <Text style={globalStyles.headerText2}>{item.name}</Text>
+                      <Text style={globalStyles.bodyText}>{item.description}</Text>
                     </View>
                   </View>
                 )}
@@ -140,8 +140,8 @@ export default function ProfileScreen({navigation}) {
                     />
 
                     <View>
-                      <Text style={styles.recipeHeaderText}>{item.name}</Text>
-                      <Text style={styles.recipeDescription}>{item.description}</Text>
+                      <Text style={globalStyles.headerText2}>{item.name}</Text>
+                      <Text style={globalStyles.bodyText}>{item.description}</Text>
                     </View>
                   </View>
                 )}
@@ -166,55 +166,43 @@ export default function ProfileScreen({navigation}) {
 }
 
 const styles = StyleSheet.create ({
-  mainView: {
-    flex: 1,
-    backgroundColor: rootStyles.colors.background,
-  },
-  header: {
-    fontSize: rootStyles.headerText.fontSize*1.5,
-    fontWeight: rootStyles.headerText.fontWeight,
-  },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginHorizontal: rootStyles.section.margin,
-    marginVertical: rootStyles.section.margin*2,
-
+    marginHorizontal: globalStyles.section.margin,
+    marginVertical: globalStyles.section.margin*2,
   },
   profileCircle: {
     width: 75,
     height: 75,
-    borderWidth: rootStyles.section.borderWidth,
-    borderColor: rootStyles.colors.text,
+    borderWidth: globalStyles.section.borderWidth,
+    borderColor: globalStyles.colors.text,
     borderRadius: 50,
-    backgroundColor: rootStyles.colors.primary,
+    backgroundColor: globalStyles.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   profileInitials: {
     fontSize: 24, 
-    color: rootStyles.colors.text,
+    color: globalStyles.colors.text,
     fontWeight: 'bold',
   },
   profileSpecs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: 200,
-    marginTop: rootStyles.section.margin,
-  },
-  profileStatsValues: {
-    fontWeight: rootStyles.headerText.fontWeight,
+    marginTop: globalStyles.section.margin,
   },
   optionsBar: {
     flexDirection: 'row',
-    backgroundColor: rootStyles.colors.backgroundSecondary,
-    borderColor: rootStyles.colors.text,
-    borderWidth: rootStyles.section.borderWidth,
-    borderRadius: rootStyles.button.borderRadius,
+    backgroundColor: globalStyles.colors.backgroundSecondary,
+    borderColor: globalStyles.colors.text,
+    borderWidth: globalStyles.section.borderWidth,
+    borderRadius: globalStyles.button.borderRadius,
     height: 50,
-    marginHorizontal: rootStyles.section.margin,
-    marginBottom: rootStyles.section.margin,
+    marginHorizontal: globalStyles.section.margin,
+    marginBottom: globalStyles.section.margin,
   },
   optionButtonFlex: {
     flex: 1,
@@ -222,39 +210,33 @@ const styles = StyleSheet.create ({
     justifyContent: 'center',
   },
   optionButtonActive: {
-    backgroundColor: rootStyles.colors.primary,
-    borderRadius: rootStyles.button.borderRadius,
+    backgroundColor: globalStyles.colors.primary,
+    borderRadius: globalStyles.button.borderRadius,
     justifyContent: 'center',
-    borderWidth: rootStyles.section.borderWidth,
-    borderColor: rootStyles.colors.text,
-    marginVertical: -rootStyles.section.borderWidth,
+    borderWidth: globalStyles.section.borderWidth,
+    borderColor: globalStyles.colors.text,
+    marginVertical: -globalStyles.section.borderWidth,
     marginHorizontal: -1,
     zIndex: 2,
   },
-  optionButtonText: {
-    color: rootStyles.colors.text,
-  },
-  optionButtonTextActive: {
-    fontWeight: 'bold',
-  },
   optionContent: {
     flex: 1,
-    padding: rootStyles.section.padding,
+    padding: globalStyles.section.padding,
   },
   emptyContent: {
     textAlign: 'center',
-    fontSize: rootStyles.headerText.fontSize,
-    fontWeight: rootStyles.headerText.fontWeight,
+    fontSize: globalStyles.headerText.fontSize,
+    fontWeight: globalStyles.headerText.fontWeight,
   },
   meal: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: rootStyles.colors.backgroundSecondary,
-    borderRadius: rootStyles.button.borderRadius,
-    borderWidth: rootStyles.section.borderWidth,
-    borderColor: rootStyles.colors.text,
-    padding: rootStyles.section.padding,
-    margin: rootStyles.section.margin/2,
+    backgroundColor: globalStyles.colors.backgroundSecondary,
+    borderRadius: globalStyles.button.borderRadius,
+    borderWidth: globalStyles.section.borderWidth,
+    borderColor: globalStyles.colors.text,
+    padding: globalStyles.section.padding,
+    margin: globalStyles.section.margin/2,
   },
   mealImage: {
     width: '40%',
@@ -268,35 +250,24 @@ const styles = StyleSheet.create ({
     justifyContent: 'space-between',
     marginBottom: 5,
   },
-  mealHeaderText: {
-    fontSize: rootStyles.headerText.fontSize,
-    fontWeight: rootStyles.headerText.fontWeight,
-  },
   mealDescription: {
-    fontSize: rootStyles.bodyText.fontSize,
+    fontSize: globalStyles.bodyText.fontSize,
     width: 175,
   },
   recipe: {
     alignItems: 'center',
-    backgroundColor: rootStyles.colors.backgroundSecondary,
-    borderRadius: rootStyles.button.borderRadius,
-    borderWidth: rootStyles.section.borderWidth,
-    borderColor: rootStyles.colors.text,
-    padding: rootStyles.section.padding,
-    margin: rootStyles.section.margin/2,
+    backgroundColor: globalStyles.colors.backgroundSecondary,
+    borderRadius: globalStyles.button.borderRadius,
+    borderWidth: globalStyles.section.borderWidth,
+    borderColor: globalStyles.colors.text,
+    padding: globalStyles.section.padding,
+    margin: globalStyles.section.margin/2,
   },
   recipeImage: {
     width: '100%',
     height: '30%',
     borderRadius: 10,
     marginRight: 10,
-  },
-  recipeHeaderText: {
-    fontSize: rootStyles.headerText.fontSize,
-    fontWeight: rootStyles.headerText.fontWeight,
-  },
-  recipeDescription: {
-    fontSize: rootStyles.bodyText.fontSize,
   },
   logMealButton: {
     position: 'absolute',
@@ -306,12 +277,12 @@ const styles = StyleSheet.create ({
     height: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: rootStyles.colors.primary,
-    borderRadius: rootStyles.button.borderRadius,
-    borderWidth: rootStyles.section.borderWidth,
-    borderColor: rootStyles.colors.text,
-    margin: rootStyles.section.margin,
-    padding: rootStyles.section.padding,
+    backgroundColor: globalStyles.colors.primary,
+    borderRadius: globalStyles.button.borderRadius,
+    borderWidth: globalStyles.section.borderWidth,
+    borderColor: globalStyles.colors.text,
+    margin: globalStyles.section.margin,
+    padding: globalStyles.section.padding,
   },
   logMealImage: {
     width: 40,
