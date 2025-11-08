@@ -115,17 +115,17 @@ export default function RecipeDetailsScreen({navigation, route}) {
         {/* Bottom buttons for Grocery List and Log Meal */}
          <View style={styles.bottomButtons}>
             <TouchableOpacity 
-            style={styles.buttonSecondary}
+            style={styles.secondaryButton}
             onPress={() => navigation.navigate("Grocery List")}
             >
-                <Text style={styles.buttonTextSecondary}>Shop Ingredients</Text>
+                <Text style={styles.secondaryButtonText}>Shop Ingredients</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-                style={styles.buttonPrimary}
+                style={styles.primaryButton}
                 onPress={() => navigation.navigate("LogMeal")}
             >
-                <Text style={styles.buttonTextPrimary}>Log Meal</Text>
+                <Text style={styles.secondaryButtonText}>Log Meal</Text>
             </TouchableOpacity>
         </View>
     </View>
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   paddingHorizontal: 16,
 },
 
-buttonPrimary: {
+primaryButton: {
 backgroundColor: "#4CAF50",
 paddingVertical: 10,
 paddingHorizontal: 20,
@@ -241,7 +241,7 @@ marginLeft: 8,
 alignItems: "center",
 },
 
-buttonSecondary: {
+secondaryButton: {
 backgroundColor: "#f2f2f2",
 paddingVertical: 10,
 paddingHorizontal: 20,
@@ -251,12 +251,12 @@ marginRight: 8,
 alignItems: "center",
 },
 
-buttonTextPrimary: {
+primaryButtonText: {
 color: "#fff",
 fontWeight: "600",
 },
 
-buttonTextSecondary: {
+secondaryButtonText: {
 color: "#4CAF50",
 fontWeight: "600",
 },
