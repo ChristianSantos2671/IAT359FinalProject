@@ -77,7 +77,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect, use } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import filter from "lodash/filter";
 
 const API_ENDPOINT = (query) =>
@@ -162,7 +161,7 @@ export default function HomeScreen({navigation}) {
                 <Ionicons name="close-circle" size={22} />
               </TouchableOpacity>
         )}
-        {/* camera icon  */}
+        {/* camera icon + add searching with the camera */}
           <TouchableOpacity onPress={() => {}}>
             <Ionicons name="camera" size={30} color="#4CAF50" />
           </TouchableOpacity>
