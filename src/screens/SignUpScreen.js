@@ -38,20 +38,27 @@ export default function SignUpScreen({navigation}) {
         behavior="padding">
         {/*all fields*/}
         <View style={styles.inputContainer}>
+          <View>
+          <Text>Full name</Text>
           <TextInput
-            placeholder="Full Name"
+            placeholder="Enter your full name"
             value={fullName}
             onChangeText={setFullName}
             style={styles.input}
             />
-
+          </View>
+          <View>
+          <Text>Username</Text>
           <TextInput
             placeholder="Username"
             value={username}
             onChangeText={setUsername}
             style={styles.input}
             />
+          </View>
 
+          <View>
+          <Text>Email</Text>
           <TextInput
             placeholder="Email"
             value={email}
@@ -59,7 +66,10 @@ export default function SignUpScreen({navigation}) {
             style={styles.input}
             autoCapitalize="none"
             />
+          </View>
 
+          <View>
+          <Text>Password</Text>
           <TextInput
           placeholder="Password"
           value={password}
@@ -67,6 +77,7 @@ export default function SignUpScreen({navigation}) {
           style={styles.input}
           secureTextEntry
           />
+          </View>
 
         </View>
 
@@ -97,7 +108,8 @@ const styles = StyleSheet.create({
 
   inputContainer: {
   width: '80%',
-  marginBottom: 20
+  marginBottom: 20, 
+  gap: 10
   },
 
   input: {

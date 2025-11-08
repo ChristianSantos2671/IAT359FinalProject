@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   h1: {
      color: 'green',
      fontWeight: '700',
-     fontSize: 35
+     fontSize: 36
   },
 
   inputContainer: {
