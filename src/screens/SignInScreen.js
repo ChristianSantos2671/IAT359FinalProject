@@ -1,24 +1,13 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, Alert, TextInput, Text, View } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import {firebase_auth} from  '../utils/firebaseConfig';
+import {firebase_auth} from  '../utils/firebaseConfig.js';
 
 export default function SignInScreen({navigation}) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false);
 
-  /*const handleSignUp = async () => {
-      try {
-          setLoading(true);
-          await createUserWithEmailAndPassword(firebase_auth, email.trim(), password);
-          Alert.alert("Account Created");
-      } catch (e) {
-          Alert.alert("Failed to create account", e.message);
-      } finally {
-          setLoading(false);
-      }
-  }; */
 
   const handleLogin = async () => {
     try {
@@ -66,12 +55,14 @@ export default function SignInScreen({navigation}) {
           <Text style={styles.primaryButtonText}>Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('SignUp')}
-          style={styles.secondaryButton}
-        >
-          <Text style={styles.secondaryButtonText}>Sign Up</Text>
-        </TouchableOpacity>
+        <View style={styles.subheading}>
+          <Text style={styles.bodyText}> Don’t have an account yet?
+            <Text style={styles.textButton}
+            onPress={() => navigation.navigate('SignUp')}
+          > Sign up here
+            </Text>
+          </Text>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -130,4 +121,17 @@ const styles = StyleSheet.create({
     color: 'green',
     fontWeight: '700',
   },
+
+  subheading: {
+    fontSize: 16,
+    fontColor: "#3f3f3fff",
+    marginBottom: 6,
+  },
+
+  textButton: {
+    color: 'green',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
 });

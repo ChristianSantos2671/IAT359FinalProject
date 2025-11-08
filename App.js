@@ -1,10 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-//import { StatusBar } from 'expo-status-bar';
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import {firebase_auth} from './src/utils/firebaseConfig.js';
+import { firebase_auth } from './src/utils/firebaseConfig.js';
+
 
 // Importing screens
 import AddRecipeScreen from './src/screens/AddRecipeScreen';
@@ -60,7 +60,7 @@ export default function App() {
       return unsubscribe;
       }, [initializing]);
 
-  {return (
+  return (
     <NavigationContainer>
       <Stack.Navigator>
 
@@ -90,10 +90,12 @@ export default function App() {
             <Stack.Screen 
             name="SignIn" 
             component={SignInScreen} 
+            options={{ headerShown: false }}
             />
 
             <Stack.Screen name="SignUp" 
             component={SignUpScreen} 
+            options={{ headerShown: false }}
             />
           </>
         )}
@@ -101,4 +103,4 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
-}}
+}
