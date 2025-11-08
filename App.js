@@ -13,6 +13,8 @@ import LogMealScreen from './src/screens/LogMealScreen';
 import SignInScreen from './src/screens/SignInScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
+import GroceryListScreen from './src/screens/GroceryListScreen';
+import RecipeDetailsScreen from './src/screens/RecipeDetailsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -23,6 +25,13 @@ function Tabs() {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
+        options={{
+        headerShown: false }}
+      />
+
+      <Tab.Screen
+        name="Grocery List"
+        component={GroceryListScreen}
       />
 
       <Tab.Screen
@@ -53,21 +62,42 @@ export default function App() {
 
   {return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator>
 
+        {/*// Checking if user is logged in*/}
         {user ? (
-          // Checking if user is logged in
-          <Stack.Screen name="MainTabs" component={Tabs} />
+          <>
+          <Stack.Screen 
+          name="MainTabs" 
+          component={Tabs} 
+          options={{ headerShown: false }} 
+          />
+
+          {/* Stack screens that appear on top of tabs */}
+          <Stack.Screen 
+          name="LogMeal" 
+          component={LogMealScreen} />
+
+          <Stack.Screen name="Recipe Details" 
+          component={RecipeDetailsScreen} 
+          />
+
+          </>
         ) : (
+
           <>
           {/*User not logged in*/}
-            <Stack.Screen name="SignIn" component={SignInScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen 
+            name="SignIn" 
+            component={SignInScreen} 
+            />
+
+            <Stack.Screen name="SignUp" 
+            component={SignUpScreen} 
+            />
           </>
         )}
 
-        {/* Screens on top of tabs */}
-        <Stack.Screen name="Log Meal" component={LogMealScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
