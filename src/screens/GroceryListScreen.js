@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Button, FlatList } from 'react-native';
-import rootStyles from '../utils/rootStyles';
+import rootStyles from '../utils/globalStyles';
 
 export default function GroceryListScreen() {
   const [ingredients, setIngredients] = useState([]);
