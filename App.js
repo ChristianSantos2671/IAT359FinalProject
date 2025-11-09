@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { firebase_auth } from './src/utils/firebaseConfig.js';
-
+import { ActivityIndicator, View } from 'react-native';
 
 // Importing screens
 import AddRecipeScreen from './src/screens/AddRecipeScreen';
@@ -50,7 +50,7 @@ function Tabs() {
 export default function App() {
 
   const [user, setUser] = useState(null)
-    const [initializing, setInitializing] = useState(true);
+  const [initializing, setInitializing] = useState(true);
 
     useEffect(() => {
       const unsubscribe = onAuthStateChanged(firebase_auth, (u) => {
@@ -59,6 +59,14 @@ export default function App() {
       });
       return unsubscribe;
       }, [initializing]);
+
+     if (initializing) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
 
   return (
     <NavigationContainer>
@@ -93,7 +101,8 @@ export default function App() {
             options={{ headerShown: false }}
             />
 
-            <Stack.Screen name="SignUp" 
+            <Stack.Screen 
+            name="SignUp" 
             component={SignUpScreen} 
             options={{ headerShown: false }}
             />

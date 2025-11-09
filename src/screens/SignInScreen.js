@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, Alert, TextInput, Text, View } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import {firebase_auth} from  '../utils/firebaseConfig.js';
+import globalStyles from '../utils/globalStyles';
 
 export default function SignInScreen({navigation}) {
   const [email, setEmail] = useState('')
@@ -27,7 +28,7 @@ export default function SignInScreen({navigation}) {
       behavior="padding"
     >
       <View>
-        <Text style={styles.h1} > Login to your account! </Text>
+        <Text style={globalStyles.h1} > Login to your account! </Text>
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -52,11 +53,11 @@ export default function SignInScreen({navigation}) {
           onPress={handleLogin}
           style={styles.primaryButton}
         >
-          <Text style={styles.primaryButtonText}>Login</Text>
+          <Text style={globalStyles.primaryButtonText}>Login</Text>
         </TouchableOpacity>
 
         <View style={styles.subheading}>
-          <Text style={styles.bodyText}> Don’t have an account yet?
+          <Text style={globalStyles.bodyText}> Don’t have an account yet?
             <Text style={styles.textButton}
             onPress={() => navigation.navigate('SignUp')}
           > Sign up here
@@ -100,12 +101,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButton: {
-    backgroundColor: 'green',
+    backgroundColor: globalStyles.colors.primary,
     width: '100%',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginVertical: 5,
+    marginBottom: 20,
   },
   secondaryButton: {
     borderColor: 'green',
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
   },
 
   textButton: {
-    color: 'green',
+    color: globalStyles.colors.primary,
     fontSize: 16,
     fontWeight: '700',
   },
