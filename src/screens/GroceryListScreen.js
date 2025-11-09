@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import globalStyles from '../utils/globalStyles';
 
-export default function GroceryListScreen() {
+export default function GroceryListScreen({navigation}) {
   const [ingredients, setIngredients] = useState([]);
   const [ingredient, setIngredient] = useState('');
 

@@ -123,7 +123,7 @@ export default function RecipeDetailsScreen({navigation, route}) {
 
             <TouchableOpacity
                 style={styles.primaryButton}
-                onPress={() => navigation.navigate("LogMeal")}
+                onPress={() => navigation.navigate("Log Meal")}
             >
                 <Text style={styles.secondaryButtonText}>Log Meal</Text>
             </TouchableOpacity>

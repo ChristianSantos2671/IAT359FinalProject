@@ -1,5 +1,6 @@
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 
 import globalStyles from '../utils/globalStyles';
 import { getMeals, removeMeal } from '../utils/storage';
@@ -11,41 +12,30 @@ export default function ProfileScreen({navigation}) {
   const [recipes, setRecipes] = useState([]);
   const [favourites, setFavourites] = useState([]);
 
-  useEffect(() => {
-    const loadMeals = async () => {
-      //await AsyncStorage.clear();
-      try {
-        const loadedMeals = await getMeals();
-        setMeals(loadedMeals || []);
-      } catch (e) {
-        console.error('Error loading meals:', e);
-        setMeals([]);
-      }
-    };
-    loadMeals();
+  const loadData = async () => {
+    try {
+      const [loadedMeals, loadedRecipes, loadedFavourites] = await Promise.all([
+        getMeals(),
+        getRecipes(),
+        getFavourites()
+      ]);
+      
+      setMeals(loadedMeals || []);
+      setRecipes(loadedRecipes || []);
+      setFavourites(loadedFavourites || []);
+    } catch (e) {
+      console.error('Error loading data:', e);
+      setMeals([]);
+      setRecipes([]);
+      setFavourites([]);
+    }
+  };
 
-    const loadRecipes = async () => {
-      try {
-        const loadedRecipes = await getRecipes();
-        setRecipes(loadedRecipes || []);
-      } catch (e) {
-        console.error('Error loading recipes:', e);
-        setRecipes([]);
-      }
-    };
-    loadRecipes();
-
-    const loadFavourites = async () => {
-      try {
-        const loadedFavourites = await getFavourites();
-        setFavourites(loadedFavourites || []);
-      } catch (e) {
-        console.error("Error loading favourites:", e);
-        setFavourites([]);
-      }
-    };
-    loadFavourites();
-  }, [meals, recipes, favourites]);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   const deleteMeal = async (item) => {
     try {
