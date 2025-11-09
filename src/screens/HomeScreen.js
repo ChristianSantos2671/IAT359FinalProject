@@ -78,6 +78,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect, use } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import filter from "lodash/filter";
+import globalStyles from "../utils/globalStyles";
 
 const API_ENDPOINT = (query) =>
   `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`;
@@ -184,34 +185,44 @@ export default function HomeScreen({navigation}) {
         </View>
       </View>
      {/* recipe list  */}
-    <FlatList
-      data={data}
-      style={styles.paddingHorizontal}
-      keyExtractor={(item) => item.idMeal}
-      renderItem={({ item }) => (
-        
-        <TouchableOpacity
-          style={[styles.itemContainer, styles.dropshadow]}
-          onPress={() => navigation.navigate('Recipe Details', { meal: item })} 
-        >
-            <Image 
-            source={{ uri: item.strMealThumb }} 
-            style={styles.thumbnail} 
-            />
+      <FlatList
+        data={data}
+        style={styles.paddingHorizontal}
+        keyExtractor={(item) => item.idMeal}
+        renderItem={({ item }) => (
+          
+          <TouchableOpacity
+            style={[styles.itemContainer, styles.dropshadow]}
+            onPress={() => navigation.navigate('Recipe Details', { meal: item })} 
+          >
+              <Image 
+              source={{ uri: item.strMealThumb }} 
+              style={styles.thumbnail} 
+              />
 
-            <View style={{ flex: 1 }}>
-              <Text style={styles.h3}>{item.strMeal}</Text>
-              <Text
-                style={styles.bodyText}
-                numberOfLines={3}
-                ellipsizeMode="tail"
-              >
-                {item.strInstructions}
-              </Text>
-            </View>
-        </TouchableOpacity>
-      )}
-    />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.h3}>{item.strMeal}</Text>
+                <Text
+                  style={styles.bodyText}
+                  numberOfLines={3}
+                  ellipsizeMode="tail"
+                >
+                  {item.strInstructions}
+                </Text>
+              </View>
+          </TouchableOpacity>
+        )}
+      />
+
+      <TouchableOpacity
+        style={globalStyles.logMealButton}
+        onPress={() => navigation.navigate('Log Meal')}
+      >
+        <Image
+          style={globalStyles.logMealImage}
+          source={require('../../assets/adaptive-icon.png')}
+        />
+      </TouchableOpacity>
     </SafeAreaView>
   );
   }

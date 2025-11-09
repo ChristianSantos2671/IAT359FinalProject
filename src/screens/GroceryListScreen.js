@@ -1,130 +1,159 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Button, FlatList } from 'react-native';
-import rootStyles from '../utils/globalStyles';
+import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+
+import globalStyles from '../utils/globalStyles';
 
 export default function GroceryListScreen() {
   const [ingredients, setIngredients] = useState([]);
-  const [ingridient, setIngredient] = useState('');
+  const [ingredient, setIngredient] = useState('');
 
-  const deleteIngridents = (index) => {
-    let newIngridients = [...ingredients];
-    newIngridients.splice(index, 1);
-    setIngredients(newIngridients);
+  const addIngredient = () => {
+    if (ingredient.trim()) {
+      setIngredients([...ingredients, { 
+        title: ingredient.trim(),
+        checked: false
+      }]);
+      setIngredient('');
+    }
+  };
+
+  const toggleIngredient = (index) => {
+    const newIngredients = [...ingredients];
+    newIngredients[index] = {
+      ...newIngredients[index],
+      checked: !newIngredients[index].checked
+    };
+    setIngredients(newIngredients);
+  };
+
+  const deleteIngredient = (index) => {
+    let newIngredients = [...ingredients];
+    newIngredients.splice(index, 1);
+    setIngredients(newIngredients);
   }
   
   return (
-    <View style={styles.mainView}>
+    <View style={globalStyles.mainView}>
       <ScrollView>
         <View>
           {/* Camera access or upload photo here */}
         </View>
 
-        <View style={styles.view}>
-          <Text style={styles.header}>Recipe Name</Text>
-          <TextInput style={styles.textInput} placeholder="eg. Beef Wellington"/>
+        <View style={[globalStyles.view, styles.addIngriedientSection]}>
+          <TextInput 
+            style={[globalStyles.textInput, styles.enterIngridientInput]} 
+            placeholder="Enter Ingredient"
+            value={ingredient}
+            onChangeText={setIngredient}
+            onSubmitEditing={addIngredient}
+          />
+          <TouchableOpacity 
+            style={styles.ingridientButton}
+            onPress={addIngredient}
+          >
+            <Text style={globalStyles.headerText2}>+</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.view}>
-          <Text style={styles.header}>Ingrdients</Text>
+        <View style={globalStyles.view}>
+          <Text style={globalStyles.headerText2}>Recipe Ingrdients</Text>
           <FlatList
             style={styles.ingredientsList}
             scrollEnabled={false}
             data={ingredients}
             renderItem={({item, index}) => (
               <View style={styles.tag}>
-                <Text style={styles.ingridientName}>{item.title}</Text>
                 <TouchableOpacity
-                  onPress={() => {
-                    deleteIngridents(index);
-                  }
-                }>
-                  <Text style={styles.closeButton}> X </Text>
+                  style={styles.checkButton}
+                  onPress={() => toggleIngredient(index)}
+                >
+                  <Text style={styles.checkmark}>{item.checked ? '✓' : ''}</Text>
+                </TouchableOpacity>
+                <Text style={[
+                  styles.ingridientName,
+                  item.checked && styles.checkedText
+                ]}>{item.title}</Text>
+                <TouchableOpacity
+                  onPress={() => deleteIngredient(index)}
+                >
+                  <Text style={styles.closeButton}>✕</Text>
                 </TouchableOpacity>
               </View>
             )}
           />
         </View>
-
-        <View style={styles.view}>
-          <Text style={styles.header}>Instructions</Text>
-          <TextInput
-            style={styles.textInput}
-            multiline={true}
-            placeholder="Step 1: ..."
-          />
-        </View>
       </ScrollView>
 
-      <View style={styles.uploadButtonSection}>
-        <TouchableOpacity style={styles.uploadButton}>
-          <Text style={styles.uploadText}>Upload Recipe</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={globalStyles.logMealButton}
+        onPress={() => navigation.navigate('Log Meal')}
+      >
+        <Image
+          style={globalStyles.logMealImage}
+          source={require('../../assets/adaptive-icon.png')}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  mainView: {
+  addIngriedientSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 0,
+  },
+  enterIngridientInput: {
     flex: 1,
-    backgroundColor: rootStyles.colors.background,
   },
-  view: {
-    margin: rootStyles.section.margin,
-  },
-  header: {
-    fontSize: rootStyles.headerText.fontSize,
-    fontWeight: rootStyles.headerText.fontWeight,
-  },
-  textInput: {
-    borderColor: rootStyles.colors.text,
-    borderWidth: rootStyles.section.borderWidth,
-    padding: rootStyles.section.padding,
-    marginTop: 5,
+  ingridientButton: {
+    backgroundColor: globalStyles.colors.primary,
+    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
+    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
+    padding: globalStyles.buttonValues.buttonPadding,
+    margin: globalStyles.buttonValues.buttonMargin,
   },
   ingredientsList: {
-    borderWidth: rootStyles.section.borderWidth,
-    backgroundColor: rootStyles.colors.backgroundSecondary,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
+    backgroundColor: globalStyles.colors.backgroundSecondary,
     marginTop: 10,
-    padding: rootStyles.section.padding,
+    padding: globalStyles.sectionValues.sectionPadding,
   },
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
     borderRadius: 16,
-    backgroundColor: rootStyles.colors.primary,
+    backgroundColor: globalStyles.colors.primary,
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 10,
   },
+  checkButton: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: globalStyles.colors.text,
+    borderRadius: 12,
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: globalStyles.colors.background,
+  },
+  checkmark: {
+    color: globalStyles.colors.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  checkedText: {
+    textDecorationLine: 'line-through',
+    opacity: 0.7,
+  },
   ingridientName: {
-    fontSize: rootStyles.tagText.fontSize,
+    fontSize: globalStyles.tagText.fontSize,
     marginRight: 5,
   },
   closeButton: {
     padding: 2,
-  },
-  uploadButtonSection: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-  },
-  uploadButton: {
-    backgroundColor: rootStyles.colors.primary,
-    borderWidth: rootStyles.button.borderWidth,
-    borderRadius: rootStyles.button.borderRadius,
-    paddingVertical: rootStyles.button.padding,
-    paddingHorizontal: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  uploadText: {
-    fontSize: rootStyles.headerText.fontSize,
-    fontWeight: rootStyles.headerText.fontWeight,
   },
 });

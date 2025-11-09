@@ -56,7 +56,7 @@ export default function SignInScreen({navigation}) {
         </TouchableOpacity>
 
         <View style={styles.subheading}>
-          <Text style={styles.bodyText}> Don’t have an account yet?
+          <Text style={styles.bodyText}> Don't have an account yet?
             <Text style={styles.textButton}
             onPress={() => navigation.navigate('SignUp')}
           > Sign up here

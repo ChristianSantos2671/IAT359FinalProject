@@ -2,12 +2,92 @@ import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react
 import { useEffect, useState } from "react";
 
 import globalStyles from '../utils/globalStyles';
+import { getMeals, removeMeal } from '../utils/storage';
+import { getRecipes, removeRecipe, getFavourites, toggleFavourite } from '../utils/db';
 
 export default function ProfileScreen({navigation}) {
   const [optionBarType, setOptionBarType] = useState('My Meals');
   const [meals, setMeals] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [favourites, setFavourites] = useState([]);
+
+  useEffect(() => {
+    const loadMeals = async () => {
+      //await AsyncStorage.clear();
+      try {
+        const loadedMeals = await getMeals();
+        setMeals(loadedMeals || []);
+      } catch (e) {
+        console.error('Error loading meals:', e);
+        setMeals([]);
+      }
+    };
+    loadMeals();
+
+    const loadRecipes = async () => {
+      try {
+        const loadedRecipes = await getRecipes();
+        setRecipes(loadedRecipes || []);
+      } catch (e) {
+        console.error('Error loading recipes:', e);
+        setRecipes([]);
+      }
+    };
+    loadRecipes();
+
+    const loadFavourites = async () => {
+      try {
+        const loadedFavourites = await getFavourites();
+        setFavourites(loadedFavourites || []);
+      } catch (e) {
+        console.error("Error loading favourites:", e);
+        setFavourites([]);
+      }
+    };
+    loadFavourites();
+  }, [meals, recipes, favourites]);
+
+  const deleteMeal = async (item) => {
+    try {
+      await removeMeal(item.name);
+      setMeals(prev => prev.filter(meal => meal.name !== meal.name));
+    } catch (e) {
+      console.error("Error deleting recipe:", e);
+    }
+  };
+
+  const deleteRecipe = async (item) => {
+    try {
+      await removeRecipe(item.id);
+      setRecipes(prev => prev.filter(recipe => recipe.id !== item.id));
+      // If it was a favourite, it will be removed from favourites automatically
+      setFavourites(prev => prev.filter(fav => fav.id !== item.id));
+    } catch (e) {
+      console.error("Error deleting recipe:", e);
+    }
+  };
+
+  const toggleFavouriteRecipe = async (item) => {
+    const isAlreadyFavourite = item.is_favourite === 1;
+    try {
+      await toggleFavourite(item.id, !isAlreadyFavourite);
+      // Update local state
+      setRecipes(prev => prev.map(recipe => 
+        recipe.id === item.id 
+          ? { ...recipe, is_favourite: isAlreadyFavourite ? 0 : 1 }
+          : recipe
+      ));
+      // Update favourites list
+      if (isAlreadyFavourite) {
+        setFavourites(prev => prev.filter(fav => fav.id !== item.id));
+      } else {
+        const updatedItem = { ...item, is_favourite: 1 };
+        setFavourites(prev => [...prev, updatedItem]);
+      }
+    } catch (e) {
+      console.error("Error toggling favourite:", e);
+    }
+  };
   
   return (
     <View style={globalStyles.mainView}>
@@ -83,19 +163,27 @@ export default function ProfileScreen({navigation}) {
                 }
                 renderItem={({item, index}) => (
                   <View style={styles.meal}>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => deleteMeal(item)}
+                    >
+                      <Text style={globalStyles.headerText}>✕</Text>
+                    </TouchableOpacity>
+
                     <Image
                       style={styles.mealImage}
                       source={require('../../assets/adaptive-icon.png')}
                     />
 
-                    <View>
-                      <View style={globalStyles.headerText2}>
+                    <View style={styles.mealTextContent}>
+                      <View style={styles.mealHeader}>
                         <Text style={globalStyles.headerText2}>{item.name}</Text>
-                        <Text style={globalStyles.headerText2}>-</Text>
                         <Text style={globalStyles.headerText2}>{item.date}</Text>
                       </View>
-                      <Text style={globalStyles.headerText2}>Recipe</Text>
-                      <Text style={styles.mealDescription}>{item.description}</Text>
+                      <Text style={[globalStyles.headerText2, styles.sectionTitle]}>Recipe</Text>
+                      <Text style={styles.mealDescription} numberOfLines={2}>{item.recipe}</Text>
+                      <Text style={[globalStyles.headerText2, styles.sectionTitle]}>Experience</Text>
+                      <Text style={styles.mealDescription} numberOfLines={2}>{item.experience}</Text>
                     </View>
                   </View>
                 )}
@@ -111,14 +199,37 @@ export default function ProfileScreen({navigation}) {
                 }
                 renderItem={({item, index}) => (
                   <View style={styles.recipe}>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => deleteRecipe(item)}
+                    >
+                      <Text style={globalStyles.headerText}>✕</Text>
+                    </TouchableOpacity>
+
                     <Image
                       style={styles.recipeImage}
                       source={require('../../assets/adaptive-icon.png')}
                     />
 
-                    <View>
-                      <Text style={globalStyles.headerText2}>{item.name}</Text>
-                      <Text style={globalStyles.bodyText}>{item.description}</Text>
+                    <View style={styles.recipeContent}>
+                      <View>
+                        <Text style={globalStyles.headerText2}>{item.name}</Text>
+                        <View style={styles.recipeIngredientsSection}>
+                          <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
+                        </View>
+                        <Text style={globalStyles.bodyText}>{item.instructions}</Text>
+                      </View>
+
+                      <View>
+                        <TouchableOpacity
+                          style={styles.favouriteButton}
+                          onPress={() => toggleFavouriteRecipe(item)}
+                        >
+                          <Text style={globalStyles.headerText}>
+                            {item.is_favourite === 1 ? '♥︎' : '♡'}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 )}
@@ -141,7 +252,10 @@ export default function ProfileScreen({navigation}) {
 
                     <View>
                       <Text style={globalStyles.headerText2}>{item.name}</Text>
-                      <Text style={globalStyles.bodyText}>{item.description}</Text>
+                      <View style={styles.recipeIngredientsSection}>
+                        <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
+                      </View>
+                      <Text style={globalStyles.bodyText}>{item.instructions}</Text>
                     </View>
                   </View>
                 )}
@@ -153,11 +267,11 @@ export default function ProfileScreen({navigation}) {
       })()}
 
       <TouchableOpacity
-        style={styles.logMealButton}
+        style={globalStyles.logMealButton}
         onPress={() => navigation.navigate('Log Meal')}
       >
         <Image
-          style={styles.logMealImage}
+          style={globalStyles.logMealImage}
           source={require('../../assets/adaptive-icon.png')}
         />
       </TouchableOpacity>
@@ -170,13 +284,13 @@ const styles = StyleSheet.create ({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginHorizontal: globalStyles.section.margin,
-    marginVertical: globalStyles.section.margin*2,
+    marginHorizontal: globalStyles.sectionValues.sectionMargin,
+    marginVertical: globalStyles.sectionValues.sectionMargin*2,
   },
   profileCircle: {
     width: 75,
     height: 75,
-    borderWidth: globalStyles.section.borderWidth,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.text,
     borderRadius: 50,
     backgroundColor: globalStyles.colors.primary,
@@ -192,17 +306,17 @@ const styles = StyleSheet.create ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: 200,
-    marginTop: globalStyles.section.margin,
+    marginTop: globalStyles.sectionValues.sectionMargin,
   },
   optionsBar: {
     flexDirection: 'row',
     backgroundColor: globalStyles.colors.backgroundSecondary,
     borderColor: globalStyles.colors.text,
-    borderWidth: globalStyles.section.borderWidth,
-    borderRadius: globalStyles.button.borderRadius,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
+    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
     height: 50,
-    marginHorizontal: globalStyles.section.margin,
-    marginBottom: globalStyles.section.margin,
+    marginHorizontal: globalStyles.sectionValues.sectionMargin,
+    marginBottom: globalStyles.sectionValues.sectionMargin,
   },
   optionButtonFlex: {
     flex: 1,
@@ -211,17 +325,17 @@ const styles = StyleSheet.create ({
   },
   optionButtonActive: {
     backgroundColor: globalStyles.colors.primary,
-    borderRadius: globalStyles.button.borderRadius,
+    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
     justifyContent: 'center',
-    borderWidth: globalStyles.section.borderWidth,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.text,
-    marginVertical: -globalStyles.section.borderWidth,
+    marginVertical: -globalStyles.sectionValues.sectionBorderWidth,
     marginHorizontal: -1,
     zIndex: 2,
   },
   optionContent: {
     flex: 1,
-    padding: globalStyles.section.padding,
+    padding: globalStyles.sectionValues.sectionPadding,
   },
   emptyContent: {
     textAlign: 'center',
@@ -230,62 +344,74 @@ const styles = StyleSheet.create ({
   },
   meal: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: globalStyles.colors.backgroundSecondary,
-    borderRadius: globalStyles.button.borderRadius,
-    borderWidth: globalStyles.section.borderWidth,
+    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.text,
-    padding: globalStyles.section.padding,
-    margin: globalStyles.section.margin/2,
+    padding: globalStyles.sectionValues.sectionPadding,
+    margin: globalStyles.sectionValues.sectionMargin/2,
   },
   mealImage: {
     width: '40%',
-    height: '100%',
+    height: 150,
     borderRadius: 10,
     marginRight: 10,
+  },
+  mealTextContent: {
+    flex: 1,
+    marginLeft: 10,
   },
   mealHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 5,
+    marginBottom: 10,
   },
   mealDescription: {
     fontSize: globalStyles.bodyText.fontSize,
-    width: 175,
+    color: globalStyles.colors.text,
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    marginTop: 4,
+    marginBottom: 2,
+    color: globalStyles.colors.primary,
   },
   recipe: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: globalStyles.colors.backgroundSecondary,
-    borderRadius: globalStyles.button.borderRadius,
-    borderWidth: globalStyles.section.borderWidth,
+    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.text,
-    padding: globalStyles.section.padding,
-    margin: globalStyles.section.margin/2,
+    padding: globalStyles.sectionValues.sectionPadding,
+    margin: globalStyles.sectionValues.sectionMargin/2,
   },
   recipeImage: {
     width: '100%',
-    height: '30%',
+    height: 150,
     borderRadius: 10,
-    marginRight: 10,
+    marginBottom: 10,
   },
-  logMealButton: {
+  recipeContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  recipeIngredientsSection: {
+    marginVertical: globalStyles.sectionValues.sectionMargin/2,
+  },
+  favouriteButton: {
+    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
+    borderColor: globalStyles.colors.text,
+    padding: globalStyles.buttonValues.buttonPadding,
+  },
+  deleteButton: {
     position: 'absolute',
     right: 0,
-    bottom: 0,
-    width: 60,
-    height: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: globalStyles.colors.primary,
-    borderRadius: globalStyles.button.borderRadius,
-    borderWidth: globalStyles.section.borderWidth,
-    borderColor: globalStyles.colors.text,
-    margin: globalStyles.section.margin,
-    padding: globalStyles.section.padding,
-  },
-  logMealImage: {
-    width: 40,
-    height: 40,
+    top: 0,
+    margin: globalStyles.sectionValues.sectionMargin,
+    zIndex: 1,
   },
 });

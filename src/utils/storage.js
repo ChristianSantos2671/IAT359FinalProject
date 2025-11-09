@@ -1,30 +1,49 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const KEY = 'userPrefs';
-
-export async function saveUserPrefs(name, color) {
+export async function storeData(key, value) {
   try {
-    const payLoad = JSON.stringify({name, color});
-    await AsyncStorage.setItem(KEY, payLoad);
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem(key, jsonValue);
+    return true;
   } catch (e) {
-    console.warn('Failaed to save prefs', e);
+    console.error("Error storing data", e);
+    return false;
   }
 }
 
-export async function loadUserPrefs() {
+export async function getMeals() {
   try {
-    const raw = await AsyncStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : null;
+    const jsonValue = await AsyncStorage.getItem('@meals');
+    return jsonValue != null ? JSON.parse(jsonValue) : [];
   } catch (e) {
-    console.warn('Failaed to fetch prefs', e);
-    return null;
+    console.error("Error reading meals", e);
+    return [];
   }
 }
 
-export async function removeUserPrefs() {
+export async function saveMeal(meal) {
   try {
-    await AsyncStorage.removeItem(KEY);
+    const meals = await getMeals();
+    meals.unshift(meal);
+    await storeData('@meals', meals);
+    return true;
   } catch (e) {
-    console.warn('Failerd to clear prefs', e);
+    console.error("Error saving meal", e);
+    return false;
   }
 }
+
+export async function removeMeal(mealName) {
+  try {
+    const meals = await getMeals();
+    const updatedMeals = meals.filter(meal => meal.name !== mealName);
+    await storeData('@meals', updatedMeals);
+    return true;
+  } catch (e) {
+    console.error("Error removing meal", e);
+    return false;
+  }
+}
+
+// Recipe functions removed - now using SQLite in db.js
+// Favourite functions removed - now using is_favourite boolean in recipes table

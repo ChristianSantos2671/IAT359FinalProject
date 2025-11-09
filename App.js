@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { firebase_auth } from './src/utils/firebaseConfig.js';
+import { initRecipesTable } from './src/utils/db.js';
 
 
 // Importing screens
@@ -53,6 +54,11 @@ export default function App() {
     const [initializing, setInitializing] = useState(true);
 
     useEffect(() => {
+      // Initialize recipes table
+      initRecipesTable().catch(err => {
+        console.error('Failed to initialize recipes table:', err);
+      });
+
       const unsubscribe = onAuthStateChanged(firebase_auth, (u) => {
         setUser(u);
         if (initializing) setInitializing(false);
@@ -75,7 +81,7 @@ export default function App() {
 
           {/* Stack screens that appear on top of tabs */}
           <Stack.Screen 
-          name="LogMeal" 
+          name="Log Meal" 
           component={LogMealScreen} />
 
           <Stack.Screen name="Recipe Details" 
