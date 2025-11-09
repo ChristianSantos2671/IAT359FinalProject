@@ -1,39 +1,69 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import globalStyles from '../utils/globalStyles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { get } from 'lodash';
+
+// Function to generate a random integer between min and max (inclusive)
+const getRandomInt = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+
 
 export default function RecipeDetailsScreen({navigation, route}) {
   const { meal } = route.params; 
   const [optionBarType, setOptionBarType] = useState('Details');
+  // Generate random numbers
+  const randomServings = getRandomInt(1, 6);
+  const randomPrepTime = getRandomInt(10, 30);
+  const randomCookTime = getRandomInt(15, 60);
+  const insets = useSafeAreaInsets();
+
+  
+  // making the list of ingredients + measurements
+  const ingredientsList = [];
+
+  for (let i = 1; i <= 20; i++) {
+    const ingredient = meal[`strIngredient${i}`];
+    const measure = meal[`strMeasure${i}`];
+
+    // check if ingredient exists
+    if (ingredient && ingredient.trim() !== '') {
+      // adding measurement + ingredient as one item 
+      ingredientsList.push(`${i}. ${measure ? measure : ''} ${ingredient}`.trim());
+    }
+  }; 
+
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.paddingHorizontal, styles.topContainer]}>
+    <View style={globalStyles.container}> 
+    <ScrollView>  
+
+      <View style={[globalStyles.paddingHorizontal, globalStyles.topContainer]}>
 
       <Image 
         source={{ uri: meal.strMealThumb }} 
         style={styles.Image} 
       />
 
-      <Text style={[styles.h2, styles.textMargins]}>{meal.strMeal}</Text>
-      {/* short description of the recipe*/}
-      <Text style={[styles.subheading, styles.textMargins]}>Recipe details...Vivamus id hendrerit ipsum, et suscipit ex. Sed rutrum consectetur lacus. Phasellus posuere turpis ipsum, sit amet finibus est cursus quis. Integer viverra dolor a tellus mattis, id ullamcorper elit varius.  </Text>
-      
+      <Text style={[globalStyles.h2, globalStyles.textMargins]}>{meal.strMeal}</Text>
+
+      {/* Later use Gemini to create a short text description of the recipe*/}
+      <Text style={[globalStyles.subheading, globalStyles.textMargins]}>A delightful dish that combines flavors and textures to create a memorable culinary experience.</Text>
+       
        {/* tags  */}
-        <View style={styles.tagContainer}>
-            {/*include country tag*/}
-            <TouchableOpacity>
-                <Text style={styles.tag}> {meal.strArea} </Text>
-            </TouchableOpacity>
-            {/*include any special tag like vegan, vegetarian*/}
-            <TouchableOpacity>
-                <Text style={styles.tag}> Vegan </Text>
-            </TouchableOpacity>
-            {/*include difficulty tag*/}
-            <TouchableOpacity>
-                <Text style={styles.tag}> Beginner-Friendly </Text>
-            </TouchableOpacity>
-        </View>
+        <View style={globalStyles.tagContainer}>
+            <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {meal.strCategory} </Text>
+            <Text style={[globalStyles.tag, globalStyles.areaTag]}>{meal.strArea} </Text>
+            {/*splitting the tags string into individual tags */}
+              {meal.strTags && meal.strTags.split(',').slice(0,3).map((tag, index) => (
+              <Text key={index} style={[globalStyles.tag, globalStyles.otherTags]}>
+                {tag.trim()}
+              </Text>
+            ))}
+       </View>
       
       {/* Option bar for Details, Ingredients, Instructions */}
         <View style={styles.optionsBar}>
@@ -65,24 +95,19 @@ export default function RecipeDetailsScreen({navigation, route}) {
             case 'Details':
             return (
                 <ScrollView style={styles.optionContent}>
-                <View style= {[styles.paddingHorizontal, styles.textSection]}>
-                    <Text style={styles.h3}> Nutritions </Text>
-                    <Text styles={styles.bodyText}> Inserts nutritients </Text>
-                    </View>
-
-                <View style= {[styles.paddingHorizontal, styles.textSection]}>
-                    <Text style={styles.h3}> Prep Time </Text>
-                    <Text styles={styles.bodyText}> Inserts prep time </Text>
+                <View style= {[globalStyles.paddingHorizontal, globalStyles.textSection]}>
+                    <Text style={globalStyles.h3}>Prep Time </Text>
+                    <Text style={globalStyles.bodyText}>{`${randomPrepTime} minutes`} </Text>
                 </View>
 
-                <View style= {[styles.paddingHorizontal, styles.textSection]}>
-                    <Text style={styles.h3}> Cook Time </Text> 
-                    <Text styles={styles.bodyText}> Inserts cook time </Text>  
+                <View style= {[globalStyles.paddingHorizontal, globalStyles.textSection]}>
+                    <Text style={globalStyles.h3}>Cook Time </Text> 
+                    <Text style={globalStyles.bodyText}>{`${randomCookTime} minutes`}</Text>  
                 </View>
 
-                <View style= {[styles.paddingHorizontal, styles.textSection]}>
-                    <Text style={styles.h3}> Servings </Text>
-                    <Text styles={styles.bodyText}> Inserts servings </Text>   
+                <View style= {[globalStyles.paddingHorizontal, globalStyles.textSection]}>
+                    <Text style={globalStyles.h3}>Servings </Text>
+                    <Text style={globalStyles.bodyText}>{`${randomServings} servings`}</Text>   
                 </View>
                 </ScrollView>
             );
@@ -90,9 +115,12 @@ export default function RecipeDetailsScreen({navigation, route}) {
             case 'Ingredients':
             return (
                 <ScrollView> 
-                    <View style={[styles.paddingHorizontal, styles.textSection]}>
-                   <Text style={styles.h3}> Ingredients </Text>
-                   <Text> Ingredients list + measurements of things </Text>
+                  <View style={[globalStyles.paddingHorizontal, globalStyles.textSection]}>
+                   <Text style={globalStyles.h3}>Ingredients </Text>
+                   {ingredientsList.map((item, index) => (
+                      <Text key={index} style={globalStyles.bodyText}> {item}
+                      </Text>
+                    ))}
                    </View>
                 </ScrollView>
             );
@@ -100,9 +128,9 @@ export default function RecipeDetailsScreen({navigation, route}) {
             case 'Instructions':
             return (
                 <ScrollView>
-                    <View style={[styles.paddingHorizontal, styles.textSection]}>
-                        <Text style={styles.h3}>Instructions </Text>
-                        <Text style={styles.bodyText}>{meal.strInstructions}</Text>
+                    <View style={[globalStyles.paddingHorizontal, globalStyles.textSection]}>
+                        <Text style={globalStyles.h3}>Instructions </Text>
+                        <Text style={globalStyles.bodyText}>{meal.strInstructions}</Text>
                     </View>
                 </ScrollView>
             );
@@ -112,53 +140,31 @@ export default function RecipeDetailsScreen({navigation, route}) {
         }
         })()}
 
+     </ScrollView>
+
         {/* Bottom buttons for Grocery List and Log Meal */}
          <View style={styles.bottomButtons}>
             <TouchableOpacity 
-            style={styles.secondaryButton}
-            onPress={() => navigation.navigate('Grocery List')}
+            style={globalStyles.secondaryButton}
+            onPress={() => navigation.navigate("Grocery List")}
             >
-                <Text style={styles.secondaryButtonText}>Shop Ingredients</Text>
+                <Text style={globalStyles.secondaryButtonText}>Shop Ingredients</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-                style={styles.primaryButton}
+                style={globalStyles.primaryButton}
                 onPress={() => navigation.navigate("Log Meal")}
             >
-                <Text style={styles.secondaryButtonText}>Log Meal</Text>
+                <Text style={globalStyles.primaryButtonText}>Log Meal</Text>
             </TouchableOpacity>
         </View>
     </View>
-  );
+    );
  
 } 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    paddingTop: 20,
-  },
-
-  h1: {
-    color: 'green',
-    fontWeight: '700',
-    fontSize: 36,
-  },
-  h2: {
-    fontSize: 24,
-    fontWeight: "600",
-  },
-  h3: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  subheading: {
-    fontSize: 16,
-    color: "#3f3f3fff",
-    marginBottom: 6,
-  },
+  
   Image: {
     width: '100%',
     height: 200,
@@ -166,14 +172,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  paddingHorizontal: {
-    paddingHorizontal: 16,
-  },
-  topContainer: {
-    backgroundColor: 'white',
-    paddingBottom: 10,
-    marginBottom: 10,
-  },
   optionsBar: {
     flexDirection: 'row',
     marginVertical: 10,
@@ -189,40 +187,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   optionButtonActive: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: globalStyles.colors.primary,
   },
 
   optionButtonText: {
-    color: '#4CAF50',
+    color: globalStyles.colors.primary,
   },
 
   optionButtonTextActive: {
     color: 'white',
     fontWeight: '600',
   },
-
-  textSection: {
-    marginBottom: 15,
-  },
-
-   tagContainer: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-
-  tag: { 
-    backgroundColor: '#4CAF50',
-    textAlign: 'center',
-    color: '#fff',
-    paddingHorizontal: 12,  
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-
-  textMargins: {
-    marginBottom: 15,
-  }, 
 
   bottomButtons: {
   flexDirection: "row",
@@ -231,34 +206,4 @@ const styles = StyleSheet.create({
   paddingHorizontal: 16,
 },
 
-primaryButton: {
-backgroundColor: "#4CAF50",
-paddingVertical: 10,
-paddingHorizontal: 20,
-borderRadius: 8,
-flex: 1,
-marginLeft: 8,
-alignItems: "center",
-},
-
-secondaryButton: {
-backgroundColor: "#f2f2f2",
-paddingVertical: 10,
-paddingHorizontal: 20,
-borderRadius: 8,
-flex: 1,
-marginRight: 8,
-alignItems: "center",
-},
-
-primaryButtonText: {
-color: "#fff",
-fontWeight: "600",
-},
-
-secondaryButtonText: {
-color: "#4CAF50",
-fontWeight: "600",
-},
-  
 });

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, Alert, TextInput, Text, View } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { firebase_auth } from '../utils/firebaseConfig.js';
-//import { db } from '../util/firebaseConfig';
-//import { doc, setDoc } from 'firebase/firestore';
+import { firebase_auth, db } from '../utils/firebaseConfig.js';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function SignUpScreen({navigation}) {
     const [email, setEmail] = useState('');
@@ -23,8 +22,15 @@ export default function SignUpScreen({navigation}) {
           setLoading(true);
           const userCredential = await createUserWithEmailAndPassword(firebase_auth, email.trim(), password);
           const user = userCredential.user;
-          //await setDoc(doc(db, 'users', user.uid), { fullName, username, email });
           Alert.alert("Account successfully created!");
+          // save user info
+          await setDoc(
+            doc(db, 'Users', user.uid), {
+              fullName,
+              username,
+              email,
+              createdAt: serverTimestamp(),
+            });
       } catch (e) {
           Alert.alert("Failed to create account", e.message);
       } finally {

@@ -72,12 +72,13 @@ const styles = StyleSheet.create ({
   },
 }); */}
 
-import { View, Text, StyleSheet, Button, TextInput, Image, FlatList, TouchableOpacity, Platform, StatusBar, ActivityIndicator, Alert } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, Button, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import filter from "lodash/filter";
+import { signOut } from 'firebase/auth';
+import { firebase_auth } from '../utils/firebaseConfig';
 import globalStyles from "../utils/globalStyles";
 
 const API_ENDPOINT = (query) =>
@@ -89,6 +90,18 @@ export default function HomeScreen({navigation}) {
   const [error, setError] = useState(null);
   const [fullData, setFullData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const insets = useSafeAreaInsets();
+
+// sign out 
+const logout = async () => {
+  try {
+    await signOut(firebase_auth);
+    Alert.alert('You have been signed out successfully.');
+  } catch (error) {
+    console.error('Sign out error:', error);
+    Alert.alert('Error', 'Failed to sign out. Please try again.');
+  }
+};
 
 // api loading the data 
   const fetchData = async(url) => {
@@ -102,7 +115,7 @@ export default function HomeScreen({navigation}) {
 
     } catch (error) { 
       setError(error);
-      Alert.alert("Could not search recipe", e.message);
+      Alert.alert("Could not search recipe", error.message);
       console.log(error);
 
     } finally {
@@ -133,17 +146,22 @@ export default function HomeScreen({navigation}) {
 
   if(isLoading) {
     return (
-      <View style={styles.loader}>
+      <View style={globalStyles.loader}>
         <ActivityIndicator size={'large'} color="green" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={[styles.topContainer, styles.paddingHorizontal]}>
-        <Text style={[styles.h1, styles.textMargins]} >Explore Recipes </Text>
-        <Text style={[styles.subheadingstyles, styles.textMargins]} >Discover new flavors and find your next favorite dish. Search, browse, and get inspired by thousands of recipes. </Text>
+    <View style={globalStyles.container}>
+      <View style={[globalStyles.topContainer, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
+        <View style={styles.signOutfeature}>
+          <Text style={[globalStyles.h1, globalStyles.textMargins]} >Explore Recipes </Text>
+          <TouchableOpacity onPress={logout}>
+              <Ionicons name="log-out" size={30} color="#4CAF50" />
+          </TouchableOpacity>
+        </View>
+        <Text style={[globalStyles.subheadingstyles, globalStyles.textMargins]} >Discover new flavors and find your next favorite dish. Search, browse, and get inspired by thousands of recipes. </Text>
         
         {/* search bar  + camera */}
         <View style={styles.searchContainer}>
@@ -168,31 +186,33 @@ export default function HomeScreen({navigation}) {
           </TouchableOpacity>
         </View>
 
-        {/* tags  */}
-        <View style={styles.tagContainer}>
+        {/* tags / filter will continue to work on this later */}
+        {/*
+        <View style={globalStyles.tagContainer}>
           <TouchableOpacity>
-            <Text style={styles.tag}> Vegan </Text>
+            <Text style={globalStyles.tag}> Vegan </Text>
           </TouchableOpacity>
           <TouchableOpacity>
-            <Text style={styles.tag}> Gluten-Free </Text>
+            <Text style={globalStyles.tag}> Gluten-Free </Text>
           </TouchableOpacity>
           <TouchableOpacity>
-            <Text style={styles.tag}> Quick & Easy </Text>
+            <Text style={globalStyles.tag}> Quick & Easy </Text>
           </TouchableOpacity>
           <TouchableOpacity>
-            <Text style={styles.tag}> Desserts </Text>
+            <Text style={globalStyles.tag}> Desserts </Text>
           </TouchableOpacity>
-        </View>
+        </View>*/}
+
       </View>
-     {/* recipe list  */}
+      {/* recipe list  */}
       <FlatList
         data={data}
-        style={styles.paddingHorizontal}
+        style={globalStyles.paddingHorizontal}
         keyExtractor={(item) => item.idMeal}
         renderItem={({ item }) => (
           
           <TouchableOpacity
-            style={[styles.itemContainer, styles.dropshadow]}
+            style={[styles.itemContainer, globalStyles.dropshadow]}
             onPress={() => navigation.navigate('Recipe Details', { meal: item })} 
           >
               <Image 
@@ -200,20 +220,22 @@ export default function HomeScreen({navigation}) {
               style={styles.thumbnail} 
               />
 
-              <View style={{ flex: 1 }}>
-                <Text style={styles.h3}>{item.strMeal}</Text>
-                <Text
-                  style={styles.bodyText}
-                  numberOfLines={3}
-                  ellipsizeMode="tail"
-                >
-                  {item.strInstructions}
-                </Text>
+              <View style={styles.mealCardTextContainer}>
+                <Text style={globalStyles.h3}>{item.strMeal}</Text>
+                <View style={globalStyles.tagContainer}>
+                  <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {item.strCategory} </Text>
+                  <Text style={[globalStyles.tag, globalStyles.areaTag]}> {item.strArea} </Text>
+                  {/*splitting the tags string into individual tags */}
+                  {item.strTags && item.strTags.split(',').slice(0,3).map((tag, index) => (
+                    <Text key={index} style={[globalStyles.tag, globalStyles.otherTags]}>
+                    {tag.trim()}
+                    </Text>
+                  ))}
+                </View>
               </View>
           </TouchableOpacity>
         )}
       />
-
       <TouchableOpacity
         style={globalStyles.logMealButton}
         onPress={() => navigation.navigate('Log Meal')}
@@ -223,76 +245,19 @@ export default function HomeScreen({navigation}) {
           source={require('../../assets/adaptive-icon.png')}
         />
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
   }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    padding: 0,
-  },
-// global styles 
-   h1: {
-     color: 'green',
-     fontWeight: '700',
-     fontSize: 36,
-  },
 
-  h2: {
-    fontSize: 24,
-    fontWeight: "600",
-  },
+    // page specific styles
+  signOutfeature: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
 
-   h3: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  
-  subheading: {
-    fontSize: 16,
-    fontColor: "#3f3f3fff",
-    marginBottom: 6,
-  },
-
-  bodyText: {
-    fontSize: 14,
-    color: "#555",
-    lineHeight: 18,
-    maxWidth: '95%',
-  },
-
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  // dropshadow style for meal items, logs, etc
-  dropshadow: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-
-  textMargins: {
-    marginBottom: 15,
-  },
-
-  paddingHorizontal: {
-    paddingHorizontal: 16,
-  },
-
-  topContainer: {
-    backgroundColor: 'white',
-    paddingBottom: 10,
-    marginBottom: 10,
-  },
-
-  // page specific styles
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -305,39 +270,31 @@ const styles = StyleSheet.create({
   },
   
   searchBar: {
-    flex: 3,
+    flex: 1,
     height: 40,
     fontSize: 16,
   },
 
   itemContainer: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'row',
     marginTop: 10,
     gap: 15,   
-    width: '100%',
     backgroundColor: "#f9f9f9",
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: globalStyles.colors.primary,
+  },
+
+  mealCardTextContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
 
   thumbnail: {
     width: 100,
     height: 100,
-    borderRadius: 8,
-  },
-  tagContainer: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-
-  tag: { 
-    backgroundColor: '#4CAF50',
-    textAlign: 'center',
-    color: '#fff',
-    paddingHorizontal: 12,  
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
+    borderRadius: 12,
   },
 });
