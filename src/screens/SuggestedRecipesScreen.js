@@ -115,7 +115,6 @@ export default function SuggestedRecipesScreen({ route, navigation }) {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[styles.itemContainer, globalStyles.dropshadow]}
-            // 
             onPress={() => navigation.navigate("Recipe Details", { meal: item })}
           >
             <Image source={{ uri: item.strMealThumb }} style={styles.thumbnail} />
