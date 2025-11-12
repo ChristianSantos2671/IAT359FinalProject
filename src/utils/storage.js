@@ -44,6 +44,3 @@ export async function removeMeal(mealName) {
     return false;
   }
 }
-
-// Recipe functions removed - now using SQLite in db.js
-// Favourite functions removed - now using is_favourite boolean in recipes table

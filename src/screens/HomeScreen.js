@@ -72,7 +72,7 @@ const styles = StyleSheet.create ({
   },
 }); */}
 
-import { View, Text, StyleSheet, Button, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -165,23 +165,24 @@ const logout = async () => {
         
         {/* search bar  + camera */}
         <View style={styles.searchContainer}>
-            <TextInput
-            placeholder="Search a recipe"
-            clearButtonMode= "always"
-            style={styles.searchBar}
-            autoCapitalize="none"
-            autoCorrect={false}
-            value={searchQuery}
-            onChangeText={(query) => handleSearch(query)}
-            />
+          <TextInput
+          placeholder="Search a recipe"
+          clearButtonMode= "always"
+          style={styles.searchBar}
+          autoCapitalize="none"
+          autoCorrect={false}
+          value={searchQuery}
+          onChangeText={(query) => handleSearch(query)}
+          />
 
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <Ionicons name="close-circle" size={22} />
-              </TouchableOpacity>
-        )}
-        {/* camera icon + add searching with the camera */}
-          <TouchableOpacity onPress={() => {}}>
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Ionicons name="close-circle" size={22} />
+            </TouchableOpacity>
+          )}
+
+          {/* camera icon + add searching with the camera */}
+          <TouchableOpacity onPress={() => { navigation.navigate('CameraScreen') }}>
             <Ionicons name="camera" size={30} color="#4CAF50" />
           </TouchableOpacity>
         </View>

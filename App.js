@@ -17,10 +17,14 @@ import HomeScreen from './src/screens/HomeScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import GroceryListScreen from './src/screens/GroceryListScreen';
 import RecipeDetailsScreen from './src/screens/RecipeDetailsScreen';
+import CameraScreen from './src/screens/CameraScreen';
+import CameraPreviewScreen from './src/screens/CameraPreviewScreen';
+import SuggestedRecipesScreen from './src/screens/SuggestedRecipesScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+// These tabs are used the show the four major sections of the app.
 function Tabs() {
   return (
     <Tab.Navigator>
@@ -55,7 +59,7 @@ export default function App() {
   const [initializing, setInitializing] = useState(true);
 
     useEffect(() => {
-      // Initialize recipes table
+      // Initialize the recipes database table.
       initRecipesTable().catch(err => {
         console.error('Failed to initialize recipes table:', err);
       });
@@ -82,26 +86,42 @@ export default function App() {
         {/*// Checking if user is logged in*/}
         {user ? (
           <>
-          <Stack.Screen 
-          name="MainTabs" 
-          component={Tabs} 
-          options={{ headerShown: false }} 
-          />
+            <Stack.Screen 
+            name="MainTabs" 
+            component={Tabs} 
+            options={{ headerShown: false }} 
+            />
 
-          {/* Stack screens that appear on top of tabs */}
-          <Stack.Screen 
-          name="Log Meal" 
-          component={LogMealScreen} />
+            {/* Stack screens that appear on top of tabs */}
+            <Stack.Screen 
+              name="Log Meal" 
+              component={LogMealScreen}
+            />
 
-          <Stack.Screen name="Recipe Details" 
-          component={RecipeDetailsScreen} 
-          />
+            <Stack.Screen
+              name="Recipe Details" 
+              component={RecipeDetailsScreen} 
+            />
 
+            {/* These are the three screens for the camer and image recognition feature. */}
+            <Stack.Screen
+              name="CameraScreen"
+              component={CameraScreen} 
+            />
+
+            <Stack.Screen
+              name="Camera Preview"
+              component={CameraPreviewScreen}
+            />
+
+            <Stack.Screen
+              name="Suggested Recipes"
+              component={SuggestedRecipesScreen}
+            />          
           </>
         ) : (
-
           <>
-          {/*User not logged in*/}
+            {/*User not logged in*/}
             <Stack.Screen 
             name="SignIn" 
             component={SignInScreen} 
