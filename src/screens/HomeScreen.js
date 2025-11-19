@@ -92,6 +92,11 @@ export default function HomeScreen({navigation}) {
   const [searchQuery, setSearchQuery] = useState("");
   const insets = useSafeAreaInsets();
 
+  //filter states 
+  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [selectedArea, setSelectedArea] = useState([]);
+
+
 // sign out 
 const logout = async () => {
   try {
@@ -109,9 +114,15 @@ const logout = async () => {
       setLoading(true);
       const response = await fetch(url);
       const json = await response.json();
-      setData(json.meals || []);
-      console.log(json.meals);
-      setFullData(json.meals || []);
+
+      // filter out meals with no thumbnail img
+      const mealsWithThumb = (json.meals || []).filter(
+        meal => meal.strMealThumb && meal.strMealThumb.trim() !== ""
+      );
+
+      setData(mealsWithThumb);
+      setFullData(mealsWithThumb);
+      console.log(mealsWithThumb);
 
     } catch (error) { 
       setError(error);
@@ -127,23 +138,79 @@ const logout = async () => {
     fetchData(API_ENDPOINT(""));
   } , []);
   
-  {/* searching + filtering the data */}
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-
-    if (query.trim() === "") {
-      setData(fullData);
-      return;
-    }
-    const formattedQuery = query.toLowerCase();
-    const filteredData = filter(fullData, (meal) => contains(meal, formattedQuery));
-    setData(filteredData);
-  };
-
-  const contains = ({ strMeal }, query) => { 
-    return strMeal.toLowerCase().includes(query);
-  }; 
-
+  useEffect(() => {
+     filterMeals();
+     }, [selectedCategory, selectedArea, searchQuery]);
+ 
+ 
+ 
+ const contains = (meal, query) => {
+   const { strMeal, strCategory, strArea, strTags } = meal;
+   
+   // convert all querries to lowercase 
+   const formattedQuery = query.toLowerCase();
+ 
+   // checking meal
+   if (strMeal.toLowerCase().includes(formattedQuery)) return true;
+ 
+   // checking category
+   if (strCategory?.toLowerCase().includes(formattedQuery)) return true;
+ 
+   // checking area
+   if (strArea?.toLowerCase().includes(formattedQuery)) return true;
+ 
+   // checking tags
+   if (strTags) {
+     // need to split tags 
+     const tagsArray = strTags.split(',').map(tag => tag.trim().toLowerCase());
+     if (tagsArray.some(tag => tag.includes(formattedQuery))) return true;
+   }
+ 
+   return false;
+ };
+ 
+ const filterMeals = () => {
+   let filtered = fullData;
+ 
+   if (selectedCategory.length > 0) {
+     filtered = filtered.filter(meal => selectedCategory.includes(meal.strCategory));
+   }
+ 
+   if (selectedArea.length > 0) {
+     filtered = filtered.filter(meal => selectedArea.includes(meal.strArea));
+   }
+ 
+   //filter on top of what is being searched
+   if (searchQuery.trim() !== "") {
+     filtered = filtered.filter(meal => contains(meal, searchQuery));
+   }
+ 
+   setData(filtered);
+ };
+ 
+ 
+ const resetFilters = () => {
+     setSelectedCategory([]);
+     setSelectedArea([]);
+     setSearchQuery("");
+     setData(fullData); // reset the displayed meals to all meals
+     };
+ 
+ 
+   {/* searching + filtering the data */}
+   const handleSearch = (query) => {
+     setSearchQuery(query);
+ 
+     if (query.trim() === "") {
+       setData(fullData);
+       return;
+     }
+ 
+     const formattedQuery = query.toLowerCase();
+     const filteredData = filter(fullData, (meal) => contains(meal, formattedQuery));
+     setData(filteredData);
+   };
+ 
   if(isLoading) {
     return (
       <View style={globalStyles.loader}>
@@ -151,6 +218,25 @@ const logout = async () => {
       </View>
     );
   }
+
+  const toggleFilters = (value, type) => {
+  switch (type) {
+    case 'category':
+      setSelectedCategory(prev =>
+        prev.includes(value) ? prev.filter(c => c !== value) : [...prev, value]
+      );
+      break;
+
+    case 'area':
+      setSelectedArea(prev =>
+        prev.includes(value) ? prev.filter(a => a !== value) : [...prev, value]
+      );
+      break;
+
+    default:
+      break;
+  }
+};
 
   return (
     <View style={globalStyles.container}>
@@ -186,23 +272,40 @@ const logout = async () => {
           </TouchableOpacity>
         </View>
 
-        {/* tags / filter will continue to work on this later */}
-        {/*
-        <View style={globalStyles.tagContainer}>
-          <TouchableOpacity>
-            <Text style={globalStyles.tag}> Vegan </Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={globalStyles.tag}> Gluten-Free </Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={globalStyles.tag}> Quick & Easy </Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={globalStyles.tag}> Desserts </Text>
-          </TouchableOpacity>
-        </View>*/}
+        <View style={[globalStyles.tagContainer, styles.tagsSearch]}>
+            <Text style={globalStyles.bodyText}>
+                Popular tags:
+            </Text>
+            <TouchableOpacity onPress={() => toggleFilters('Vegetarian', 'category')}>
+                <Text style={[globalStyles.tag, selectedCategory.includes('Vegetarian') ? globalStyles.categoryTag : null]}>Vegetarian</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => toggleFilters('Seafood', 'category')}>
+                <Text style={[globalStyles.tag, selectedCategory.includes('Seafood') ? globalStyles.categoryTag : null]}>Seafood</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => toggleFilters('Dessert', 'category')}>
+                <Text style={[globalStyles.tag, selectedCategory.includes('Dessert') ? globalStyles.categoryTag : null]}>Dessert</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => toggleFilters('Side', 'category')}>
+                <Text style={[globalStyles.tag, selectedCategory.includes('Side') ? globalStyles.categoryTag : null]}>Side</Text>
+            </TouchableOpacity>
 
+            <TouchableOpacity onPress={() => toggleFilters('Turkish', 'area')}>
+                <Text style={[globalStyles.tag, selectedArea.includes('Turkish') ? globalStyles.areaTag : null]}>Turkish</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => toggleFilters('British', 'area')}>
+                <Text style={[globalStyles.tag, selectedArea.includes('British') ? globalStyles.areaTag : null]}>British</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => toggleFilters('Canadian', 'area')}>
+                <Text style={[globalStyles.tag, selectedArea.includes('Canadian') ? globalStyles.areaTag : null]}>Canadian</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => toggleFilters('Japanese', 'area')}>
+                <Text style={[globalStyles.tag, selectedArea.includes('Japanese') ? globalStyles.areaTag : null]}>Japanese</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={resetFilters}>
+                <Text style={[globalStyles.tag, {color: 'red'}]}>Clear Filters</Text>
+            </TouchableOpacity>
+        </View>
       </View>
       {/* recipe list  */}
       <FlatList
@@ -261,7 +364,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderColor: "gray",
+    borderColor: globalStyles.colors.border,
     borderWidth: 1,
     borderRadius: 8,
     backgroundColor: "#fff",

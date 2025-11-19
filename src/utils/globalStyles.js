@@ -7,6 +7,9 @@ const colors = {
   backgroundSecondary: '#cbcbcbff',
   topContainer: '#ffffff',
   text: '#212121',
+  subtext: "#616161",
+  border: "#E0E0E0",
+  tagBackground: "#F5F5F5"
 };
 
 const sectionValues = {
@@ -84,34 +87,34 @@ const globalStyles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
-   h1: {
-     color: colors.primary,
-     fontWeight: '700',
-     fontSize: 36,
+  h1: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: colors.text,
   },
-
   h2: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "600",
+    color: colors.text,
   },
 
-   h3: {
-    fontSize: 18,
+  h3: {
+    fontSize: 16,
     fontWeight: "600",
-    marginBottom: 4,
+    color: colors.text,
   },
   
   subheading: {
-    fontSize: 16,
-    fontColor: "#3f3f3fff",
     marginBottom: 6,
+    fontSize: 16,
+    color: colors.subtext,
+    lineHeight: 20,
   },
 
   bodyText: {
     fontSize: 14,
     color: "#555",
     lineHeight: 18,
-    maxWidth: '95%',
   },
 
   loader: {
@@ -143,34 +146,35 @@ const globalStyles = StyleSheet.create({
     marginBottom: 10,
   },
 
+  // tag styles
   tagContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 2,
-    width: '100%',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 5,
+    marginTop: 5,
   },
 
-  tag: { 
-    textAlign: 'center',
-    color: '#fff',
-    paddingHorizontal: 8,  
-    paddingVertical: 4,
-    borderRadius: 16,
-    marginRight: 2,
+  tag: {
     fontSize: 12,
-    marginBottom: 4,
-  },
-
-  areaTag: {
-    backgroundColor: '#f4a259',
+    backgroundColor: colors.tagBackground,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
 
   categoryTag: {
-    backgroundColor: '#8cb369',
+    backgroundColor: "#E8F5E9", // light green tint
+    color: colors.primary,
+  },
+  
+  areaTag: {
+    backgroundColor: "#FFF3E0", // orange tint
+    color: "#E65100",
   },
 
   otherTags: {
-    backgroundColor: '#177e89',
+    backgroundColor: "#E3F2FD", // blue tint
+    color: "#1565C0",
   },
 
   primaryButton: {
