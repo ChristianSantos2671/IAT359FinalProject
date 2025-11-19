@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import globalStyles from '../utils/globalStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getFavourites, toggleFavourite } from '../utils/db';
+
 
 import { get } from 'lodash';
 
@@ -20,6 +22,7 @@ export default function RecipeDetailsScreen({navigation, route}) {
   const randomPrepTime = getRandomInt(10, 30);
   const randomCookTime = getRandomInt(15, 60);
   const insets = useSafeAreaInsets();
+  const [favourites, setFavourites] = useState([]);
 
   
   // making the list of ingredients + measurements
@@ -35,6 +38,29 @@ export default function RecipeDetailsScreen({navigation, route}) {
       ingredientsList.push(`${i}. ${measure ? measure : ''} ${ingredient}`.trim());
     }
   }; 
+
+  {/* favouriting the recipes 
+  const toggleFavouriteRecipe = async (item) => {
+      const isAlreadyFavourite = item.is_favourite === 1;
+      try {
+        await toggleFavourite(item.id, !isAlreadyFavourite);
+        // Update local state
+        setRecipes(prev => prev.map(recipe => 
+          recipe.id === item.id 
+            ? { ...recipe, is_favourite: isAlreadyFavourite ? 0 : 1 }
+            : recipe
+        ));
+        // Update favourites list
+        if (isAlreadyFavourite) {
+          setFavourites(prev => prev.filter(fav => fav.id !== item.id));
+        } else {
+          const updatedItem = { ...item, is_favourite: 1 };
+          setFavourites(prev => [...prev, updatedItem]);
+        }
+      } catch (e) {
+        console.error("Error toggling favourite:", e);
+      }
+    }; */}
 
 
   return (
@@ -64,6 +90,15 @@ export default function RecipeDetailsScreen({navigation, route}) {
               </Text>
             ))}
        </View>
+
+       {/* <TouchableOpacity
+          style={styles.favouriteButton}
+          onPress={() => toggleFavouriteRecipe(item)}
+        >
+          <Text style={globalStyles.headerText}>
+            {item.is_favourite === 1 ? '♥︎' : '♡'}
+          </Text>
+        </TouchableOpacity> */}
       
       {/* Option bar for Details, Ingredients, Instructions */}
         <View style={styles.optionsBar}>
