@@ -6,7 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import globalStyles from '../utils/globalStyles';
 
 // This screen shows what the camera sees, a flip button to swap the front and back phone cameras, and a take photo button.
-export default function CameraScreen({ navigation }) {
+export default function CameraScreen({ navigation, route }) {
+  const { previousScreen } = route.params;
   const [facing, setFacing] = useState('back');
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef(null);
@@ -44,7 +45,7 @@ export default function CameraScreen({ navigation }) {
       try {
         // Photo taken will be a string representation of the image (base 64 encoding).
         const photo = await cameraRef.current.takePictureAsync({ base64: true });
-        navigation.navigate('Camera Preview', { photo });
+        navigation.navigate('Camera Preview', { previousScreen, photo });
       } catch (e) {
         console.error('Error taking photo:', e);
       }

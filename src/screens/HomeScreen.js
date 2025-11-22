@@ -342,7 +342,7 @@ const logout = async () => {
       />
       <TouchableOpacity
         style={globalStyles.logMealButton}
-        onPress={() => navigation.navigate('Log Meal')}
+        onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home Screen', photo: '../../assets/adaptive-icon.png'})}
       >
         <Image
           style={globalStyles.logMealImage}

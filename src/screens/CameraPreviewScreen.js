@@ -4,9 +4,17 @@ import globalStyles from '../utils/globalStyles';
 
 // This screen shows the photo taken, a retake button to go back to the previous screen, and a Use Photo button that will go to the Suggested Recipes screen passing it the photo taken.
 export default function CameraPreviewScreen({ route, navigation }) {
-  const { photo } = route.params;
+  const { previousScreen, photo } = route.params;
 
   const insets = useSafeAreaInsets();
+
+  const navigateToCertainScreen = () => {
+    if (previousScreen === 'Log Meal') {
+      navigation.navigate('Log Meal', { photo });
+    } else {
+      navigation.navigate('Suggested Recipes', { photo });
+    }
+  }
 
   return (
     <View style={globalStyles.mainView}>
@@ -26,7 +34,7 @@ export default function CameraPreviewScreen({ route, navigation }) {
 
         <TouchableOpacity
           style={[styles.button, {marginBottom: insets.bottom}]}
-          onPress={() => navigation.navigate('Suggested Recipes', { photo })}
+          onPress={() => navigateToCertainScreen()}
         >
           <Text style={globalStyles.headerText2}>Use Photo</Text>
         </TouchableOpacity>

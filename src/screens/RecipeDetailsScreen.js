@@ -188,7 +188,7 @@ export default function RecipeDetailsScreen({navigation, route}) {
 
             <TouchableOpacity
                 style={globalStyles.primaryButton}
-                onPress={() => navigation.navigate("Log Meal")}
+                onPress={() => navigation.navigate("Log Meal", {photo: '../../assets/adaptive-icon.png'})}
             >
                 <Text style={globalStyles.primaryButtonText}>Log Meal</Text>
             </TouchableOpacity>

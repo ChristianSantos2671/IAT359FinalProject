@@ -40,7 +40,7 @@ export default function ProfileScreen({navigation}) {
   const deleteMeal = async (item) => {
     try {
       await removeMeal(item.name);
-      setMeals(prev => prev.filter(meal => meal.name !== meal.name));
+      setMeals(prev => prev.filter(meal => meal.name !== item.name));
     } catch (e) {
       console.error("Error deleting recipe:", e);
     }
@@ -162,7 +162,11 @@ export default function ProfileScreen({navigation}) {
 
                     <Image
                       style={styles.mealImage}
-                      source={require('../../assets/adaptive-icon.png')}
+                      source={
+                        item.photo
+                          ? { uri: item.photo }
+                          : require('../../assets/adaptive-icon.png')
+                      }
                     />
 
                     <View style={styles.mealTextContent}>
@@ -258,7 +262,7 @@ export default function ProfileScreen({navigation}) {
 
       <TouchableOpacity
         style={globalStyles.logMealButton}
-        onPress={() => navigation.navigate('Log Meal')}
+        onPress={() => navigation.navigate('Log Meal', {photo: '../../assets/adaptive-icon.png'})}
       >
         <Image
           style={globalStyles.logMealImage}

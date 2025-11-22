@@ -1,11 +1,12 @@
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import globalStyles from '../utils/globalStyles';
 import { saveMeal } from "../utils/storage";
 
-export default function LogMealScreen() {
+export default function LogMealScreen({ navigation, route }) {
+  const { photo } = route.params;
   const [recipeName, setRecipeName] = useState('');
   const [recipe, setRecipe] = useState('');
   const [experience, setExperience] = useState('');
@@ -29,12 +30,17 @@ export default function LogMealScreen() {
       setError('Please share your experience');
       return;
     }
+    if (photo === '../../assets/adaptive-icon.png') {
+      setError('Please take a photo of the meal');
+      return;
+    }
 
     const newMeal = {
       name: recipeName.trim(),
       recipe: recipe.trim(),
       experience: experience.trim(),
       timestamp: Date.now(),
+      photo: photo.uri,
     };
 
     try {
@@ -92,7 +98,16 @@ export default function LogMealScreen() {
         </View>
 
         <View>
-          {/* Camera access or upload photo here */}
+          <Image
+            style={styles.image}
+            source={photo === '../../assets/adaptive-icon.png' ? require('../../assets/adaptive-icon.png') : {uri: photo.uri}}
+          />
+          <TouchableOpacity
+            style={[styles.uploadButton, styles.uploadImageButton]}
+            onPress={() => navigation.navigate('CameraScreen', { previousScreen: 'Log Meal' })}
+          >
+            <Text style={globalStyles.headerText2}>Upload Image</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -112,6 +127,13 @@ export default function LogMealScreen() {
 }
 
 const styles = StyleSheet.create({
+  image: {
+    flex: 1,
+    width: '100%',
+    height: 150,
+    marginVertical: globalStyles.sectionValues.sectionMargin,
+    resizeMode: 'contain',
+  },
   uploadButtonSection: {
     position: 'absolute',
     left: 0,
@@ -129,6 +151,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 100,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  uploadImageButton: {
+    marginHorizontal: globalStyles.buttonValues.buttonMargin * 3,
   },
   errorText: {
     color: 'red',
