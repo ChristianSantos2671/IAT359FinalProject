@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 
 const colors = {
   primary: '#4CAF50',
-  background: '#e8e6e6ff',
+  background: '#F5F5F5',
   backgroundSecondary: '#cbcbcbff',
   topContainer: '#ffffff',
   text: '#212121',
@@ -113,7 +113,7 @@ const globalStyles = StyleSheet.create({
 
   bodyText: {
     fontSize: 14,
-    color: "#555",
+    color: colors.text,
     lineHeight: 18,
   },
 
@@ -121,6 +121,30 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  // logo 
+
+  logo: {
+    width: 50,
+    height: 50,
+  },
+
+  // input containers 
+
+  inputContainer: {
+    width: '80%',
+    marginBottom: 20,
+  },
+  
+  input: {
+    backgroundColor: '#fff',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 
   // dropshadow style for meal items, logs, etc
@@ -209,6 +233,11 @@ const globalStyles = StyleSheet.create({
    textSection: {
     marginBottom: 15,
   },
+
+  buttonFix: {
+    flex: 0,
+    marginLeft: 0,
+  }
 
 });
 
