@@ -11,6 +11,8 @@ export default function CameraPreviewScreen({ route, navigation }) {
   const navigateToCertainScreen = () => {
     if (previousScreen === 'Log Meal') {
       navigation.navigate('Log Meal', { photo });
+    } else if (previousScreen === 'Add Recipe') {
+      navigation.navigate('Add Recipe', { photo });
     } else {
       navigation.navigate('Suggested Recipes', { photo });
     }

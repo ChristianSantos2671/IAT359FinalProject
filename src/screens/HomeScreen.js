@@ -1,85 +1,13 @@
-{/*import { useState, useEffect } from "react";
-import { Button, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { saveUserPrefs, loadUserPrefs, removeUserPrefs } from "./utils/storage";
-
-export default function HomeScreen({ navigation }) {
-  const [name, setName] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
-  const colors = ["red", "green", "blue", "orange"];
-
-  useEffect(() => {
-    (async () => {
-      const prefs = await loadUserPrefs();
-      if (prefs?.name) setName(prefs.name);
-      if (prefs?.color) setSelectedColor(prefs.color);
-    })()
-  }, []);
-
-  const handleSubmit = async () => {
-    if (name.trim() && selectedColor) {
-
-      await saveUserPrefs(name.trim(), selectedColor);
-
-      navigation.navigate("Welcome", {
-        userName: name.trim(),
-        backgroundColor: selectedColor
-      });
-    } else {
-      Alert.alert("Missing info");
-    }
-  }
-  
-  return (
-    <View>
-      <Text>Enter your name:</Text>
-      <TextInput
-        placeholder = "Name"
-        value = {name}
-        onChangeText = {setName}
-      />
-
-      <View style = {styles.colorRow}>
-        {colors.map((c) => (
-          <TouchableOpacity
-            key = {c}
-            onPress = {() => setSelectedColor(c)}
-            style = {[styles.colorSwatch,
-              { backgroundColor: c, borderWidth: selectedColor === c ? 3 : 1 }
-            ]}
-          />
-        ))}
-      </View>
-      
-      <Button
-        title = "Submit"
-        onPress = {handleSubmit}
-      />
-    </View>
-  )
-}
-
-const styles = StyleSheet.create ({
-  colorRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginVertical: 10,
-  },
-  colorSwatch: {
-    width: 40,
-    height: 40,
-    borderWidth: "#111",
-    borderRadius: 8,
-  },
-}); */}
-
 import { View, Text, StyleSheet, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import filter from "lodash/filter";
 import { signOut } from 'firebase/auth';
 import { firebase_auth } from '../utils/firebaseConfig';
 import globalStyles from "../utils/globalStyles";
+import { useFocusEffect } from '@react-navigation/native';
+import { saveRecipe, toggleFavourite, getRecipes } from '../utils/db';
 
 const API_ENDPOINT = (query) =>
   `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`;
@@ -96,19 +24,37 @@ export default function HomeScreen({navigation}) {
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedArea, setSelectedArea] = useState([]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadFavourites = async () => {
+        try {
+          const recipesFromDB = await getRecipes();
+          setData(prevData =>
+            prevData.map(meal => {
+              const fav = recipesFromDB.find(r => r.name === meal.strMeal);
+              return fav ? { ...meal, is_favourite: fav.is_favourite } : meal;
+            })
+          );
+        } catch (e) {
+          console.error("Error syncing favourites:", e);
+        }
+      };
+      loadFavourites();
+    }, [])
+  );
 
-// sign out 
-const logout = async () => {
-  try {
-    await signOut(firebase_auth);
-    Alert.alert('You have been signed out successfully.');
-  } catch (error) {
-    console.error('Sign out error:', error);
-    Alert.alert('Error', 'Failed to sign out. Please try again.');
-  }
-};
+  // sign out 
+  const logout = async () => {
+    try {
+      await signOut(firebase_auth);
+      Alert.alert('You have been signed out successfully.');
+    } catch (error) {
+      console.error('Sign out error:', error);
+      Alert.alert('Error', 'Failed to sign out. Please try again.');
+    }
+  };
 
-// api loading the data 
+  // api loading the data 
   const fetchData = async(url) => {
     try {
       setLoading(true);
@@ -190,34 +136,26 @@ const logout = async () => {
  
  
  const resetFilters = () => {
-     setSelectedCategory([]);
-     setSelectedArea([]);
-     setSearchQuery("");
-     setData(fullData); // reset the displayed meals to all meals
-     };
- 
- 
-   {/* searching + filtering the data */}
-   const handleSearch = (query) => {
-     setSearchQuery(query);
- 
-     if (query.trim() === "") {
-       setData(fullData);
-       return;
-     }
- 
-     const formattedQuery = query.toLowerCase();
-     const filteredData = filter(fullData, (meal) => contains(meal, formattedQuery));
-     setData(filteredData);
-   };
- 
-  if(isLoading) {
-    return (
-      <View style={globalStyles.loader}>
-        <ActivityIndicator size={'large'} color="green" />
-      </View>
-    );
-  }
+    setSelectedCategory([]);
+    setSelectedArea([]);
+    setSearchQuery("");
+    setData(fullData); // reset the displayed meals to all meals
+    };
+
+
+  {/* searching + filtering the data */}
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+
+    if (query.trim() === "") {
+      setData(fullData);
+      return;
+    }
+
+    const formattedQuery = query.toLowerCase();
+    const filteredData = filter(fullData, (meal) => contains(meal, formattedQuery));
+    setData(filteredData);
+  };
 
   const toggleFilters = (value, type) => {
   switch (type) {
@@ -235,8 +173,54 @@ const logout = async () => {
 
     default:
       break;
+    }
+  };
+
+const toggleFavouriteRecipe = async (meal) => {
+  try {
+    // Check if this meal already exists in DB
+    const recipes = await getRecipes();
+    const existing = recipes.find(r => r.name === meal.strMeal);
+
+    if (existing) {
+      // Meal exists → just toggle favourite
+      const newValue = await toggleFavourite(existing.id, existing.is_favourite);
+      setData(prev =>
+        prev.map(m =>
+          m.strMeal === meal.strMeal ? { ...m, is_favourite: newValue } : m
+        )
+      );
+    } else {
+      // Meal not in DB → save as favourite
+      await saveRecipe({
+        name: meal.strMeal,
+        ingredients: getIngredientsString(meal),
+        instructions: meal.strInstructions || '',
+        image_uri: meal.strMealThumb,
+      });
+
+      setData(prev =>
+        prev.map(m =>
+          m.strMeal === meal.strMeal ? { ...m, is_favourite: 1 } : m
+        )
+      );
+    }
+  } catch (e) {
+    console.error("Error toggling favourite:", e);
   }
 };
+
+  const getIngredientsString = (meal) => {
+    const ingredients = [];
+    for (let i = 1; i <= 20; i++) {
+      const ingredient = meal[`strIngredient${i}`];
+      const measure = meal[`strMeasure${i}`];
+      if (ingredient && ingredient.trim() !== "") {
+        ingredients.push(`${measure || ""} ${ingredient}`.trim());
+      }
+    }
+    return ingredients.join(", ");
+  };
 
   return (
     <View style={globalStyles.container}>
@@ -332,10 +316,18 @@ const logout = async () => {
                   {/*splitting the tags string into individual tags */}
                   {item.strTags && item.strTags.split(',').slice(0,3).map((tag, index) => (
                     <Text key={index} style={[globalStyles.tag, globalStyles.otherTags]}>
-                    {tag.trim()}
+                      {tag.trim()}
                     </Text>
                   ))}
                 </View>
+                <TouchableOpacity
+                  style={styles.favouriteButton}
+                  onPress={() => toggleFavouriteRecipe(item)}
+                >
+                  <Text style={globalStyles.headerText}>
+                    {item.is_favourite === 1 ? '♥︎' : '♡'}
+                  </Text>
+                </TouchableOpacity>
               </View>
           </TouchableOpacity>
         )}
@@ -400,5 +392,14 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 12,
+  },
+
+  favouriteButton: {
+    width: '20%',
+    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
+    borderColor: globalStyles.colors.text,
+    backgroundColor: globalStyles.colors.primary,
+    padding: globalStyles.buttonValues.buttonPadding,
   },
 });

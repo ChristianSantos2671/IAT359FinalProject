@@ -1,10 +1,11 @@
-import { Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 
 import globalStyles from '../utils/globalStyles';
 import { saveRecipe } from '../utils/db';
 
-export default function AddRecipeScreen() {
+export default function AddRecipeScreen({ navigation, route }) {
+  const photo = route?.params?.photo ?? null;
   const [recipeName, setRecipeName] = useState('');
   const [ingredients, setIngredients] = useState([]);
   const [ingredient, setIngredient] = useState('');
@@ -52,7 +53,8 @@ export default function AddRecipeScreen() {
         const recipe = {
           name: recipeName.trim(),
           ingredients: ingredients.join(', '),
-          instructions: instructions.trim()
+          instructions: instructions.trim(),
+          image_uri: photo?.uri ?? '',
         };
 
         await saveRecipe(recipe);
@@ -135,9 +137,26 @@ export default function AddRecipeScreen() {
             onChangeText={setInstructions}
           />
         </View>
+
+        <View>
+          <Image
+            style={styles.image}
+            source={
+              photo && photo.uri
+                ? { uri: photo.uri }
+                : require('../../assets/adaptive-icon.png')
+            }
+          />
+        </View>
       </ScrollView>
 
       <View style={styles.uploadButtonSection}>
+        <TouchableOpacity
+          style={[styles.uploadButton, styles.uploadImageButton]}
+          onPress={() => navigation.navigate('CameraScreen', { previousScreen: 'Add Recipe' })}
+        >
+          <Text style={globalStyles.headerText2}>Upload Image</Text>
+        </TouchableOpacity>
         <TouchableOpacity 
           style={styles.uploadButton}
           onPress={uploadRecipe}
@@ -153,6 +172,13 @@ export default function AddRecipeScreen() {
 }
 
 const styles = StyleSheet.create({
+  image: {
+    flex: 1,
+    width: '100%',
+    height: 150,
+    marginVertical: globalStyles.sectionValues.sectionMargin,
+    resizeMode: 'contain',
+  },
   addIngriedientSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -206,8 +232,12 @@ const styles = StyleSheet.create({
     borderRadius: globalStyles.buttonValues.buttonBorderRadius,
     paddingVertical: globalStyles.buttonValues.buttonPadding,
     paddingHorizontal: 100,
+    marginVertical: 5,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  uploadImageButton: {
+    marginHorizontal: globalStyles.buttonValues.buttonMargin * 3,
   },
   errorText: {
     color: 'red',

@@ -6,6 +6,7 @@ import globalStyles from '../utils/globalStyles';
 import { getMeals, removeMeal } from '../utils/storage';
 import { getRecipes, removeRecipe, getFavourites, toggleFavourite } from '../utils/db';
 
+
 export default function ProfileScreen({navigation}) {
   const [optionBarType, setOptionBarType] = useState('My Meals');
   const [meals, setMeals] = useState([]);
@@ -42,38 +43,36 @@ export default function ProfileScreen({navigation}) {
       await removeMeal(item.name);
       setMeals(prev => prev.filter(meal => meal.name !== item.name));
     } catch (e) {
-      console.error("Error deleting recipe:", e);
+      console.error("Error deleting meal:", e);
     }
   };
 
   const deleteRecipe = async (item) => {
     try {
-      await removeRecipe(item.id);
+      await removeRecipe(item.id); // removes from DB
       setRecipes(prev => prev.filter(recipe => recipe.id !== item.id));
-      // If it was a favourite, it will be removed from favourites automatically
       setFavourites(prev => prev.filter(fav => fav.id !== item.id));
+      // HomeScreen will sync via useFocusEffect
     } catch (e) {
       console.error("Error deleting recipe:", e);
     }
   };
 
   const toggleFavouriteRecipe = async (item) => {
-    const isAlreadyFavourite = item.is_favourite === 1;
     try {
-      await toggleFavourite(item.id, !isAlreadyFavourite);
-      // Update local state
-      setRecipes(prev => prev.map(recipe => 
-        recipe.id === item.id 
-          ? { ...recipe, is_favourite: isAlreadyFavourite ? 0 : 1 }
-          : recipe
-      ));
+      const newValue = await toggleFavourite(item.id, item.is_favourite);
+      // Update recipes list
+      setRecipes(prev =>
+        prev.map(recipe =>
+          recipe.id === item.id ? { ...recipe, is_favourite: newValue } : recipe
+        )
+      );
       // Update favourites list
-      if (isAlreadyFavourite) {
-        setFavourites(prev => prev.filter(fav => fav.id !== item.id));
-      } else {
-        const updatedItem = { ...item, is_favourite: 1 };
-        setFavourites(prev => [...prev, updatedItem]);
-      }
+      setFavourites(prev =>
+        newValue === 1
+          ? [...prev, { ...item, is_favourite: 1 }]
+          : prev.filter(fav => fav.id !== item.id)
+      );
     } catch (e) {
       console.error("Error toggling favourite:", e);
     }
@@ -191,7 +190,7 @@ export default function ProfileScreen({navigation}) {
                 ListEmptyComponent={
                   <Text style={styles.emptyContent}>No Recipes</Text>
                 }
-                renderItem={({item, index}) => (
+                renderItem={({ item }) => (
                   <View style={styles.recipe}>
                     <TouchableOpacity
                       style={styles.deleteButton}
@@ -202,7 +201,11 @@ export default function ProfileScreen({navigation}) {
 
                     <Image
                       style={styles.recipeImage}
-                      source={require('../../assets/adaptive-icon.png')}
+                      source={
+                        item.image_uri
+                          ? { uri: item.image_uri }
+                          : require('../../assets/adaptive-icon.png')
+                      }
                     />
 
                     <View style={styles.recipeContent}>
@@ -239,10 +242,14 @@ export default function ProfileScreen({navigation}) {
                 }
                 renderItem={({item, index}) => (
                   <View style={styles.recipe}>
-                    <Image
-                      style={styles.recipeImage}
-                      source={require('../../assets/adaptive-icon.png')}
-                    />
+                  <Image
+                    style={styles.recipeImage}
+                    source={
+                      item.image_uri
+                        ? { uri: item.image_uri }
+                        : require('../../assets/adaptive-icon.png')
+                    }
+                  />
 
                     <View>
                       <Text style={globalStyles.headerText2}>{item.name}</Text>
@@ -396,9 +403,13 @@ const styles = StyleSheet.create ({
     marginVertical: globalStyles.sectionValues.sectionMargin/2,
   },
   favouriteButton: {
+    position: 'absolute',
+    right: '100%',
+    top: -65,
     borderRadius: globalStyles.buttonValues.buttonBorderRadius,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.text,
+    backgroundColor: globalStyles.colors.primary,
     padding: globalStyles.buttonValues.buttonPadding,
   },
   deleteButton: {
