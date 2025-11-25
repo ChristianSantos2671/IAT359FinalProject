@@ -5,13 +5,19 @@ import { useFocusEffect } from '@react-navigation/native';
 import globalStyles from '../utils/globalStyles';
 import { getMeals, removeMeal } from '../utils/storage';
 import { getRecipes, removeRecipe, getFavourites, toggleFavourite } from '../utils/db';
+import { firebase_auth, db } from "../utils/firebaseConfig";
+import { getDoc, doc } from "firebase/firestore";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-
-export default function ProfileScreen({navigation}) {
-  const [optionBarType, setOptionBarType] = useState('My Meals');
+export default function ProfileScreen({navigation, route}) {
+  const [optionBarType, setOptionBarType] = useState('My Logged Meals');
   const [meals, setMeals] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [favourites, setFavourites] = useState([]);
+  const [firstname, setFirstName] = useState("");
+  const [lastname, setLastName] = useState("");
+  const insets = useSafeAreaInsets();
+  
 
   const loadData = async () => {
     try {
@@ -34,9 +40,29 @@ export default function ProfileScreen({navigation}) {
 
   useFocusEffect(
     React.useCallback(() => {
-      loadData();
-    }, [])
-  );
+      if (route?.params?.firstname) {
+      setFirstName(route.params.firstname || "N/A");
+      setLastName(route.params.lastname || "N/A");
+
+    } else {
+      const loadUser = async () => {
+        const user = firebase_auth.currentUser;
+        if (!user) return;
+
+        const snap = await getDoc(doc(db, "Users", user.uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          setFirstName(data.firstName || "N/A");
+          setLastName(data.lastName || "N/A");
+
+        }
+      };
+
+      loadUser();
+    }
+    loadData();
+  }, [route?.params])
+);
 
   const deleteMeal = async (item) => {
     try {
@@ -79,14 +105,14 @@ export default function ProfileScreen({navigation}) {
   };
   
   return (
-    <View style={globalStyles.mainView}>
-      <View style={styles.profileSection}>
+    <View style={globalStyles.container}>
+      <View style={[globalStyles.topContainer, styles.profileSection, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
         <View style={styles.profileCircle}>
-          <Text style={styles.profileInitials}>__</Text>
+          <Text style={styles.profileInitials}>{(firstname || "N/A")[0]}{(lastname || "A")[0]}</Text>
         </View>
 
         <View>
-          <Text style={globalStyles.headerText}>Name</Text>
+          <Text style={globalStyles.h1}>{(firstname || "N/A")} {(lastname || "A")}</Text>
 
           <View style={styles.profileSpecs}>
             <Text><Text style={globalStyles.headerText.fontWeight}>{meals.length}</Text> Meals</Text>
@@ -94,61 +120,61 @@ export default function ProfileScreen({navigation}) {
             <Text><Text style={globalStyles.headerText.fontWeight}>{recipes.length}</Text> Recipes</Text>
           </View>
         </View>
-      </View>
 
-      <View style={styles.optionsBar}>
+         <View style={globalStyles.optionsBar}>
         <TouchableOpacity
           style={[
-            styles.optionButtonFlex,
-            optionBarType === 'My Meals' ? styles.optionButtonActive : null
+            globalStyles.optionButtonFlex,
+            optionBarType === 'My Logged Meals' ? globalStyles.optionButtonActive : null
           ]}
-          onPress={() => setOptionBarType('My Meals')}
+          onPress={() => setOptionBarType('My Logged Meals')}
         >
           <Text
             style={
-              optionBarType === 'My Meals' ? globalStyles.tagText : { color: globalStyles.colors.text }
+              optionBarType === 'My Logged Meals' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
             }
-          >My Meals</Text>
+          >My Logged Meals</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
-            styles.optionButtonFlex,
-            optionBarType === 'My Recipes' ? styles.optionButtonActive : null
+            globalStyles.optionButtonFlex,
+            optionBarType === 'My Recipes' ? globalStyles.optionButtonActive : null
           ]}
           onPress={() => setOptionBarType('My Recipes')}
         >
           <Text
             style={
-              optionBarType === 'My Recipes' ? globalStyles.tagText : { color: globalStyles.colors.text }
+              optionBarType === 'My Recipes' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
             }
           >My Recipes</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
-            styles.optionButtonFlex,
-            optionBarType === 'Favourites' ? styles.optionButtonActive : null
+            globalStyles.optionButtonFlex,
+            optionBarType === 'Favourites' ? globalStyles.optionButtonActive : null
           ]}
           onPress={() => setOptionBarType('Favourites')}
         >
           <Text
             style={
-              optionBarType === 'Favourites' ? globalStyles.tagText : { color: globalStyles.colors.text }
+              optionBarType === 'Favourites' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
             }
           >Favourites</Text>
         </TouchableOpacity>
       </View>
+      </View>
 
       {(() => {
         switch (optionBarType) {
-          case 'My Meals':
+          case 'My Logged Meals':
             return (
               <FlatList
                 style={styles.optionContent}
                 data={meals}
                 ListEmptyComponent={
-                  <Text style={styles.emptyContent}>No Meals</Text>
+                  <Text style={styles.emptyContent}>No Logged Meals</Text>
                 }
                 renderItem={({item, index}) => (
                   <View style={styles.meal}>
@@ -282,19 +308,18 @@ export default function ProfileScreen({navigation}) {
 
 const styles = StyleSheet.create ({
   profileSection: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: globalStyles.sectionValues.sectionMargin,
-    marginVertical: globalStyles.sectionValues.sectionMargin*2,
+    justifyContent: 'center',
   },
+
   profileCircle: {
     width: 75,
     height: 75,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.text,
     borderRadius: 50,
-    backgroundColor: globalStyles.colors.primary,
+    backgroundColor: globalStyles.colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -309,31 +334,7 @@ const styles = StyleSheet.create ({
     width: 200,
     marginTop: globalStyles.sectionValues.sectionMargin,
   },
-  optionsBar: {
-    flexDirection: 'row',
-    backgroundColor: globalStyles.colors.backgroundSecondary,
-    borderColor: globalStyles.colors.text,
-    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    height: 50,
-    marginHorizontal: globalStyles.sectionValues.sectionMargin,
-    marginBottom: globalStyles.sectionValues.sectionMargin,
-  },
-  optionButtonFlex: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionButtonActive: {
-    backgroundColor: globalStyles.colors.primary,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    justifyContent: 'center',
-    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderColor: globalStyles.colors.text,
-    marginVertical: -globalStyles.sectionValues.sectionBorderWidth,
-    marginHorizontal: -1,
-    zIndex: 2,
-  },
+  
   optionContent: {
     flex: 1,
     padding: globalStyles.sectionValues.sectionPadding,

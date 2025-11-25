@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, Alert, TextInput, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Image, StyleSheet, TouchableOpacity, Alert, TextInput, Text, View } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import {firebase_auth} from  '../utils/firebaseConfig.js';
 import globalStyles from '../utils/globalStyles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
 
 export default function SignInScreen({navigation}) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false);
+  const insets = useSafeAreaInsets();
 
 
   const handleLogin = async () => {
@@ -22,117 +26,114 @@ export default function SignInScreen({navigation}) {
     }
   };
 
-  return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior="padding"
-    >
-      <View>
-        <Text style={globalStyles.h1} > Login to your account! </Text>
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Email"
-          value = {email}
-          onChangeText={text => setEmail(text)}
-          style={styles.input}
-          autoCapitalize="none"
-        />
+return (
 
+  <KeyboardAvoidingView behavior="padding"  style={globalStyles.container}>
+
+    {/* Logo + App Name */}
+    <View style={[styles.logoSection, { paddingTop: insets.top + 100 }]}>
+      <Image
+        source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
+        style={[globalStyles.textMargins, globalStyles.logo] }
+      />
+      <Text style={ globalStyles.h1}>My Cookbook</Text>
+    </View>
+
+    <View style={{ flex: 1 }} />
+
+    {/* Login Form Container */}
+    <View style={[globalStyles.topContainer, styles.bottonContainer]}>
+
+      <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
+        
+        <View style={globalStyles.textSection}>
+          <Text style={[globalStyles.h2, globalStyles.textMargins]}>Login</Text>
+        </View> 
+        <Text style={globalStyles.h3}>Email</Text>
         <TextInput
-          placeholder="Password"
-          value = {password}
-          onChangeText={text => setPassword(text)}
-          style={styles.input}
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={setEmail}
+          style={globalStyles.input}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+      </View>
+
+      <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
+        <Text style={globalStyles.h3}>Password</Text>
+        <TextInput
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
+          style={globalStyles.input}
           secureTextEntry
         />
       </View>
 
+      {/* Button container aligned with input width */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={handleLogin}
-          style={styles.primaryButton}
+          style={[globalStyles.primaryButton, globalStyles.buttonFix]}
+          disabled={loading}
         >
           <Text style={globalStyles.primaryButtonText}>Login</Text>
         </TouchableOpacity>
 
-        <View style={styles.subheading}>
-          <Text style={globalStyles.bodyText}> Don't have an account yet?
-            <Text style={styles.textButton}
+        <Text style={[globalStyles.bodyText, styles.alignments]}>
+          Don't have an account yet?{' '}
+          <Text
+            style={globalStyles.secondaryButtonText}
             onPress={() => navigation.navigate('SignUp')}
-          > Sign up here
-            </Text>
+          >
+            Sign up here
           </Text>
-        </View>
+        </Text>
       </View>
-    </KeyboardAvoidingView>
-  );
+
+    </View>
+
+  </KeyboardAvoidingView>
+);
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    backgroundColor: globalStyles.colors.background,
   },
 
-  h1: {
-     color: 'green',
-     fontWeight: '700',
-     fontSize: 36
+
+  logoSection: {
+    alignItems: "center",
+    justifyContent: "center",    
+    marginBottom: 10,
   },
 
-  inputContainer: {
-    width: '80%',
-    marginBottom: 20,
-  },
-  input: {
-    backgroundColor: '#fff',
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
   buttonContainer: {
-    width: '80%',
-    alignItems: 'center',
-  },
-  primaryButton: {
-    backgroundColor: globalStyles.colors.primary,
-    width: '100%',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  secondaryButton: {
-    borderColor: 'green',
-    padding: 15,
+    width: "80%",
+    alignSelf: "center",
+    marginTop: 10,
+    
   },
 
-  primaryButtonText: {
-    color: 'white',
-    fontWeight: '700',
-  },
+  bottonContainer: {
   
-  secondaryButtonText: {
-    color: 'green',
-    fontWeight: '700',
+    paddingBottom: 30,
+    paddingTop: 40,
+    // The curved top effect:
+    borderTopLeftRadius: 50, 
+    borderTopRightRadius: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    flexGrow: 1,    
   },
 
-  subheading: {
-    fontSize: 16,
-    fontColor: "#3f3f3fff",
-    marginBottom: 6,
+  alignments: {
+    marginTop: 20,
+    textAlign: "center",
   },
-
-  textButton: {
-    color: globalStyles.colors.primary,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-
 });

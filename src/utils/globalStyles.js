@@ -3,7 +3,8 @@ import { StyleSheet } from 'react-native';
 
 const colors = {
   primary: '#4CAF50',
-  background: '#e8e6e6ff',
+  secondary: '#E8F5E9',
+  background: '#F5F5F5',
   backgroundSecondary: '#cbcbcbff',
   topContainer: '#ffffff',
   text: '#212121',
@@ -13,9 +14,9 @@ const colors = {
 };
 
 const sectionValues = {
-  sectionBorderWidth: 3,
-  sectionPadding: 10,
-  sectionMargin: 15,
+  sectionBorderWidth: 1,
+  sectionPadding: 16,
+  sectionMargin: 16,
 };
 
 const buttonValues = {
@@ -113,7 +114,7 @@ const globalStyles = StyleSheet.create({
 
   bodyText: {
     fontSize: 14,
-    color: "#555",
+    color: colors.text,
     lineHeight: 18,
   },
 
@@ -121,6 +122,59 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  // logo 
+
+  logo: {
+    width: 50,
+    height: 50,
+  },
+
+  // option bars / tabs
+
+  optionsBar: {
+    flexDirection: 'row',
+    marginVertical: 10,
+    border: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  optionButtonFlex: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  optionButtonActive: {
+    backgroundColor: colors.primary,
+  },
+
+  optionButtonText: {
+    color: colors.primary,
+  },
+
+  optionButtonTextActive: {
+    color: 'white',
+    fontWeight: '600',
+  },
+
+  // input containers 
+
+  inputContainer: {
+    width: '80%',
+    marginBottom: 20,
+  },
+  
+  input: {
+    backgroundColor: '#fff',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 
   // dropshadow style for meal items, logs, etc
@@ -137,13 +191,19 @@ const globalStyles = StyleSheet.create({
   },
 
   paddingHorizontal: {
-    paddingHorizontal: 16,
+    paddingHorizontal: sectionValues.sectionPadding,
   },
 
   topContainer: {
     backgroundColor: 'white',
-    paddingBottom: 10,
+    paddingBottom: 15,
     marginBottom: 10,
+    borderBottomLeftRadius: 20, 
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
 
   // tag styles
@@ -163,7 +223,7 @@ const globalStyles = StyleSheet.create({
   },
 
   categoryTag: {
-    backgroundColor: "#E8F5E9", // light green tint
+    backgroundColor: colors.secondary, // light green tint
     color: colors.primary,
   },
   
@@ -209,6 +269,11 @@ const globalStyles = StyleSheet.create({
    textSection: {
     marginBottom: 15,
   },
+
+  buttonFix: {
+    flex: 0,
+    marginLeft: 0,
+  }
 
 });
 

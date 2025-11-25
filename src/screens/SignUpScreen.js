@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, StyleSheet, TouchableOpacity, Alert, TextInput, Text, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Image, TouchableOpacity, Alert, TextInput, Text, View } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { firebase_auth, db } from '../utils/firebaseConfig.js';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import globalStyles from '../utils/globalStyles.js';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 export default function SignUpScreen({navigation}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [fullName, setFullName] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(false);
+      const insets = useSafeAreaInsets();
+
 
     const handleSignUp = async () => {
 
-      if (!email || !password || !fullName || !username) {
+      if (!email || !password || !lastName || !firstName || !username) {
         Alert.alert("Please fill in all fields");
         return;
       }
@@ -26,11 +32,17 @@ export default function SignUpScreen({navigation}) {
           // save user info
           await setDoc(
             doc(db, 'Users', user.uid), {
-              fullName,
+              firstName,
+              lastName,
               username,
               email,
               createdAt: serverTimestamp(),
+
             });
+
+            //passing the parameters 
+            navigation.navigate("Profile", {firstname: firstName, lastname: lastName});
+
       } catch (e) {
           Alert.alert("Failed to create account", e.message);
       } finally {
@@ -38,122 +50,115 @@ export default function SignUpScreen({navigation}) {
       }
   };
 
-    return (
-        <KeyboardAvoidingView
-        style={styles.container}
-        behavior="padding">
-        {/*all fields*/}
-        <View style={styles.inputContainer}>
-          <View>
-          <Text>Full name</Text>
-          <TextInput
-            placeholder="Enter your full name"
-            value={fullName}
-            onChangeText={setFullName}
-            style={styles.input}
-            />
+
+  return (
+    <KeyboardAvoidingView behavior="padding" style={ [globalStyles.container, styles.background, {paddingTop: insets.top+20}]}>
+
+      {/* Sign Up Form Container */}
+      <ScrollView>
+
+        <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
+          <View style={globalStyles.textSection}>
+            <Text style={globalStyles.h2}>Sign Up</Text>
           </View>
-          <View>
-          <Text>Username</Text>
+        </View>
+
+        {/* First name */}
+        <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
+          <Text style={globalStyles.h3}>First Name</Text>
+          <TextInput
+            placeholder="Enter your first name"
+            value={firstName}
+            onChangeText={setFirstName}
+            style={globalStyles.input}
+          />
+        </View>
+
+         {/* Last name */}
+        <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
+          <Text style={globalStyles.h3}>Last Name</Text>
+          <TextInput
+            placeholder="Enter your last name"
+            value={lastName}
+            onChangeText={setLastName}
+            style={globalStyles.input}
+          />
+        </View>
+
+        {/* USERNAME */}
+        <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
+          <Text style={globalStyles.h3}>Username</Text>
           <TextInput
             placeholder="Username"
             value={username}
             onChangeText={setUsername}
-            style={styles.input}
-            />
-          </View>
+            style={globalStyles.input}
+          />
+        </View>
 
-          <View>
-          <Text>Email</Text>
+        {/* EMAIL */}
+        <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
+          <Text style={globalStyles.h3}>Email</Text>
           <TextInput
             placeholder="Email"
             value={email}
             onChangeText={setEmail}
-            style={styles.input}
+            style={globalStyles.input}
             autoCapitalize="none"
-            />
-          </View>
-
-          <View>
-          <Text>Password</Text>
-          <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-          secureTextEntry
           />
-          </View>
-
         </View>
 
+        {/* PASSWORD */}
+        <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
+          <Text style={globalStyles.h3}>Password</Text>
+          <TextInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            style={globalStyles.input}
+            secureTextEntry
+          />
+        </View>
+
+        {/* BUTTONS */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={handleSignUp}
-            style={styles.primaryButton}
+            style={[globalStyles.primaryButton, globalStyles.buttonFix]}
           >
-            <Text style={styles.primaryButtonText}>Sign Up</Text>
+            <Text style={globalStyles.primaryButtonText}>Sign Up</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.secondaryButton}>
-                <Text style={styles.secondaryButtonText}>Back to Login</Text>
-          </TouchableOpacity>
+
+          <Text style={[globalStyles.bodyText, styles.alignments]}>
+            Already have an account?{' '}
+            <Text
+              style={globalStyles.secondaryButtonText}
+              onPress={() => navigation.navigate('SignIn')}
+            >
+              Back to Login
+            </Text>
+          </Text>
         </View>
-        </KeyboardAvoidingView>
+
+      </ScrollView>
+
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%'
-  },
-
-  inputContainer: {
-  width: '80%',
-  marginBottom: 20, 
-  gap: 10
-  },
-
-  input: {
-  backgroundColor: '#fff',
-  paddingVertical: 15,
-  paddingHorizontal: 10,
-  borderRadius: 10,
-  marginVertical: 8,
-  borderWidth: 1,
-  borderColor: '#ccc'
+  background: {
+    backgroundColor: 'white',
   },
 
   buttonContainer: {
-  width: '80%',
-  alignItems: 'center'
+    width: "80%",
+    alignSelf: "center",
+    marginTop: 10,
   },
 
-  primaryButton: {
-  backgroundColor: 'green',
-  width: '100%',
-  padding: 15,
-  borderRadius: 10,
-  alignItems: 'center',
-  marginVertical: 5
-  },
-
-  secondaryButton: {
-  borderColor: 'green',
-  padding: 15
-  },
-
-  primaryButtonText: {
-  color: 'white',
-  fontWeight: '700'
-  },
-
-  secondaryButtonText: {
-  color: 'green',
-  fontWeight: '700'
+  alignments: {
+    marginTop: 20,
+    textAlign: "center",
   },
 });

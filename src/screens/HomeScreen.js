@@ -300,7 +300,7 @@ const toggleFavouriteRecipe = async (meal) => {
         renderItem={({ item }) => (
           
           <TouchableOpacity
-            style={[styles.itemContainer, globalStyles.dropshadow]}
+            style={styles.itemContainer}
             onPress={() => navigation.navigate('Recipe Details', { meal: item })} 
           >
               <Image 
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     padding: 10,
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.primary,
   },
 
