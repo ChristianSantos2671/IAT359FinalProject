@@ -38,6 +38,13 @@ export default function SignUpScreen({navigation}) {
               email,
               createdAt: serverTimestamp(),
             });
+
+            //passing the parameters 
+            navigation.navigate("Profile", {
+            firstname: firstName,
+            lastname: lastName
+            });
+
       } catch (e) {
           Alert.alert("Failed to create account", e.message);
       } finally {

@@ -6,7 +6,8 @@ import globalStyles from '../utils/globalStyles';
 import { getMeals, removeMeal } from '../utils/storage';
 import { getRecipes, removeRecipe, getFavourites, toggleFavourite } from '../utils/db';
 
-export default function ProfileScreen({navigation}) {
+export default function ProfileScreen({navigation, route}) {
+  const {firstname, lastname} = route.params
   const [optionBarType, setOptionBarType] = useState('My Meals');
   const [meals, setMeals] = useState([]);
   const [recipes, setRecipes] = useState([]);
@@ -40,7 +41,7 @@ export default function ProfileScreen({navigation}) {
   const deleteMeal = async (item) => {
     try {
       await removeMeal(item.name);
-      setMeals(prev => prev.filter(meal => meal.name !== meal.name));
+      setMeals(prev => prev.filter(meal => meal.name !== item.name));
     } catch (e) {
       console.error("Error deleting recipe:", e);
     }
@@ -83,7 +84,7 @@ export default function ProfileScreen({navigation}) {
     <View style={globalStyles.mainView}>
       <View style={styles.profileSection}>
         <View style={styles.profileCircle}>
-          <Text style={styles.profileInitials}>__</Text>
+          <Text style={styles.profileInitials}>{firstname[0]}{lastname[0]}</Text>
         </View>
 
         <View>
