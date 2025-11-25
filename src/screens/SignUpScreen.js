@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Image, TouchableOpacity, Alert, TextInput, Text, View } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { firebase_auth, db } from '../utils/firebaseConfig.js';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import globalStyles from '../utils/globalStyles.js';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -37,13 +37,11 @@ export default function SignUpScreen({navigation}) {
               username,
               email,
               createdAt: serverTimestamp(),
+
             });
 
             //passing the parameters 
-            navigation.navigate("Profile", {
-            firstname: firstName,
-            lastname: lastName
-            });
+            navigation.navigate("Profile", {firstname: firstName, lastname: lastName});
 
       } catch (e) {
           Alert.alert("Failed to create account", e.message);
@@ -69,7 +67,7 @@ export default function SignUpScreen({navigation}) {
         <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
           <Text style={globalStyles.h3}>First Name</Text>
           <TextInput
-            placeholder="Enter your full name"
+            placeholder="Enter your first name"
             value={firstName}
             onChangeText={setFirstName}
             style={globalStyles.input}
@@ -78,9 +76,9 @@ export default function SignUpScreen({navigation}) {
 
          {/* Last name */}
         <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
-          <Text style={globalStyles.h3}>First Name</Text>
+          <Text style={globalStyles.h3}>Last Name</Text>
           <TextInput
-            placeholder="Enter your full name"
+            placeholder="Enter your last name"
             value={lastName}
             onChangeText={setLastName}
             style={globalStyles.input}

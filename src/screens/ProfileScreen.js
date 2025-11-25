@@ -7,11 +7,12 @@ import { getMeals, removeMeal } from '../utils/storage';
 import { getRecipes, removeRecipe, getFavourites, toggleFavourite } from '../utils/db';
 
 export default function ProfileScreen({navigation, route}) {
-  const {firstname, lastname} = route.params
   const [optionBarType, setOptionBarType] = useState('My Meals');
   const [meals, setMeals] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [favourites, setFavourites] = useState([]);
+  const [firstname, setFirstName] = useState("");
+  const [lastname, setLastName] = useState("");
 
   const loadData = async () => {
     try {
@@ -34,9 +35,31 @@ export default function ProfileScreen({navigation, route}) {
 
   useFocusEffect(
     React.useCallback(() => {
-      loadData();
-    }, [])
-  );
+      if (route?.params?.firstname) {
+      setFirstName(route.params.firstname || "N/A");
+      setLastName(route.params.lastname || "N/A");
+
+    } else {
+      const loadUser = async () => {
+        const user = firebase_auth.currentUser;
+        if (!user) return;
+
+        const snap = await getDoc(doc(db, "Users", user.uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          setFirstName(data.firstName || "N/A");
+          setLastName(data.lastName || "N/A");
+
+        }
+      };
+
+      loadUser();
+    }
+
+    // 🔹 3. Always reload meals/recipes/favourites
+    loadData();
+  }, [route?.params])
+);
 
   const deleteMeal = async (item) => {
     try {
@@ -84,11 +107,11 @@ export default function ProfileScreen({navigation, route}) {
     <View style={globalStyles.mainView}>
       <View style={styles.profileSection}>
         <View style={styles.profileCircle}>
-          <Text style={styles.profileInitials}>{firstname[0]}{lastname[0]}</Text>
+          <Text style={styles.profileInitials}>{(firstname || "N/A")[0]}{(lastname || "A")[0]}</Text>
         </View>
 
         <View>
-          <Text style={globalStyles.headerText}>Name</Text>
+          <Text style={globalStyles.headerText}>{firstname} {lastname}</Text>
 
           <View style={styles.profileSpecs}>
             <Text><Text style={globalStyles.headerText.fontWeight}>{meals.length}</Text> Meals</Text>
