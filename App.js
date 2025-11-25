@@ -6,7 +6,12 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { firebase_auth } from './src/utils/firebaseConfig.js';
 import { initRecipesTable } from './src/utils/db.js';
 
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, TextInput, Text } from 'react-native';
+
+//fonts
+import { useFonts } from "expo-font";
+import { Quicksand_300Light, Quicksand_400Regular, Quicksand_500Medium, Quicksand_600SemiBold, Quicksand_700Bold } from "@expo-google-fonts/quicksand";
+
 
 // Importing screens
 import AddRecipeScreen from './src/screens/AddRecipeScreen';
@@ -48,6 +53,8 @@ function Tabs() {
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
+        options={{
+        headerShown: false }}
       />
     </Tab.Navigator>
   );
@@ -57,27 +64,47 @@ export default function App() {
 
   const [user, setUser] = useState(null)
   const [initializing, setInitializing] = useState(true);
+  
+  // ------------------------------
+  // LOAD FONTS
+  // ------------------------------
+  const [fontsLoaded] = useFonts({
+    Quicksand_300Light,
+    Quicksand_400Regular,
+    Quicksand_500Medium,
+    Quicksand_600SemiBold,
+    Quicksand_700Bold,
+  });
 
-    useEffect(() => {
-      // Initialize the recipes database table.
-      initRecipesTable().catch(err => {
-        console.error('Failed to initialize recipes table:', err);
-      });
+  if (fontsLoaded) {
+    // Default for ALL <Text>
+    Text.defaultProps = Text.defaultProps || {};
+    Text.defaultProps.style = { fontFamily: "Quicksand_400Regular" };
 
-      const unsubscribe = onAuthStateChanged(firebase_auth, (u) => {
-        setUser(u);
-        if (initializing) setInitializing(false);
-      });
-      return unsubscribe;
-      }, [initializing]);
+    TextInput.defaultProps = TextInput.defaultProps || {};
+    TextInput.defaultProps.style = { fontFamily: "Quicksand_400Regular" };
+  }
 
-     if (initializing) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" />
-            </View>
-        );
-    }
+  useEffect(() => {
+    // Initialize the recipes database table.
+    initRecipesTable().catch(err => {
+      console.error('Failed to initialize recipes table:', err);
+    });
+
+    const unsubscribe = onAuthStateChanged(firebase_auth, (u) => {
+      setUser(u);
+      if (initializing) setInitializing(false);
+    });
+    return unsubscribe;
+    }, [initializing]);
+
+  if (initializing) {
+      return (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <ActivityIndicator size="large" />
+          </View>
+      );
+  }
 
   return (
     <NavigationContainer>

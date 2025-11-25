@@ -7,6 +7,7 @@ import { getMeals, removeMeal } from '../utils/storage';
 import { getRecipes, removeRecipe, getFavourites, toggleFavourite } from '../utils/db';
 import { firebase_auth, db } from "../utils/firebaseConfig";
 import { getDoc, doc } from "firebase/firestore";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProfileScreen({navigation, route}) {
   const [optionBarType, setOptionBarType] = useState('My Logged Meals');
@@ -15,6 +16,8 @@ export default function ProfileScreen({navigation, route}) {
   const [favourites, setFavourites] = useState([]);
   const [firstname, setFirstName] = useState("");
   const [lastname, setLastName] = useState("");
+  const insets = useSafeAreaInsets();
+  
 
   const loadData = async () => {
     try {
@@ -104,8 +107,8 @@ export default function ProfileScreen({navigation, route}) {
   };
   
   return (
-    <View style={globalStyles.mainView}>
-      <View style={styles.profileSection}>
+    <View style={globalStyles.container}>
+      <View style={[globalStyles.topContainer, styles.profileSection, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
         <View style={styles.profileCircle}>
           <Text style={styles.profileInitials}>{(firstname || "N/A")[0]}{(lastname || "A")[0]}</Text>
         </View>
@@ -119,9 +122,8 @@ export default function ProfileScreen({navigation, route}) {
             <Text><Text style={globalStyles.headerText.fontWeight}>{recipes.length}</Text> Recipes</Text>
           </View>
         </View>
-      </View>
 
-      <View style={globalStyles.optionsBar}>
+         <View style={globalStyles.optionsBar}>
         <TouchableOpacity
           style={[
             globalStyles.optionButtonFlex,
@@ -163,6 +165,7 @@ export default function ProfileScreen({navigation, route}) {
             }
           >Favourites</Text>
         </TouchableOpacity>
+      </View>
       </View>
 
       {(() => {
@@ -295,19 +298,18 @@ export default function ProfileScreen({navigation, route}) {
 
 const styles = StyleSheet.create ({
   profileSection: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: globalStyles.sectionValues.sectionMargin,
-    marginVertical: globalStyles.sectionValues.sectionMargin*2,
+    justifyContent: 'center',
   },
+
   profileCircle: {
     width: 75,
     height: 75,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.text,
     borderRadius: 50,
-    backgroundColor: globalStyles.colors.primary,
+    backgroundColor: globalStyles.colors.secondary,
     justifyContent: 'center',
     alignItems: 'center',
   },

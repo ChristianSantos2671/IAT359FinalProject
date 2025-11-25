@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 
 const colors = {
   primary: '#4CAF50',
+  secondary: '#E8F5E9',
   background: '#F5F5F5',
   backgroundSecondary: '#cbcbcbff',
   topContainer: '#ffffff',
@@ -13,9 +14,9 @@ const colors = {
 };
 
 const sectionValues = {
-  sectionBorderWidth: 3,
-  sectionPadding: 10,
-  sectionMargin: 15,
+  sectionBorderWidth: 1,
+  sectionPadding: 16,
+  sectionMargin: 16,
 };
 
 const buttonValues = {
@@ -190,13 +191,19 @@ const globalStyles = StyleSheet.create({
   },
 
   paddingHorizontal: {
-    paddingHorizontal: 16,
+    paddingHorizontal: sectionValues.sectionPadding,
   },
 
   topContainer: {
     backgroundColor: 'white',
-    paddingBottom: 10,
+    paddingBottom: 15,
     marginBottom: 10,
+    borderBottomLeftRadius: 20, 
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
 
   // tag styles
@@ -216,7 +223,7 @@ const globalStyles = StyleSheet.create({
   },
 
   categoryTag: {
-    backgroundColor: "#E8F5E9", // light green tint
+    backgroundColor: colors.secondary, // light green tint
     color: colors.primary,
   },
   
