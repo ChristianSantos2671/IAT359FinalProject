@@ -57,8 +57,6 @@ export default function ProfileScreen({navigation, route}) {
 
       loadUser();
     }
-
-    // 🔹 3. Always reload meals/recipes/favourites
     loadData();
   }, [route?.params])
 );
