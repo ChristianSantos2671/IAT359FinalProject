@@ -5,9 +5,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import globalStyles from '../utils/globalStyles';
 import { getMeals, removeMeal } from '../utils/storage';
 import { getRecipes, removeRecipe, getFavourites, toggleFavourite } from '../utils/db';
+import { firebase_auth, db } from "../utils/firebaseConfig";
+import { getDoc, doc } from "firebase/firestore";
 
 export default function ProfileScreen({navigation, route}) {
-  const [optionBarType, setOptionBarType] = useState('My Meals');
+  const [optionBarType, setOptionBarType] = useState('My Logged Meals');
   const [meals, setMeals] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [favourites, setFavourites] = useState([]);
@@ -111,7 +113,7 @@ export default function ProfileScreen({navigation, route}) {
         </View>
 
         <View>
-          <Text style={globalStyles.headerText}>{firstname} {lastname}</Text>
+          <Text style={globalStyles.h1}>{(firstname || "N/A")} {(lastname || "A")}</Text>
 
           <View style={styles.profileSpecs}>
             <Text><Text style={globalStyles.headerText.fontWeight}>{meals.length}</Text> Meals</Text>
@@ -121,45 +123,45 @@ export default function ProfileScreen({navigation, route}) {
         </View>
       </View>
 
-      <View style={styles.optionsBar}>
+      <View style={globalStyles.optionsBar}>
         <TouchableOpacity
           style={[
-            styles.optionButtonFlex,
-            optionBarType === 'My Meals' ? styles.optionButtonActive : null
+            globalStyles.optionButtonFlex,
+            optionBarType === 'My Logged Meals' ? globalStyles.optionButtonActive : null
           ]}
-          onPress={() => setOptionBarType('My Meals')}
+          onPress={() => setOptionBarType('My Logged Meals')}
         >
           <Text
             style={
-              optionBarType === 'My Meals' ? globalStyles.tagText : { color: globalStyles.colors.text }
+              optionBarType === 'My Logged Meals' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
             }
-          >My Meals</Text>
+          >My Logged Meals</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
-            styles.optionButtonFlex,
-            optionBarType === 'My Recipes' ? styles.optionButtonActive : null
+            globalStyles.optionButtonFlex,
+            optionBarType === 'My Recipes' ? globalStyles.optionButtonActive : null
           ]}
           onPress={() => setOptionBarType('My Recipes')}
         >
           <Text
             style={
-              optionBarType === 'My Recipes' ? globalStyles.tagText : { color: globalStyles.colors.text }
+              optionBarType === 'My Recipes' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
             }
           >My Recipes</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
-            styles.optionButtonFlex,
-            optionBarType === 'Favourites' ? styles.optionButtonActive : null
+            globalStyles.optionButtonFlex,
+            optionBarType === 'Favourites' ? globalStyles.optionButtonActive : null
           ]}
           onPress={() => setOptionBarType('Favourites')}
         >
           <Text
             style={
-              optionBarType === 'Favourites' ? globalStyles.tagText : { color: globalStyles.colors.text }
+              optionBarType === 'Favourites' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
             }
           >Favourites</Text>
         </TouchableOpacity>
@@ -167,13 +169,13 @@ export default function ProfileScreen({navigation, route}) {
 
       {(() => {
         switch (optionBarType) {
-          case 'My Meals':
+          case 'My Logged Meals':
             return (
               <FlatList
                 style={styles.optionContent}
                 data={meals}
                 ListEmptyComponent={
-                  <Text style={styles.emptyContent}>No Meals</Text>
+                  <Text style={styles.emptyContent}>No Logged Meals</Text>
                 }
                 renderItem={({item, index}) => (
                   <View style={styles.meal}>
@@ -322,31 +324,7 @@ const styles = StyleSheet.create ({
     width: 200,
     marginTop: globalStyles.sectionValues.sectionMargin,
   },
-  optionsBar: {
-    flexDirection: 'row',
-    backgroundColor: globalStyles.colors.backgroundSecondary,
-    borderColor: globalStyles.colors.text,
-    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    height: 50,
-    marginHorizontal: globalStyles.sectionValues.sectionMargin,
-    marginBottom: globalStyles.sectionValues.sectionMargin,
-  },
-  optionButtonFlex: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionButtonActive: {
-    backgroundColor: globalStyles.colors.primary,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    justifyContent: 'center',
-    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderColor: globalStyles.colors.text,
-    marginVertical: -globalStyles.sectionValues.sectionBorderWidth,
-    marginHorizontal: -1,
-    zIndex: 2,
-  },
+  
   optionContent: {
     flex: 1,
     padding: globalStyles.sectionValues.sectionPadding,

@@ -130,6 +130,35 @@ const globalStyles = StyleSheet.create({
     height: 50,
   },
 
+  // option bars / tabs
+
+  optionsBar: {
+    flexDirection: 'row',
+    marginVertical: 10,
+    border: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  optionButtonFlex: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  optionButtonActive: {
+    backgroundColor: colors.primary,
+  },
+
+  optionButtonText: {
+    color: colors.primary,
+  },
+
+  optionButtonTextActive: {
+    color: 'white',
+    fontWeight: '600',
+  },
+
   // input containers 
 
   inputContainer: {

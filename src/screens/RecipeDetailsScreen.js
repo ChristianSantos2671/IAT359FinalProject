@@ -101,26 +101,26 @@ export default function RecipeDetailsScreen({navigation, route}) {
         </TouchableOpacity> */}
       
       {/* Option bar for Details, Ingredients, Instructions */}
-        <View style={styles.optionsBar}>
+        <View style={globalStyles.optionsBar}>
             <TouchableOpacity
-            style={[styles.optionButtonFlex, optionBarType === 'Details' ? styles.optionButtonActive : null]}
+            style={[globalStyles.optionButtonFlex, optionBarType === 'Details' ? globalStyles.optionButtonActive : null]}
             onPress={() => setOptionBarType('Details')}
             >
-            <Text style={optionBarType === 'Details' ? styles.optionButtonTextActive : styles.optionButtonText}>Details</Text>
+            <Text style={optionBarType === 'Details' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>Details</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-            style={[styles.optionButtonFlex, optionBarType === 'Ingredients' ? styles.optionButtonActive : null]}
+            style={[globalStyles.optionButtonFlex, optionBarType === 'Ingredients' ? globalStyles.optionButtonActive : null]}
             onPress={() => setOptionBarType('Ingredients')}
             >
-            <Text style={optionBarType === 'Ingredients' ? styles.optionButtonTextActive : styles.optionButtonText}>Ingredients</Text>
+            <Text style={optionBarType === 'Ingredients' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>Ingredients</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-            style={[styles.optionButtonFlex, optionBarType === 'Instructions' ? styles.optionButtonActive : null]}
+            style={[globalStyles.optionButtonFlex, optionBarType === 'Instructions' ? globalStyles.optionButtonActive : null]}
             onPress={() => setOptionBarType('Instructions')}
             >
-            <Text style={optionBarType === 'Instructions' ? styles.optionButtonTextActive : styles.optionButtonText}>Instructions</Text>
+            <Text style={optionBarType === 'Instructions' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>Instructions</Text>
             </TouchableOpacity>
         </View>
       </View> 
@@ -205,33 +205,6 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 10,
     marginBottom: 10,
-  },
-
-  optionsBar: {
-    flexDirection: 'row',
-    marginVertical: 10,
-    border: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  optionButtonFlex: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  optionButtonActive: {
-    backgroundColor: globalStyles.colors.primary,
-  },
-
-  optionButtonText: {
-    color: globalStyles.colors.primary,
-  },
-
-  optionButtonTextActive: {
-    color: 'white',
-    fontWeight: '600',
   },
 
   bottomButtons: {
