@@ -40,34 +40,36 @@ export default function ProfileScreen({navigation, route}) {
 
   useFocusEffect(
     React.useCallback(() => {
+      if (route?.params?.activeTab) {
+        setOptionBarType(route.params.activeTab);
+      }
+
       if (route?.params?.firstname) {
-      setFirstName(route.params.firstname || "N/A");
-      setLastName(route.params.lastname || "N/A");
+        setFirstName(route.params.firstname || "N/A");
+        setLastName(route.params.lastname || "N/A");
+      } else {
+        const loadUser = async () => {
+          const user = firebase_auth.currentUser;
+          if (!user) return;
 
-    } else {
-      const loadUser = async () => {
-        const user = firebase_auth.currentUser;
-        if (!user) return;
+          const snap = await getDoc(doc(db, "Users", user.uid));
+          if (snap.exists()) {
+            const data = snap.data();
+            setFirstName(data.firstName || "N/A");
+            setLastName(data.lastName || "N/A");
+          }
+        };
+        loadUser();
+      }
 
-        const snap = await getDoc(doc(db, "Users", user.uid));
-        if (snap.exists()) {
-          const data = snap.data();
-          setFirstName(data.firstName || "N/A");
-          setLastName(data.lastName || "N/A");
-
-        }
-      };
-
-      loadUser();
-    }
-    loadData();
-  }, [route?.params])
-);
+      loadData();
+    }, [route?.params])
+  );
 
   const deleteMeal = async (item) => {
     try {
-      await removeMeal(item.name);
-      setMeals(prev => prev.filter(meal => meal.name !== item.name));
+      await removeMeal(item.timestamp);
+      setMeals(prev => prev.filter(meal => meal.timestamp !== item.timestamp));
     } catch (e) {
       console.error("Error deleting meal:", e);
     }
@@ -87,18 +89,30 @@ export default function ProfileScreen({navigation, route}) {
   const toggleFavouriteRecipe = async (item) => {
     try {
       const newValue = await toggleFavourite(item.id, item.is_favourite);
-      // Update recipes list
+
+      // Update both recipes and favourites consistently
       setRecipes(prev =>
         prev.map(recipe =>
           recipe.id === item.id ? { ...recipe, is_favourite: newValue } : recipe
         )
       );
-      // Update favourites list
-      setFavourites(prev =>
-        newValue === 1
-          ? [...prev, { ...item, is_favourite: 1 }]
-          : prev.filter(fav => fav.id !== item.id)
-      );
+
+      setFavourites(prev => {
+        if (newValue === 1) {
+          // If newly favourited, add to favourites and avoid duplicates
+          const exists = prev.some(fav => fav.id === item.id);
+          return exists ? prev : [...prev, { ...item, is_favourite: 1 }];
+        } else {
+          // If unfavourited, remove from favourites
+          return prev.filter(fav => fav.id !== item.id);
+        }
+      });
+
+      const updatedRecipes = await getRecipes();
+      const updatedFavourites = await getFavourites();
+      setRecipes(updatedRecipes);
+      setFavourites(updatedFavourites);
+
     } catch (e) {
       console.error("Error toggling favourite:", e);
     }
@@ -268,21 +282,34 @@ export default function ProfileScreen({navigation, route}) {
                 }
                 renderItem={({item, index}) => (
                   <View style={styles.recipe}>
-                  <Image
-                    style={styles.recipeImage}
-                    source={
-                      item.image_uri
-                        ? { uri: item.image_uri }
-                        : require('../../assets/adaptive-icon.png')
-                    }
-                  />
+                    <Image
+                      style={styles.recipeImage}
+                      source={
+                        item.image_uri
+                          ? { uri: item.image_uri }
+                          : require('../../assets/adaptive-icon.png')
+                      }
+                    />
 
-                    <View>
-                      <Text style={globalStyles.headerText2}>{item.name}</Text>
-                      <View style={styles.recipeIngredientsSection}>
-                        <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
+                    <View style={styles.recipeContent}>
+                      <View>
+                        <Text style={globalStyles.headerText2}>{item.name}</Text>
+                        <View style={styles.recipeIngredientsSection}>
+                          <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
+                        </View>
+                        <Text style={globalStyles.bodyText}>{item.instructions}</Text>
                       </View>
-                      <Text style={globalStyles.bodyText}>{item.instructions}</Text>
+
+                      <View>
+                        <TouchableOpacity
+                          style={styles.favouriteButton}
+                          onPress={() => toggleFavouriteRecipe(item)}
+                        >
+                          <Text style={globalStyles.headerText}>
+                            {item.is_favourite === 1 ? '♥︎' : '♡'}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 )}
