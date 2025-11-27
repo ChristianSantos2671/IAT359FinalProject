@@ -252,7 +252,7 @@ return (
         )}
 
         {/* camera icon + add searching with the camera */}
-        <TouchableOpacity onPress={() => { navigation.navigate('CameraScreen') }}>
+        <TouchableOpacity onPress={() => { navigation.navigate('CameraScreen', {previousScreen: 'Home'}) }}>
           <Ionicons name="camera" size={30} color="#4CAF50" />
         </TouchableOpacity>
       </View>
@@ -333,7 +333,7 @@ return (
       />
       <TouchableOpacity
         style={globalStyles.logMealButton}
-        onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home Screen', photo: '../../assets/adaptive-icon.png'})}
+        onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home', photo: '../../assets/adaptive-icon.png'})}
       >
         <Image
           style={globalStyles.logMealImage}
