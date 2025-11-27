@@ -50,12 +50,14 @@ export async function getRecipes() {
 // Save new recipe
 export async function saveRecipe(recipe) {
   const db = await getDb();
-  const { name, ingredients, instructions, image_uri } = recipe;
+  const { name, ingredients, instructions, image_uri, is_favourite = 0 } = recipe;
   const created_at = Date.now();
 
   await db.runAsync(
-    "INSERT INTO recipes (name, ingredients, instructions, image_uri, created_at) VALUES (?, ?, ?, ?, ?);",
-    [name, ingredients, instructions, image_uri || '', created_at]
+    `INSERT INTO recipes 
+     (name, ingredients, instructions, image_uri, is_favourite, created_at) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [name, ingredients, instructions, image_uri || '', is_favourite, created_at]
   );
   return true;
 }

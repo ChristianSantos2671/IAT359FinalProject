@@ -33,14 +33,18 @@ export async function saveMeal(meal) {
   }
 }
 
-export async function removeMeal(mealName) {
+export async function removeMeal(mealId) {
   try {
-    const meals = await getMeals();
-    const updatedMeals = meals.filter(meal => meal.name !== mealName);
-    await storeData('@meals', updatedMeals);
+    const storedMeals = await AsyncStorage.getItem('meals');
+    if (!storedMeals) return false;
+
+    const meals = JSON.parse(storedMeals);
+    const updatedMeals = meals.filter(meal => meal.timestamp !== mealId);
+
+    await AsyncStorage.setItem('meals', JSON.stringify(updatedMeals));
     return true;
-  } catch (e) {
-    console.error("Error removing meal", e);
+  } catch (error) {
+    console.error('Error removing meal:', error);
     return false;
   }
 }

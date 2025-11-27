@@ -3,9 +3,19 @@ import { useEffect, useState } from "react";
 
 import globalStyles from '../utils/globalStyles';
 
-export default function GroceryListScreen({navigation}) {
+export default function GroceryListScreen({navigation, route}) {
   const [ingredients, setIngredients] = useState([]);
   const [ingredient, setIngredient] = useState('');
+
+  useEffect(() => {
+    if (route?.params?.ingredients) {
+      const initialIngredients = route.params.ingredients.map(item => ({
+        title: item,
+        checked: false
+      }));
+      setIngredients(initialIngredients);
+    }
+  }, [route?.params?.ingredients]);
 
   const addIngredient = () => {
     if (ingredient.trim()) {
@@ -120,14 +130,17 @@ const styles = StyleSheet.create({
     padding: globalStyles.sectionValues.sectionPadding,
   },
   tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    borderRadius: 16,
     backgroundColor: globalStyles.colors.primary,
+    borderRadius: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '95%',
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    margin: 10,
+    paddingVertical: 8,
+    marginVertical: 6,
+    marginHorizontal: 10,
   },
   checkButton: {
     width: 24,
@@ -150,10 +163,16 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   ingridientName: {
+    flex: 1,
+    flexShrink: 1,
+    flexWrap: 'wrap',
     fontSize: globalStyles.tagText.fontSize,
-    marginRight: 5,
+    marginRight: 8,
+    color: globalStyles.colors.text,
+    textAlignVertical: 'top',
   },
   closeButton: {
-    padding: 2,
+    alignSelf: 'center',
+    paddingLeft: 8,
   },
 });

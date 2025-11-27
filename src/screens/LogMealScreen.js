@@ -53,6 +53,7 @@ export default function LogMealScreen({ navigation, route }) {
           'Success',
           'Meal uploaded successfully!',
         );
+        navigation.navigate("Profile", { activeTab: "My Logged Meals" });
       } else {
         setError('Failed to save meal. Please try again.');
       }

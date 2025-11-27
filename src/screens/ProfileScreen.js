@@ -4,7 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import globalStyles from '../utils/globalStyles';
 import { getMeals, removeMeal } from '../utils/storage';
-import { getRecipes, removeRecipe, getFavourites, toggleFavourite } from '../utils/db';
+import { getRecipes, removeRecipe, toggleFavourite } from '../utils/db';
 import { firebase_auth, db } from "../utils/firebaseConfig";
 import { getDoc, doc } from "firebase/firestore";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,19 +17,21 @@ export default function ProfileScreen({navigation, route}) {
   const [firstname, setFirstName] = useState("");
   const [lastname, setLastName] = useState("");
   const insets = useSafeAreaInsets();
-  
 
+  // load meals & recipes from DB and separate favourites
   const loadData = async () => {
     try {
-      const [loadedMeals, loadedRecipes, loadedFavourites] = await Promise.all([
-        getMeals(),
-        getRecipes(),
-        getFavourites()
-      ]);
-      
+      const allRecipes = await getRecipes();
+
+      // Separate favourites and non-favourites
+      const favs = allRecipes.filter(r => r.is_favourite === 1);
+      const nonFavs = allRecipes.filter(r => r.is_favourite !== 1);
+
+      setRecipes(nonFavs); // only non-favourites
+      setFavourites(favs); // only favourites
+
+      const loadedMeals = await getMeals();
       setMeals(loadedMeals || []);
-      setRecipes(loadedRecipes || []);
-      setFavourites(loadedFavourites || []);
     } catch (e) {
       console.error('Error loading data:', e);
       setMeals([]);
@@ -40,72 +42,75 @@ export default function ProfileScreen({navigation, route}) {
 
   useFocusEffect(
     React.useCallback(() => {
+      if (route?.params?.activeTab) {
+        setOptionBarType(route.params.activeTab);
+      }
+
       if (route?.params?.firstname) {
-      setFirstName(route.params.firstname || "N/A");
-      setLastName(route.params.lastname || "N/A");
+        setFirstName(route.params.firstname || "N/A");
+        setLastName(route.params.lastname || "N/A");
+      } else {
+        const loadUser = async () => {
+          const user = firebase_auth.currentUser;
+          if (!user) return;
 
-    } else {
-      const loadUser = async () => {
-        const user = firebase_auth.currentUser;
-        if (!user) return;
+          const snap = await getDoc(doc(db, "Users", user.uid));
+          if (snap.exists()) {
+            const data = snap.data();
+            setFirstName(data.firstName || "N/A");
+            setLastName(data.lastName || "N/A");
+          }
+        };
+        loadUser();
+      }
 
-        const snap = await getDoc(doc(db, "Users", user.uid));
-        if (snap.exists()) {
-          const data = snap.data();
-          setFirstName(data.firstName || "N/A");
-          setLastName(data.lastName || "N/A");
+      loadData();
+    }, [route?.params])
+  );
 
-        }
-      };
-
-      loadUser();
-    }
-    loadData();
-  }, [route?.params])
-);
-
+  // delete meal from storage & state
   const deleteMeal = async (item) => {
     try {
-      await removeMeal(item.name);
-      setMeals(prev => prev.filter(meal => meal.name !== item.name));
+      await removeMeal(item.timestamp);
+      setMeals(prev => prev.filter(meal => meal.timestamp !== item.timestamp));
     } catch (e) {
       console.error("Error deleting meal:", e);
     }
   };
 
+  // delete recipe from DB & remove from both lists
   const deleteRecipe = async (item) => {
     try {
-      await removeRecipe(item.id); // removes from DB
+      await removeRecipe(item.id);
       setRecipes(prev => prev.filter(recipe => recipe.id !== item.id));
       setFavourites(prev => prev.filter(fav => fav.id !== item.id));
-      // HomeScreen will sync via useFocusEffect
     } catch (e) {
       console.error("Error deleting recipe:", e);
     }
   };
 
+  // toggle favourite status and move recipe between lists
   const toggleFavouriteRecipe = async (item) => {
     try {
-      const newValue = await toggleFavourite(item.id, item.is_favourite);
-      // Update recipes list
-      setRecipes(prev =>
-        prev.map(recipe =>
-          recipe.id === item.id ? { ...recipe, is_favourite: newValue } : recipe
-        )
-      );
-      // Update favourites list
-      setFavourites(prev =>
-        newValue === 1
-          ? [...prev, { ...item, is_favourite: 1 }]
-          : prev.filter(fav => fav.id !== item.id)
-      );
+      if (item.is_favourite === 1) {
+        // If currently a favourite → remove completely
+        await removeRecipe(item.id);
+        setFavourites(prev => prev.filter(fav => fav.id !== item.id));
+        setRecipes(prev => prev.filter(r => r.id !== item.id));
+      } else {
+        // Add as favourite
+        const newItem = { ...item, is_favourite: 1 };
+        await saveRecipe(newItem);
+        setFavourites(prev => [...prev, newItem]);
+      }
     } catch (e) {
       console.error("Error toggling favourite:", e);
     }
   };
-  
+
   return (
     <View style={globalStyles.container}>
+      {/* Profile section */}
       <View style={[globalStyles.topContainer, styles.profileSection, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
         <View style={styles.profileCircle}>
           <Text style={styles.profileInitials}>{(firstname || "N/A")[0]}{(lastname || "A")[0]}</Text>
@@ -121,51 +126,32 @@ export default function ProfileScreen({navigation, route}) {
           </View>
         </View>
 
-         <View style={globalStyles.optionsBar}>
-        <TouchableOpacity
-          style={[
-            globalStyles.optionButtonFlex,
-            optionBarType === 'My Logged Meals' ? globalStyles.optionButtonActive : null
-          ]}
-          onPress={() => setOptionBarType('My Logged Meals')}
-        >
-          <Text
-            style={
-              optionBarType === 'My Logged Meals' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
-            }
-          >My Logged Meals</Text>
-        </TouchableOpacity>
+        {/* Option bar */}
+        <View style={globalStyles.optionsBar}>
+          <TouchableOpacity
+            style={[globalStyles.optionButtonFlex, optionBarType === 'My Logged Meals' ? globalStyles.optionButtonActive : null]}
+            onPress={() => setOptionBarType('My Logged Meals')}
+          >
+            <Text style={optionBarType === 'My Logged Meals' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>My Logged Meals</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            globalStyles.optionButtonFlex,
-            optionBarType === 'My Recipes' ? globalStyles.optionButtonActive : null
-          ]}
-          onPress={() => setOptionBarType('My Recipes')}
-        >
-          <Text
-            style={
-              optionBarType === 'My Recipes' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
-            }
-          >My Recipes</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[globalStyles.optionButtonFlex, optionBarType === 'My Recipes' ? globalStyles.optionButtonActive : null]}
+            onPress={() => setOptionBarType('My Recipes')}
+          >
+            <Text style={optionBarType === 'My Recipes' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>My Recipes</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            globalStyles.optionButtonFlex,
-            optionBarType === 'Favourites' ? globalStyles.optionButtonActive : null
-          ]}
-          onPress={() => setOptionBarType('Favourites')}
-        >
-          <Text
-            style={
-              optionBarType === 'Favourites' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText
-            }
-          >Favourites</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={[globalStyles.optionButtonFlex, optionBarType === 'Favourites' ? globalStyles.optionButtonActive : null]}
+            onPress={() => setOptionBarType('Favourites')}
+          >
+            <Text style={optionBarType === 'Favourites' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>Favourites</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
+      {/* Render content based on selected tab */}
       {(() => {
         switch (optionBarType) {
           case 'My Logged Meals':
@@ -173,10 +159,8 @@ export default function ProfileScreen({navigation, route}) {
               <FlatList
                 style={styles.optionContent}
                 data={meals}
-                ListEmptyComponent={
-                  <Text style={styles.emptyContent}>No Logged Meals</Text>
-                }
-                renderItem={({item, index}) => (
+                ListEmptyComponent={<Text style={styles.emptyContent}>No Logged Meals</Text>}
+                renderItem={({item}) => (
                   <View style={styles.meal}>
                     <TouchableOpacity
                       style={[globalStyles.deleteButton, globalStyles.deletePosition]}
@@ -185,14 +169,7 @@ export default function ProfileScreen({navigation, route}) {
                       <Text style={[globalStyles.h4, globalStyles.favouriteActive]}>✕</Text>
                     </TouchableOpacity>
 
-                    <Image
-                      style={styles.mealImage}
-                      source={
-                        item.photo
-                          ? { uri: item.photo }
-                          : require('../../assets/adaptive-icon.png')
-                      }
-                    />
+                    <Image style={styles.mealImage} source={item.photo ? { uri: item.photo } : require('../../assets/adaptive-icon.png')} />
 
                     <View style={styles.mealTextContent}>
                       <View style={styles.mealHeader}>
@@ -213,12 +190,9 @@ export default function ProfileScreen({navigation, route}) {
               <FlatList
                 style={styles.optionContent}
                 data={recipes}
-                ListEmptyComponent={
-                  <Text style={styles.emptyContent}>No Recipes</Text>
-                }
+                ListEmptyComponent={<Text style={styles.emptyContent}>No Recipes</Text>}
                 renderItem={({ item }) => (
-                          
-                 <View style={styles.recipe}>
+                  <View style={styles.recipe}>
                     <TouchableOpacity
                       style={[globalStyles.deleteButton, globalStyles.deletePosition]}
                       onPress={() => deleteRecipe(item)}
@@ -226,14 +200,7 @@ export default function ProfileScreen({navigation, route}) {
                       <Text style={[globalStyles.h4, globalStyles.favouriteActive]}>✕</Text>
                     </TouchableOpacity>
 
-                    <Image
-                      style={styles.recipeImage}
-                      source={
-                        item.image_uri
-                          ? { uri: item.image_uri }
-                          : require('../../assets/adaptive-icon.png')
-                      }
-                    />
+                    <Image style={styles.recipeImage} source={item.image_uri ? { uri: item.image_uri } : require('../../assets/adaptive-icon.png')} />
 
                     <View style={styles.recipeContent}>
                       <View>
@@ -242,18 +209,7 @@ export default function ProfileScreen({navigation, route}) {
 
                           <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
                         </View>
-                        <Text style={globalStyles.bodyText}>{item.instructions}</Text>
-                      </View>
-
-                      <View>
-                        <TouchableOpacity
-                          style={styles.favouriteButton}
-                          onPress={() => toggleFavouriteRecipe(item)}
-                        >
-                          <Text style={globalStyles.headerText}>
-                            {item.is_favourite === 1 ? '♥︎' : '♡'}
-                          </Text>
-                        </TouchableOpacity>
+                        <Text style={styles.bodyText}>{item.instructions}</Text>
                       </View>
                     </View>
                   </View>
@@ -265,26 +221,26 @@ export default function ProfileScreen({navigation, route}) {
               <FlatList
                 style={styles.optionContent}
                 data={favourites}
-                ListEmptyComponent={
-                  <Text style={styles.emptyContent}>No Favourites</Text>
-                }
-                renderItem={({item, index}) => (
+                ListEmptyComponent={<Text style={styles.emptyContent}>No Favourites</Text>}
+                renderItem={({item}) => (
                   <View style={styles.recipe}>
-                  <Image
-                    style={styles.recipeImage}
-                    source={
-                      item.image_uri
-                        ? { uri: item.image_uri }
-                        : require('../../assets/adaptive-icon.png')
-                    }
-                  />
+                    <Image style={styles.recipeImage} source={item.image_uri ? { uri: item.image_uri } : require('../../assets/adaptive-icon.png')} />
 
-                    <View>
-                      <Text style={globalStyles.headerText2}>{item.name}</Text>
-                      <View style={styles.recipeIngredientsSection}>
-                        <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
+                    <View style={styles.recipeContent}>
+                      <View>
+                        <Text style={globalStyles.headerText2}>{item.name}</Text>
+                        <View style={styles.recipeIngredientsSection}>
+                          <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
+                        </View>
+                        <Text style={globalStyles.bodyText}>{item.instructions}</Text>
                       </View>
-                      <Text style={globalStyles.bodyText}>{item.instructions}</Text>
+
+                      {/* favourite toggle button */}
+                      <View>
+                        <TouchableOpacity style={styles.favouriteButton} onPress={() => toggleFavouriteRecipe(item)}>
+                          <Text style={globalStyles.headerText}>{Number(item.is_favourite) === 1 ? '♥︎' : '♡'}</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
                 )}
@@ -295,14 +251,9 @@ export default function ProfileScreen({navigation, route}) {
         }
       })()}
 
-      <TouchableOpacity
-        style={globalStyles.logMealButton}
-        onPress={() => navigation.navigate('Log Meal', {photo: '../../assets/adaptive-icon.png'})}
-      >
-        <Image
-          style={globalStyles.logMealImage}
-          source={require('../../assets/adaptive-icon.png')}
-        />
+      {/* Log meal button */}
+      <TouchableOpacity style={globalStyles.logMealButton} onPress={() => navigation.navigate('Log Meal', {photo: '../../assets/adaptive-icon.png'})}>
+        <Image style={globalStyles.logMealImage} source={require('../../assets/adaptive-icon.png')} />
       </TouchableOpacity>
     </View>
   );
