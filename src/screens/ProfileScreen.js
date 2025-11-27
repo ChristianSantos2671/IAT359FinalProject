@@ -182,7 +182,7 @@ export default function ProfileScreen({navigation, route}) {
                       style={styles.deleteButton}
                       onPress={() => deleteMeal(item)}
                     >
-                      <Text style={globalStyles.headerText}>✕</Text>
+                      <Text style={globalStyles.h3}>✕</Text>
                     </TouchableOpacity>
 
                     <Image
@@ -196,13 +196,13 @@ export default function ProfileScreen({navigation, route}) {
 
                     <View style={styles.mealTextContent}>
                       <View style={styles.mealHeader}>
-                        <Text style={globalStyles.headerText2}>{item.name}</Text>
-                        <Text style={globalStyles.headerText2}>{item.date}</Text>
+                        <Text style={globalStyles.h3}>{item.name}</Text>
+                        <Text style={globalStyles.h3}>{item.date}</Text>
                       </View>
-                      <Text style={[globalStyles.headerText2, styles.sectionTitle]}>Recipe</Text>
+                      <Text style={[globalStyles.h3, styles.sectionTitle]}>Recipe</Text>
                       <Text style={styles.mealDescription} numberOfLines={2}>{item.recipe}</Text>
-                      <Text style={[globalStyles.headerText2, styles.sectionTitle]}>Experience</Text>
-                      <Text style={styles.mealDescription} numberOfLines={2}>{item.experience}</Text>
+                      <Text style={[globalStyles.h3, styles.sectionTitle]}>Experience</Text>
+                      <Text style={globalStyles.bodyText} numberOfLines={2}>{item.experience}</Text>
                     </View>
                   </View>
                 )}
@@ -217,7 +217,8 @@ export default function ProfileScreen({navigation, route}) {
                   <Text style={styles.emptyContent}>No Recipes</Text>
                 }
                 renderItem={({ item }) => (
-                  <View style={styles.recipe}>
+                          
+                 <View style={styles.recipe}>
                     <TouchableOpacity
                       style={styles.deleteButton}
                       onPress={() => deleteRecipe(item)}
@@ -317,7 +318,7 @@ const styles = StyleSheet.create ({
     width: 75,
     height: 75,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderColor: globalStyles.colors.text,
+    borderColor: globalStyles.colors.border,
     borderRadius: 50,
     backgroundColor: globalStyles.colors.secondary,
     justifyContent: 'center',
@@ -341,19 +342,19 @@ const styles = StyleSheet.create ({
   },
   emptyContent: {
     textAlign: 'center',
-    fontSize: globalStyles.headerText.fontSize,
-    fontWeight: globalStyles.headerText.fontWeight,
   },
+  
   meal: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: globalStyles.colors.backgroundSecondary,
+    backgroundColor: 'white',
     borderRadius: globalStyles.buttonValues.buttonBorderRadius,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderColor: globalStyles.colors.text,
+    borderColor: globalStyles.colors.border,
     padding: globalStyles.sectionValues.sectionPadding,
-    margin: globalStyles.sectionValues.sectionMargin/2,
+    marginBottom: globalStyles.sectionValues.sectionMargin,
   },
+  
   mealImage: {
     width: '40%',
     height: 150,
@@ -362,7 +363,7 @@ const styles = StyleSheet.create ({
   },
   mealTextContent: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 4,
   },
   mealHeader: {
     flexDirection: 'row',
