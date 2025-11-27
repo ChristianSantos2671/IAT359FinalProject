@@ -42,7 +42,6 @@ function Tabs() {
   return (
     <Tab.Navigator 
       screenOptions={{
-        headerShown: false,
         tabBarStyle: {
           backgroundColor: "#fff",
           paddingTop: 6,
@@ -59,6 +58,7 @@ function Tabs() {
         name="Home"
         component={HomeScreen}
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
