@@ -179,10 +179,10 @@ export default function ProfileScreen({navigation, route}) {
                 renderItem={({item, index}) => (
                   <View style={styles.meal}>
                     <TouchableOpacity
-                      style={styles.deleteButton}
+                      style={[globalStyles.deleteButton, globalStyles.deletePosition]}
                       onPress={() => deleteMeal(item)}
                     >
-                      <Text style={globalStyles.h3}>✕</Text>
+                      <Text style={[globalStyles.h4, globalStyles.favouriteActive]}>✕</Text>
                     </TouchableOpacity>
 
                     <Image
@@ -199,9 +199,9 @@ export default function ProfileScreen({navigation, route}) {
                         <Text style={globalStyles.h3}>{item.name}</Text>
                         <Text style={globalStyles.h3}>{item.date}</Text>
                       </View>
-                      <Text style={[globalStyles.h3, styles.sectionTitle]}>Recipe</Text>
+                      <Text style={[globalStyles.h4, styles.sectionTitle]}>Recipe</Text>
                       <Text style={styles.mealDescription} numberOfLines={2}>{item.recipe}</Text>
-                      <Text style={[globalStyles.h3, styles.sectionTitle]}>Experience</Text>
+                      <Text style={[globalStyles.h4, styles.sectionTitle]}>Experience</Text>
                       <Text style={globalStyles.bodyText} numberOfLines={2}>{item.experience}</Text>
                     </View>
                   </View>
@@ -220,10 +220,10 @@ export default function ProfileScreen({navigation, route}) {
                           
                  <View style={styles.recipe}>
                     <TouchableOpacity
-                      style={styles.deleteButton}
+                      style={[globalStyles.deleteButton, globalStyles.deletePosition]}
                       onPress={() => deleteRecipe(item)}
                     >
-                      <Text style={globalStyles.headerText}>✕</Text>
+                      <Text style={[globalStyles.h4, globalStyles.favouriteActive]}>✕</Text>
                     </TouchableOpacity>
 
                     <Image
@@ -237,8 +237,9 @@ export default function ProfileScreen({navigation, route}) {
 
                     <View style={styles.recipeContent}>
                       <View>
-                        <Text style={globalStyles.headerText2}>{item.name}</Text>
+                        <Text style={globalStyles.h3}>{item.name}</Text>
                         <View style={styles.recipeIngredientsSection}>
+
                           <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
                         </View>
                         <Text style={globalStyles.bodyText}>{item.instructions}</Text>
@@ -348,18 +349,18 @@ const styles = StyleSheet.create ({
     flexDirection: 'row',
     alignItems: 'flex-start',
     backgroundColor: 'white',
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
+    borderRadius: globalStyles.sectionValues.sectionRadius,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.border,
     padding: globalStyles.sectionValues.sectionPadding,
     marginBottom: globalStyles.sectionValues.sectionMargin,
+    gap: 6,
   },
   
   mealImage: {
     width: '40%',
     height: 150,
-    borderRadius: 10,
-    marginRight: 10,
+    borderRadius:8,
   },
   mealTextContent: {
     flex: 1,

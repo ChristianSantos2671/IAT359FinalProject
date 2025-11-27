@@ -319,7 +319,7 @@ const toggleFavouriteRecipe = async (meal) => {
                       </Text>
                    </TouchableOpacity>
                   </View>
-                <View style={globalStyles.tagContainer}>
+                <View style={[globalStyles.tagContainer, {maxWidth: '80%'}]}>
                   <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {item.strCategory} </Text>
                   <Text style={[globalStyles.tag, globalStyles.areaTag]}> {item.strArea} </Text>
                   {/*splitting the tags string into individual tags */}
