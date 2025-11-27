@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
+  
   cameraButtonSection: {
     position: 'absolute',
     bottom: 0,
@@ -99,7 +100,5 @@ const styles = StyleSheet.create({
     borderColor: globalStyles.colors.background,
     borderRadius: globalStyles.buttonValues.buttonBorderRadius*1.5,
   },
-  text: {
-    color: globalStyles.colors.background,
-  },
+
 });
