@@ -23,12 +23,12 @@ export default function CameraScreen({ navigation, route }) {
     // Camera permissions are not granted yet.
     return (
       <View style={[globalStyles.mainView, styles.permissionSection]}>
-        <Text style={[styles.permissionMessage, globalStyles.headerText2]}>We need your permission to show the camera</Text>
+        <Text style={[styles.permissionMessage, globalStyles.h3]}>We need your permission to show the camera</Text>
         <TouchableOpacity
-          style={styles.permissionButton}
+          style={[globalStyles.primaryButton, {flex:0}]}
           onPress={requestPermission}
         >
-          <Text style={[styles.permissionButtonText, globalStyles.headerText2]}>Grant Permission</Text>
+          <Text style={globalStyles.primaryButtonText}>Grant Permission</Text>
         </TouchableOpacity>
       </View>
     );
@@ -57,11 +57,11 @@ export default function CameraScreen({ navigation, route }) {
       <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
 
       <View style={[styles.cameraButtonSection, { paddingBottom: insets.bottom*2 }]}>
-        <TouchableOpacity style={styles.flipCameraButton} onPress={toggleCameraFacing}>
-          <Text style={[globalStyles.headerText, styles.text]}>Flip</Text>
+        <TouchableOpacity style={styles.cameraButton} onPress={toggleCameraFacing}>
+          <Ionicons name="sync" size={30} color={globalStyles.colors.background} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
+        <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
           <Ionicons name="camera" size={30} color={globalStyles.colors.background} />
         </TouchableOpacity>
       </View>
@@ -78,15 +78,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: globalStyles.sectionValues.sectionPadding,
   },
-  permissionButton: {
-    backgroundColor: globalStyles.colors.primary,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    paddingVertical: globalStyles.buttonValues.buttonPadding,
-    paddingHorizontal: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
   cameraSection: {
     flex: 1,
   },
@@ -100,13 +92,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     width: '100%',
   },
-  flipCameraButton: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    padding: globalStyles.sectionValues.sectionPadding,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius*1.5,
-  },
-  captureButton: {
+
+  cameraButton: {
     padding: globalStyles.buttonValues.buttonPadding*2,
     borderWidth: globalStyles.buttonValues.buttonBorderWidth,
     borderColor: globalStyles.colors.background,
