@@ -196,6 +196,9 @@ const toggleFavouriteRecipe = async (meal) => {
         instructions: meal.strInstructions || '',
         image_uri: meal.strMealThumb,
         is_favourite: 1,
+        category: meal.strCategory,
+        area: meal.strArea,
+        tags: meal.strTags
       });
 
       setData(prev =>

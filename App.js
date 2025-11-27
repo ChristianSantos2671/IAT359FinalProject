@@ -25,6 +25,7 @@ import RecipeDetailsScreen from './src/screens/RecipeDetailsScreen';
 import CameraScreen from './src/screens/CameraScreen';
 import CameraPreviewScreen from './src/screens/CameraPreviewScreen';
 import SuggestedRecipesScreen from './src/screens/SuggestedRecipesScreen';
+import FaveRecipeDetailsScreen from './src/screens/FaveRecipeDetailsScreen.js';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -129,6 +130,12 @@ export default function App() {
               name="Recipe Details" 
               component={RecipeDetailsScreen} 
             />
+
+            <Stack.Screen 
+            name="Saved Recipe Details" 
+            component={FaveRecipeDetailsScreen} 
+            />
+
 
             {/* These are the three screens for the camer and image recognition feature. */}
             <Stack.Screen

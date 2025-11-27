@@ -99,7 +99,13 @@ export default function ProfileScreen({navigation, route}) {
         setRecipes(prev => prev.filter(r => r.id !== item.id));
       } else {
         // Add as favourite
-        const newItem = { ...item, is_favourite: 1 };
+        const newItem = {
+          ...item,
+          is_favourite: 1,
+          category: item.category || "",
+          area: item.area || "",
+          tags: item.tags || "",
+        };
         await saveRecipe(newItem);
         setFavourites(prev => [...prev, newItem]);
       }
@@ -222,29 +228,43 @@ export default function ProfileScreen({navigation, route}) {
                 style={styles.optionContent}
                 data={favourites}
                 ListEmptyComponent={<Text style={styles.emptyContent}>No Favourites</Text>}
-                renderItem={({item}) => (
-                  <View style={styles.recipe}>
-                    <Image style={styles.recipeImage} source={item.image_uri ? { uri: item.image_uri } : require('../../assets/adaptive-icon.png')} />
+               renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={globalStyles.itemContainer}
+                  onPress={() => navigation.navigate("Saved Recipe Details", { recipe: item })}
+                >
+                  <Image 
+                    source={{ uri: item.image_uri }}
+                    style={globalStyles.thumbnail}
+                  />
 
-                    <View style={styles.recipeContent}>
-                      <View>
-                        <Text style={globalStyles.headerText2}>{item.name}</Text>
-                        <View style={styles.recipeIngredientsSection}>
-                          <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
-                        </View>
-                        <Text style={globalStyles.bodyText}>{item.instructions}</Text>
-                      </View>
+                  <View style={globalStyles.mealCardTextContainer}>
+                    <View style={globalStyles.favouriteContainer}>
+                      <Text style={globalStyles.h3}>{item.name}</Text>
 
-                      {/* favourite toggle button */}
-                      <View>
-                        <TouchableOpacity style={styles.favouriteButton} onPress={() => toggleFavouriteRecipe(item)}>
-                          <Text style={globalStyles.headerText}>{Number(item.is_favourite) === 1 ? '♥︎' : '♡'}</Text>
-                        </TouchableOpacity>
-                      </View>
+                      <TouchableOpacity
+                        style={globalStyles.favouriteButton}
+                        onPress={() => toggleFavouriteRecipe(item)}
+                      >
+                        <Text style={[globalStyles.h3, Number(item.is_favourite) === 1 && globalStyles.favouriteActive]}>
+                          {Number(item.is_favourite) === 1 ? '♥︎' : '♡'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={[globalStyles.tagContainer, {maxWidth: '80%'}]}>
+                      <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {item.category} </Text>
+                      <Text style={[globalStyles.tag, globalStyles.areaTag]}> {item.area} </Text>
+                      {/*splitting the tags string into individual tags */}
+                      {item.tags && item.tags.split(',').slice(0,3).map((tag, index) => (
+                        <Text key={index} style={[globalStyles.tag, globalStyles.otherTags]}>
+                          {tag.trim()}
+                        </Text>
+                      ))}
                     </View>
                   </View>
-                )}
-              />
+                </TouchableOpacity>
+              )}
+            />
             );
           default:
             return null;
@@ -292,6 +312,7 @@ const styles = StyleSheet.create ({
     flex: 1,
     padding: globalStyles.sectionValues.sectionPadding,
   },
+  
   emptyContent: {
     textAlign: 'center',
   },

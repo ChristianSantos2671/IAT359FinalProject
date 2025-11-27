@@ -343,7 +343,6 @@ const globalStyles = StyleSheet.create({
     paddingVertical: 6,
   },
 
-
   favouriteActive: {
     color: colors.primary
   }
