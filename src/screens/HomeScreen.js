@@ -24,6 +24,7 @@ export default function HomeScreen({navigation}) {
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedArea, setSelectedArea] = useState([]);
 
+  // sync favourites from DB whenever screen focuses
   useFocusEffect(
     React.useCallback(() => {
       const loadFavourites = async () => {
@@ -32,7 +33,7 @@ export default function HomeScreen({navigation}) {
           setData(prevData =>
             prevData.map(meal => {
               const fav = recipesFromDB.find(r => r.name === meal.strMeal);
-              return fav ? { ...meal, is_favourite: fav.is_favourite } : meal;
+              return fav ? { ...meal, is_favourite: Number(fav.is_favourite) } : { ...meal, is_favourite: 0 };
             })
           );
         } catch (e) {
@@ -66,8 +67,8 @@ export default function HomeScreen({navigation}) {
         meal => meal.strMealThumb && meal.strMealThumb.trim() !== ""
       );
 
-      setData(mealsWithThumb);
-      setFullData(mealsWithThumb);
+      setData(mealsWithThumb.map(m => ({ ...m, is_favourite: 0 }))); // initialise is_favourite
+      setFullData(mealsWithThumb.map(m => ({ ...m, is_favourite: 0 }))); 
       console.log(mealsWithThumb);
 
     } catch (error) { 
@@ -87,8 +88,6 @@ export default function HomeScreen({navigation}) {
   useEffect(() => {
      filterMeals();
      }, [selectedCategory, selectedArea, searchQuery]);
- 
- 
  
  const contains = (meal, query) => {
    const { strMeal, strCategory, strArea, strTags } = meal;
@@ -134,17 +133,15 @@ export default function HomeScreen({navigation}) {
    setData(filtered);
  };
  
- 
  const resetFilters = () => {
     setSelectedCategory([]);
     setSelectedArea([]);
     setSearchQuery("");
     setData(fullData); // reset the displayed meals to all meals
-    };
+ };
 
-
-  {/* searching + filtering the data */}
-  const handleSearch = (query) => {
+ {/* searching + filtering the data */}
+ const handleSearch = (query) => {
     setSearchQuery(query);
 
     if (query.trim() === "") {
@@ -155,9 +152,9 @@ export default function HomeScreen({navigation}) {
     const formattedQuery = query.toLowerCase();
     const filteredData = filter(fullData, (meal) => contains(meal, formattedQuery));
     setData(filteredData);
-  };
+ };
 
-  const toggleFilters = (value, type) => {
+ const toggleFilters = (value, type) => {
   switch (type) {
     case 'category':
       setSelectedCategory(prev =>
@@ -176,6 +173,7 @@ export default function HomeScreen({navigation}) {
     }
   };
 
+// toggle favourite in DB and update list
 const toggleFavouriteRecipe = async (meal) => {
   try {
     // Check if this meal already exists in DB
@@ -184,10 +182,10 @@ const toggleFavouriteRecipe = async (meal) => {
 
     if (existing) {
       // Meal exists → just toggle favourite
-      const newValue = await toggleFavourite(existing.id, existing.is_favourite);
+      const newValue = await toggleFavourite(existing.id, Number(existing.is_favourite));
       setData(prev =>
         prev.map(m =>
-          m.strMeal === meal.strMeal ? { ...m, is_favourite: newValue } : m
+          m.strMeal === meal.strMeal ? { ...m, is_favourite: Number(newValue) } : m
         )
       );
     } else {
@@ -197,6 +195,7 @@ const toggleFavouriteRecipe = async (meal) => {
         ingredients: getIngredientsString(meal),
         instructions: meal.strInstructions || '',
         image_uri: meal.strMealThumb,
+        is_favourite: 1,
       });
 
       setData(prev =>
@@ -210,149 +209,143 @@ const toggleFavouriteRecipe = async (meal) => {
   }
 };
 
-  const getIngredientsString = (meal) => {
-    const ingredients = [];
-    for (let i = 1; i <= 20; i++) {
-      const ingredient = meal[`strIngredient${i}`];
-      const measure = meal[`strMeasure${i}`];
-      if (ingredient && ingredient.trim() !== "") {
-        ingredients.push(`${measure || ""} ${ingredient}`.trim());
-      }
+// helper to convert meal object ingredients into string
+const getIngredientsString = (meal) => {
+  const ingredients = [];
+  for (let i = 1; i <= 20; i++) {
+    const ingredient = meal[`strIngredient${i}`];
+    const measure = meal[`strMeasure${i}`];
+    if (ingredient && ingredient.trim() !== "") {
+      ingredients.push(`${measure || ""} ${ingredient}`.trim());
     }
-    return ingredients.join(", ");
-  };
+  }
+  return ingredients.join(", ");
+};
 
-  return (
-    <View style={globalStyles.container}>
-      <View style={[globalStyles.topContainer, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
-        <View style={styles.signOutfeature}>
-          <Text style={[globalStyles.h1, globalStyles.textMargins]} >Explore Recipes </Text>
-          <TouchableOpacity onPress={logout}>
-              <Ionicons name="log-out" size={30} color="#4CAF50" />
-          </TouchableOpacity>
-        </View>
-        <Text style={[globalStyles.subheadingstyles, globalStyles.textMargins]} >Discover new flavors and find your next favorite dish. Search, browse, and get inspired by thousands of recipes. </Text>
-        
-        {/* search bar  + camera */}
-        <View style={styles.searchContainer}>
-          <TextInput
-          placeholder="Search a recipe"
-          clearButtonMode= "always"
-          style={styles.searchBar}
-          autoCapitalize="none"
-          autoCorrect={false}
-          value={searchQuery}
-          onChangeText={(query) => handleSearch(query)}
-          />
-
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
-              <Ionicons name="close-circle" size={22} />
-            </TouchableOpacity>
-          )}
-
-          {/* camera icon + add searching with the camera */}
-          <TouchableOpacity onPress={() => { navigation.navigate('CameraScreen') }}>
-            <Ionicons name="camera" size={30} color="#4CAF50" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={[globalStyles.tagContainer, styles.tagsSearch]}>
-            <Text style={globalStyles.bodyText}>
-                Popular tags:
-            </Text>
-            <TouchableOpacity onPress={() => toggleFilters('Vegetarian', 'category')}>
-                <Text style={[globalStyles.tag, selectedCategory.includes('Vegetarian') ? globalStyles.categoryTag : null]}>Vegetarian</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleFilters('Seafood', 'category')}>
-                <Text style={[globalStyles.tag, selectedCategory.includes('Seafood') ? globalStyles.categoryTag : null]}>Seafood</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleFilters('Dessert', 'category')}>
-                <Text style={[globalStyles.tag, selectedCategory.includes('Dessert') ? globalStyles.categoryTag : null]}>Dessert</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleFilters('Side', 'category')}>
-                <Text style={[globalStyles.tag, selectedCategory.includes('Side') ? globalStyles.categoryTag : null]}>Side</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => toggleFilters('Turkish', 'area')}>
-                <Text style={[globalStyles.tag, selectedArea.includes('Turkish') ? globalStyles.areaTag : null]}>Turkish</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleFilters('British', 'area')}>
-                <Text style={[globalStyles.tag, selectedArea.includes('British') ? globalStyles.areaTag : null]}>British</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleFilters('Canadian', 'area')}>
-                <Text style={[globalStyles.tag, selectedArea.includes('Canadian') ? globalStyles.areaTag : null]}>Canadian</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleFilters('Japanese', 'area')}>
-                <Text style={[globalStyles.tag, selectedArea.includes('Japanese') ? globalStyles.areaTag : null]}>Japanese</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={resetFilters}>
-                <Text style={[globalStyles.tag, {color: 'red'}]}>Clear Filters</Text>
-            </TouchableOpacity>
-        </View>
+return (
+  <View style={globalStyles.container}>
+    <View style={[globalStyles.topContainer, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
+      <View style={styles.signOutfeature}>
+        <Text style={[globalStyles.h1, globalStyles.textMargins]} >Explore Recipes </Text>
+        <TouchableOpacity onPress={logout}>
+            <Ionicons name="log-out" size={30} color="#4CAF50" />
+        </TouchableOpacity>
       </View>
-      {/* recipe list  */}
-      <FlatList
-        data={data}
-        style={globalStyles.paddingHorizontal}
-        keyExtractor={(item) => item.idMeal}
-        renderItem={({ item }) => (
-          
-          <TouchableOpacity
-            style={styles.itemContainer}
-            onPress={() => navigation.navigate('Recipe Details', { meal: item })} 
-          >
-              <Image 
-              source={{ uri: item.strMealThumb }} 
-              style={styles.thumbnail} 
-              />
+      <Text style={[globalStyles.subheadingstyles, globalStyles.textMargins]} >Discover new flavors and find your next favorite dish. Search, browse, and get inspired by thousands of recipes. </Text>
+      
+      {/* search bar  + camera */}
+      <View style={styles.searchContainer}>
+        <TextInput
+        placeholder="Search a recipe"
+        clearButtonMode= "always"
+        style={styles.searchBar}
+        autoCapitalize="none"
+        autoCorrect={false}
+        value={searchQuery}
+        onChangeText={(query) => handleSearch(query)}
+        />
 
-              <View style={styles.mealCardTextContainer}>
-                <Text style={globalStyles.h3}>{item.strMeal}</Text>
-                <View style={globalStyles.tagContainer}>
-                  <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {item.strCategory} </Text>
-                  <Text style={[globalStyles.tag, globalStyles.areaTag]}> {item.strArea} </Text>
-                  {/*splitting the tags string into individual tags */}
-                  {item.strTags && item.strTags.split(',').slice(0,3).map((tag, index) => (
-                    <Text key={index} style={[globalStyles.tag, globalStyles.otherTags]}>
-                      {tag.trim()}
-                    </Text>
-                  ))}
-                </View>
-                <TouchableOpacity
-                  style={styles.favouriteButton}
-                  onPress={() => toggleFavouriteRecipe(item)}
-                >
-                  <Text style={globalStyles.headerText}>
-                    {item.is_favourite === 1 ? '♥︎' : '♡'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <Ionicons name="close-circle" size={22} />
           </TouchableOpacity>
         )}
-      />
-      <TouchableOpacity
-        style={globalStyles.logMealButton}
-        onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home Screen', photo: '../../assets/adaptive-icon.png'})}
-      >
-        <Image
-          style={globalStyles.logMealImage}
-          source={require('../../assets/adaptive-icon.png')}
-        />
-      </TouchableOpacity>
+
+        {/* camera icon + add searching with the camera */}
+        <TouchableOpacity onPress={() => { navigation.navigate('CameraScreen') }}>
+          <Ionicons name="camera" size={30} color="#4CAF50" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={[globalStyles.tagContainer, styles.tagsSearch]}>
+          <Text style={globalStyles.bodyText}>Popular tags:</Text>
+          <TouchableOpacity onPress={() => toggleFilters('Vegetarian', 'category')}>
+              <Text style={[globalStyles.tag, selectedCategory.includes('Vegetarian') ? globalStyles.categoryTag : null]}>Vegetarian</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => toggleFilters('Seafood', 'category')}>
+              <Text style={[globalStyles.tag, selectedCategory.includes('Seafood') ? globalStyles.categoryTag : null]}>Seafood</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => toggleFilters('Dessert', 'category')}>
+              <Text style={[globalStyles.tag, selectedCategory.includes('Dessert') ? globalStyles.categoryTag : null]}>Dessert</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => toggleFilters('Side', 'category')}>
+              <Text style={[globalStyles.tag, selectedCategory.includes('Side') ? globalStyles.categoryTag : null]}>Side</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => toggleFilters('Turkish', 'area')}>
+              <Text style={[globalStyles.tag, selectedArea.includes('Turkish') ? globalStyles.areaTag : null]}>Turkish</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => toggleFilters('British', 'area')}>
+              <Text style={[globalStyles.tag, selectedArea.includes('British') ? globalStyles.areaTag : null]}>British</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => toggleFilters('Canadian', 'area')}>
+              <Text style={[globalStyles.tag, selectedArea.includes('Canadian') ? globalStyles.areaTag : null]}>Canadian</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => toggleFilters('Japanese', 'area')}>
+              <Text style={[globalStyles.tag, selectedArea.includes('Japanese') ? globalStyles.areaTag : null]}>Japanese</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={resetFilters}>
+              <Text style={[globalStyles.tag, {color: 'red'}]}>Clear Filters</Text>
+          </TouchableOpacity>
+      </View>
     </View>
-  );
-  }
+
+    {/* recipe list */}
+    <FlatList
+      data={data}
+      style={globalStyles.paddingHorizontal}
+      keyExtractor={(item) => item.idMeal}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.itemContainer}
+          onPress={() => navigation.navigate('Recipe Details', { meal: item })} 
+        >
+            <Image source={{ uri: item.strMealThumb }} style={styles.thumbnail} />
+
+            <View style={styles.mealCardTextContainer}>
+              <Text style={globalStyles.h3}>{item.strMeal}</Text>
+              <View style={globalStyles.tagContainer}>
+                <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {item.strCategory} </Text>
+                <Text style={[globalStyles.tag, globalStyles.areaTag]}> {item.strArea} </Text>
+                {/*splitting the tags string into individual tags */}
+                {item.strTags && item.strTags.split(',').slice(0,3).map((tag, index) => (
+                  <Text key={index} style={[globalStyles.tag, globalStyles.otherTags]}>
+                    {tag.trim()}
+                  </Text>
+                ))}
+              </View>
+
+              {/* favourite button */}
+              <TouchableOpacity
+                style={styles.favouriteButton}
+                onPress={() => toggleFavouriteRecipe(item)}
+              >
+                <Text style={globalStyles.headerText}>
+                  {item.is_favourite === 1 ? '♥︎' : '♡'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+        </TouchableOpacity>
+      )}
+    />
+
+    <TouchableOpacity
+      style={globalStyles.logMealButton}
+      onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home Screen', photo: '../../assets/adaptive-icon.png'})}
+    >
+      <Image style={globalStyles.logMealImage} source={require('../../assets/adaptive-icon.png')} />
+    </TouchableOpacity>
+  </View>
+);
+}
 
 const styles = StyleSheet.create({
-
-    // page specific styles
   signOutfeature: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between'
-    },
+  },
 
   searchContainer: {
     flexDirection: "row",
