@@ -285,60 +285,64 @@ return (
               <Text style={[globalStyles.tag, selectedArea.includes('Japanese') ? globalStyles.areaTag : null]}>Japanese</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={resetFilters}>
-              <Text style={[globalStyles.tag, {color: 'red'}]}>Clear Filters</Text>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={resetFilters}>
+                <Text style={[globalStyles.tag, {color: 'red'}]}>Clear Filters</Text>
+            </TouchableOpacity>
+        </View>
       </View>
-    </View>
+      {/* recipe list  */}
+      <FlatList
+        data={data}
+        style={globalStyles.paddingHorizontal}
+        keyExtractor={(item) => item.idMeal}
+        renderItem={({ item }) => (
+          
+          <TouchableOpacity
+            style={globalStyles.itemContainer}
+            onPress={() => navigation.navigate('Recipe Details', { meal: item })} 
+          >
+              <Image 
+              source={{ uri: item.strMealThumb }} 
+              style={globalStyles.thumbnail} 
+              />
 
-    {/* recipe list */}
-    <FlatList
-      data={data}
-      style={globalStyles.paddingHorizontal}
-      keyExtractor={(item) => item.idMeal}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          style={styles.itemContainer}
-          onPress={() => navigation.navigate('Recipe Details', { meal: item })} 
-        >
-            <Image source={{ uri: item.strMealThumb }} style={styles.thumbnail} />
-
-            <View style={styles.mealCardTextContainer}>
-              <Text style={globalStyles.h3}>{item.strMeal}</Text>
-              <View style={globalStyles.tagContainer}>
-                <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {item.strCategory} </Text>
-                <Text style={[globalStyles.tag, globalStyles.areaTag]}> {item.strArea} </Text>
-                {/*splitting the tags string into individual tags */}
-                {item.strTags && item.strTags.split(',').slice(0,3).map((tag, index) => (
-                  <Text key={index} style={[globalStyles.tag, globalStyles.otherTags]}>
-                    {tag.trim()}
-                  </Text>
-                ))}
+              <View style={globalStyles.mealCardTextContainer}>
+                  <View style={globalStyles.favouriteContainer}>
+                    <Text style={globalStyles.h3}>{item.strMeal}</Text>
+                    <TouchableOpacity
+                    style={globalStyles.favouriteButton}
+                    onPress={() => toggleFavouriteRecipe(item)}>
+                      <Text style={[globalStyles.h3,  item.is_favourite === 1 && globalStyles.favouriteActive]}>
+                        {item.is_favourite === 1 ? '♥︎' : '♡'}
+                      </Text>
+                   </TouchableOpacity>
+                  </View>
+                <View style={globalStyles.tagContainer}>
+                  <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {item.strCategory} </Text>
+                  <Text style={[globalStyles.tag, globalStyles.areaTag]}> {item.strArea} </Text>
+                  {/*splitting the tags string into individual tags */}
+                  {item.strTags && item.strTags.split(',').slice(0,3).map((tag, index) => (
+                    <Text key={index} style={[globalStyles.tag, globalStyles.otherTags]}>
+                      {tag.trim()}
+                    </Text>
+                  ))}
+                </View>
               </View>
-
-              {/* favourite button */}
-              <TouchableOpacity
-                style={styles.favouriteButton}
-                onPress={() => toggleFavouriteRecipe(item)}
-              >
-                <Text style={globalStyles.headerText}>
-                  {item.is_favourite === 1 ? '♥︎' : '♡'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-        </TouchableOpacity>
-      )}
-    />
-
-    <TouchableOpacity
-      style={globalStyles.logMealButton}
-      onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home Screen', photo: '../../assets/adaptive-icon.png'})}
-    >
-      <Image style={globalStyles.logMealImage} source={require('../../assets/adaptive-icon.png')} />
-    </TouchableOpacity>
-  </View>
-);
-}
+          </TouchableOpacity>
+        )}
+      />
+      <TouchableOpacity
+        style={globalStyles.logMealButton}
+        onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home Screen', photo: '../../assets/adaptive-icon.png'})}
+      >
+        <Image
+          style={globalStyles.logMealImage}
+          source={require('../../assets/adaptive-icon.png')}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+  }
 
 const styles = StyleSheet.create({
   signOutfeature: {
@@ -364,35 +368,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  itemContainer: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    marginTop: 10,
-    gap: 15,   
-    backgroundColor: "#f9f9f9",
-    padding: 10,
-    borderRadius: 16,
-    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderColor: globalStyles.colors.primary,
-  },
-
-  mealCardTextContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-
-  thumbnail: {
-    width: 100,
-    height: 100,
-    borderRadius: 12,
-  },
-
-  favouriteButton: {
-    width: '20%',
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderColor: globalStyles.colors.text,
-    backgroundColor: globalStyles.colors.primary,
-    padding: globalStyles.buttonValues.buttonPadding,
-  },
 });

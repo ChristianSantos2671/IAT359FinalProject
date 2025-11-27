@@ -17,11 +17,14 @@ const sectionValues = {
   sectionBorderWidth: 1,
   sectionPadding: 16,
   sectionMargin: 16,
+  sectionRadius: 8,
 };
 
 const buttonValues = {
-  buttonBorderWidth: 3,
+  buttonBorderWidth: 1,
   buttonBorderRadius: 30,
+  buttonPaddingHorizontal: 20,
+  buttonPaddingVertical: 10,
   buttonPadding: 10,
   buttonMargin: 10,
 };
@@ -48,6 +51,7 @@ const globalStyles = StyleSheet.create({
   bodyText: {
     fontSize: 10,
   },
+
   tagText: {
     fontSize: 14,
     fontWeight: 'bold',
@@ -58,6 +62,8 @@ const globalStyles = StyleSheet.create({
     padding: sectionValues.sectionPadding,
     marginTop: 5,
   },
+
+
   logMealButton: {
     position: 'absolute',
     right: 0,
@@ -69,10 +75,11 @@ const globalStyles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: buttonValues.buttonBorderRadius,
     borderWidth: buttonValues.buttonBorderWidth,
-    borderColor: colors.text,
+    borderColor: colors.border,
     padding: buttonValues.buttonPadding,
-    margin: buttonValues.buttonMargin,
+    margin: 20,
   },
+  
   logMealImage: {
     width: 40,
     height: 40,
@@ -101,6 +108,12 @@ const globalStyles = StyleSheet.create({
 
   h3: {
     fontSize: 16,
+    fontWeight: "600",
+    color: colors.text,
+  },
+
+  h4: {
+    fontSize: 14,
     fontWeight: "600",
     color: colors.text,
   },
@@ -241,7 +254,7 @@ const globalStyles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: buttonValues.buttonBorderRadius,
     flex: 1,
     marginLeft: 8,
     alignItems: "center",
@@ -273,6 +286,51 @@ const globalStyles = StyleSheet.create({
   buttonFix: {
     flex: 0,
     marginLeft: 0,
+  },
+
+  // meal cards
+  
+  itemContainer: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    marginTop: 10,
+    gap: 15,   
+    backgroundColor: "#f9f9f9",
+    padding: 10,
+    borderRadius: 16,
+    borderWidth: sectionValues.sectionBorderWidth,
+    borderColor: colors.border,
+  },
+
+  mealCardTextContainer: {
+    justifyContent: 'flex-start',
+  },
+
+  thumbnail: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+  },
+
+  // favourite button
+  favouriteContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '80%',
+    margin: 4
+  },
+
+   favouriteButton: {
+    width: '10%',
+    alignItems: 'center',
+    borderRadius: 50,
+    backgroundColor: colors.secondary,
+    padding: 0,
+  },
+
+  favouriteActive: {
+    color: colors.primary
   }
 
 });
