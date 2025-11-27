@@ -28,17 +28,17 @@ export default function CameraPreviewScreen({ route, navigation }) {
       
       <View style={styles.buttonSection}>
         <TouchableOpacity
-          style={[styles.button, {backgroundColor: globalStyles.colors.background}, {marginBottom: insets.bottom}]}
+          style={[globalStyles.secondaryButton, styles.button, {marginBottom: insets.bottom}]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={globalStyles.headerText2}>Retake</Text>
+          <Text style={globalStyles.secondaryButtonText}>Retake</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, {marginBottom: insets.bottom}]}
+          style={[globalStyles.primaryButton, {marginBottom: insets.bottom}]}
           onPress={() => navigateToCertainScreen()}
         >
-          <Text style={globalStyles.headerText2}>Use Photo</Text>
+          <Text style={globalStyles.primaryButtonText}>Use Photo</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -56,11 +56,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: globalStyles.sectionValues.sectionPadding,
   },
-  button: {
-    backgroundColor: globalStyles.colors.primary,
-    padding: globalStyles.buttonValues.buttonPadding,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderColor: globalStyles.colors.text,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-  },
+
 });

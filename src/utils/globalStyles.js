@@ -273,10 +273,11 @@ const globalStyles = StyleSheet.create({
   secondaryButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
     flex: 1,
     marginRight: 8,
     alignItems: "center",
+    borderRadius: buttonValues.buttonBorderRadius,
+    borderWidth: buttonValues.borderWidth
     },
 
   primaryButtonText: {
