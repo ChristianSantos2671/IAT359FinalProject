@@ -92,16 +92,16 @@ export default function ProfileScreen({navigation, route}) {
   // toggle favourite status and move recipe between lists
   const toggleFavouriteRecipe = async (item) => {
     try {
-      const newValue = await toggleFavourite(item.id, item.is_favourite);
-
-      if (newValue === 1) {
-        // Move to favourites
-        setRecipes(prev => prev.filter(r => r.id !== item.id));
-        setFavourites(prev => [...prev, { ...item, is_favourite: 1 }]);
-      } else {
-        // Move back to recipes
+      if (item.is_favourite === 1) {
+        // If currently a favourite → remove completely
+        await removeRecipe(item.id);
         setFavourites(prev => prev.filter(fav => fav.id !== item.id));
-        setRecipes(prev => [...prev, { ...item, is_favourite: 0 }]);
+        setRecipes(prev => prev.filter(r => r.id !== item.id));
+      } else {
+        // Add as favourite
+        const newItem = { ...item, is_favourite: 1 };
+        await saveRecipe(newItem);
+        setFavourites(prev => [...prev, newItem]);
       }
     } catch (e) {
       console.error("Error toggling favourite:", e);
