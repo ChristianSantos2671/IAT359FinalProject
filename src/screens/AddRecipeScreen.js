@@ -69,6 +69,7 @@ export default function AddRecipeScreen({ navigation, route }) {
           'Success',
           'Recipe uploaded successfully!',
         );
+        navigation.navigate("Profile", { activeTab: "My Recipes" });
       } catch (e) {
         setError('Failed to upload recipe. Please try again.');
         console.error('Error uploading recipe:', e);
