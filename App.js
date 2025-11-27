@@ -48,7 +48,8 @@ function Tabs() {
           paddingBottom: insets.bottom + 6,
           height: 65 + insets.bottom,
           borderTopWidth: 0,
-        },          
+        }, 
+        tabLabelStyle: globalStyles.tabLabelStyle,         
         tabBarActiveTintColor: globalStyles.tabBarActiveTint,
         tabBarInactiveTintColor: globalStyles.tabBarInactiveTint,
         }}
