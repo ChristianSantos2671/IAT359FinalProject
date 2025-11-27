@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { firebase_auth } from './src/utils/firebaseConfig.js';
 import { initRecipesTable } from './src/utils/db.js';
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 import { ActivityIndicator, View, TextInput, Text } from 'react-native';
 
@@ -26,36 +29,90 @@ import CameraScreen from './src/screens/CameraScreen';
 import CameraPreviewScreen from './src/screens/CameraPreviewScreen';
 import SuggestedRecipesScreen from './src/screens/SuggestedRecipesScreen';
 import FaveRecipeDetailsScreen from './src/screens/FaveRecipeDetailsScreen.js';
+import globalStyles from './src/utils/globalStyles.js';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+
 // These tabs are used the show the four major sections of the app.
 function Tabs() {
+  const insets = useSafeAreaInsets();
+
   return (
-    <Tab.Navigator>
+    <Tab.Navigator 
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: "#fff",
+          paddingTop: 6,
+          paddingBottom: insets.bottom + 6,
+          height: 65 + insets.bottom,
+          borderTopWidth: 0,
+        },          
+        tabBarActiveTintColor: globalStyles.tabBarActiveTint,
+        tabBarInactiveTintColor: globalStyles.tabBarInactiveTint,
+        }}
+    >
+{/* HOME */}
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-        headerShown: false }}
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={26}
+              color={color}
+            />
+          ),
+        }}
       />
 
+      {/* GROCERY LIST */}
       <Tab.Screen
         name="Grocery List"
         component={GroceryListScreen}
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "cart" : "cart-outline"}
+              size={26}
+              color={color}
+            />
+          ),
+        }}
       />
 
+      {/* ADD RECIPE */}
       <Tab.Screen
         name="Add Recipe"
         component={AddRecipeScreen}
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "add-circle" : "add-circle-outline"}
+              size={28}
+              color={color}
+            />
+          ),
+        }}
       />
 
+      {/* PROFILE */}
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
-        headerShown: false }}
+          headerShown: false, 
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={26}
+              color={color}
+            />
+          ),
+        }}
       />
     </Tab.Navigator>
   );

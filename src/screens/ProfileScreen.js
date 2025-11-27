@@ -230,7 +230,7 @@ export default function ProfileScreen({navigation, route}) {
                 ListEmptyComponent={<Text style={styles.emptyContent}>No Favourites</Text>}
                renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={globalStyles.itemContainer}
+                  style={[globalStyles.itemContainer, styles.favouriteSpacing]}
                   onPress={() => navigation.navigate("Saved Recipe Details", { recipe: item })}
                 >
                   <Image 
@@ -394,4 +394,9 @@ const styles = StyleSheet.create ({
     margin: globalStyles.sectionValues.sectionMargin,
     zIndex: 1,
   },
+
+  favouriteSpacing:{
+    marginTop: 0, 
+    marginBottom: 10
+  }
 });

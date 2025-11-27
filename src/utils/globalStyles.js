@@ -30,9 +30,11 @@ const buttonValues = {
 };
 
 const globalStyles = StyleSheet.create({
+
   colors,
   buttonValues,
   sectionValues,
+
   mainView: {
     flex: 1,
     backgroundColor: colors.background,
@@ -92,6 +94,17 @@ const globalStyles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
+  // TAB NAVIGATION STYLING 
+
+  tabLabelStyle: {
+    fontSize: 12,
+  },
+
+  tabBarActiveTint: colors.primary,       
+  tabBarInactiveTint: colors.subtext,     
+
+
+  // text styling
   h1: {
     fontSize: 26,
     fontWeight: "bold",
@@ -345,7 +358,7 @@ const globalStyles = StyleSheet.create({
 
   favouriteActive: {
     color: colors.primary
-  }
+  },
 
 });
 
