@@ -125,7 +125,7 @@ export default function ProfileScreen({navigation, route}) {
         </View>
 
         <View>
-          <Text style={globalStyles.h1}>{(firstname || "N/A")} {(lastname || "A")}</Text>
+            <Text style={[globalStyles.h1, {alignSelf: 'center'}]}>{(firstname || "N/A")} {(lastname || "A")}</Text>
 
           <View style={styles.profileSpecs}>
             <Text><Text style={globalStyles.headerText.fontWeight}>{meals.length}</Text> Meals</Text>
@@ -315,7 +315,7 @@ const styles = StyleSheet.create ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: 200,
-    marginTop: globalStyles.sectionValues.sectionMargin,
+    marginVertical: globalStyles.sectionValues.sectionMargin,
   },
   
   optionContent: {
@@ -366,7 +366,7 @@ const styles = StyleSheet.create ({
   },
   recipe: {
     alignItems: 'flex-start',
-    backgroundColor: globalStyles.colors.backgroundSecondary,
+    backgroundColor: "white",
     borderRadius: globalStyles.buttonValues.buttonBorderRadius,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.text,
