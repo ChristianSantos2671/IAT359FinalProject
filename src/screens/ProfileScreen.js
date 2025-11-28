@@ -184,8 +184,8 @@ export default function ProfileScreen({navigation, route}) {
                         <Text style={globalStyles.h3}>{item.name}</Text>
                         <Text style={globalStyles.h3}>{item.date}</Text>
                       </View>
-                      <Text style={[globalStyles.h4, styles.sectionTitle]}>Recipe</Text>
-                      <Text style={styles.mealDescription} numberOfLines={2}>{item.recipe}</Text>
+                      {/*<Text style={[globalStyles.h4, styles.sectionTitle]}>Recipe</Text>
+                      <Text style={styles.mealDescription} numberOfLines={2}>{item.recipe}</Text> */}
                       <Text style={[globalStyles.h4, styles.sectionTitle]}>Experience</Text>
                       <Text style={globalStyles.bodyText} numberOfLines={2}>{item.experience}</Text>
                     </View>

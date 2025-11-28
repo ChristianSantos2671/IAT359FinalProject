@@ -8,7 +8,7 @@ import { saveMeal } from "../utils/storage";
 export default function LogMealScreen({ navigation, route }) {
   const { photo } = route.params;
   const [recipeName, setRecipeName] = useState('');
-  const [recipe, setRecipe] = useState('');
+ // const [recipe, setRecipe] = useState('');
   const [experience, setExperience] = useState('');
   const [error, setError] = useState('');
 
@@ -22,10 +22,11 @@ export default function LogMealScreen({ navigation, route }) {
       setError('Please enter a recipe name');
       return;
     }
-    if (!recipe.trim()) {
+  {/*  if (!recipe.trim()) {
       setError('Please enter the recipe');
       return;
-    }
+    } */}
+    
     if (!experience.trim()) {
       setError('Please share your experience');
       return;
@@ -37,7 +38,7 @@ export default function LogMealScreen({ navigation, route }) {
 
     const newMeal = {
       name: recipeName.trim(),
-      recipe: recipe.trim(),
+      //recipe: recipe.trim(),
       experience: experience.trim(),
       timestamp: Date.now(),
       photo: photo.uri,
@@ -47,7 +48,7 @@ export default function LogMealScreen({ navigation, route }) {
       const success = await saveMeal(newMeal);
       if (success) {
         setRecipeName('');
-        setRecipe('');
+        //setRecipe('');
         setExperience('');
         Alert.alert(
           'Success',
@@ -63,68 +64,82 @@ export default function LogMealScreen({ navigation, route }) {
     }
   };
 
-	return (
-		<View style={globalStyles.mainView}>
-      <ScrollView>
-        <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>Recipe Name</Text>
-          <TextInput 
-            style={globalStyles.textInput} 
-            placeholder="eg. Beef Wellington"
-            value={recipeName}
-            onChangeText={setRecipeName}
-          />
-        </View>
+return (
+  <View style={globalStyles.container}>
+    
+    {/* Top Header */}
+    <View style={[globalStyles.topContainer, globalStyles.paddingHorizontal,{ paddingTop: insets.top -40 }]}>
+      <Text style={[globalStyles.subheadingstyles, globalStyles.textMargins]}>
+        Add a meal name, tags, experience, and an image.
+      </Text>
+      {/* Recipe Name */}
+      <Text style={globalStyles.h3}>Meal Name</Text>
+      <TextInput
+        placeholder="Enter meal name"
+        style={[globalStyles.input, { marginTop: 10 }]}
+        value={recipeName}
+        onChangeText={setRecipeName}
+      />
 
-        <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>Recipe</Text>
-          <TextInput
-            style={globalStyles.textInput}
-            multiline={true}
-            placeholder="Step 1: ..."
-            value={recipe}
-            onChangeText={setRecipe}
-          />
-        </View>
+      {/* Recipe Steps 
+      <Text style={globalStyles.h3}>Recipe</Text>
+      <TextInput
+        style={[globalStyles.input, { height: 120, textAlignVertical: "top" }]}
+        multiline
+        placeholder="Step 1..."
+        value={recipe}
+        onChangeText={setRecipe}
+      /> */}
 
-        <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>My Experience</Text>
-          <TextInput
-            style={globalStyles.textInput}
-            multiline={true}
-            placeholder="This recipe was delicious because..."
-            value={experience}
-            onChangeText={setExperience}
-          />
-        </View>
 
-        <View>
-          <Image
-            style={styles.image}
-            source={photo === '../../assets/adaptive-icon.png' ? require('../../assets/adaptive-icon.png') : {uri: photo.uri}}
-          />
-          <TouchableOpacity
-            style={[styles.uploadButton, styles.uploadImageButton]}
-            onPress={() => navigation.navigate('CameraScreen', { previousScreen: 'Log Meal' })}
-          >
-            <Text style={globalStyles.headerText2}>Upload Image</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+    </View>
 
-      <View style={[styles.uploadButtonSection, { paddingBottom: insets.bottom }]}>
-          <TouchableOpacity
-            style={styles.uploadButton}
-            onPress={uploadMeal}
-          >
-            <Text style={globalStyles.headerText2}>Upload My Meal</Text>
-          </TouchableOpacity>
-          {error ? (
-            <Text style={styles.errorText}>{error}</Text>
-          ) : null}
-        </View>
-		</View>
-	);
+    <ScrollView style={globalStyles.paddingHorizontal}>
+     
+      {/* Experience */}
+      <Text style={globalStyles.h3}>My Experience</Text>
+      <TextInput
+        style={[globalStyles.input, { height: 120, textAlignVertical: "top" }]}
+        multiline
+        placeholder="This recipe was delicious because..."
+        value={experience}
+        onChangeText={setExperience}
+      />
+      {/* Image */}
+      {photo?.uri && (
+        <Image
+          style={styles.image}
+          source={{ uri: photo.uri }}
+        />
+      )}
+
+      {/* Errors */}
+      {error ? (
+        <Text style={{ color: "red", marginVertical: 10 }}>{error}</Text>
+      ) : null}
+
+      {/* Bottom Buttons */}
+      <View style={{ marginVertical: 30 }}>
+        <TouchableOpacity
+          style={[globalStyles.secondaryButton, { marginBottom: 10 }]}
+          onPress={() =>
+            navigation.navigate("CameraScreen", { previousScreen: "Log Meal" })
+          }
+        >
+          <Text style={globalStyles.secondaryButtonText}>Upload Image</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={globalStyles.primaryButton}
+          onPress={uploadMeal}
+        >
+          <Text style={globalStyles.primaryButtonText}>Upload My Meal</Text>
+        </TouchableOpacity>
+      </View>
+
+    </ScrollView>
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
