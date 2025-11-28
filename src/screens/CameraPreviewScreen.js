@@ -25,7 +25,6 @@ export default function CameraPreviewScreen({ route, navigation }) {
         style={styles.image}
         source={{uri: photo.uri}}
       />
-      
       <View style={styles.buttonSection}>
         <TouchableOpacity
           style={[globalStyles.secondaryButton, styles.button, {marginBottom: insets.bottom}]}

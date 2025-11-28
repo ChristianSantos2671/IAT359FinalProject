@@ -82,7 +82,7 @@ export default function SuggestedRecipesScreen({ route, navigation }) {
   // Shows a loading spinning incidator.
   if (isLoading) {
     return (
-      <View style={globalStyles.loader}>
+      <View style={[globalStyles.loader, {paddingBottom: 16}]}>
         <ActivityIndicator size="large" color="green" />
         <Text>Analyzing image and finding recipes...</Text>
       </View>
@@ -93,31 +93,33 @@ export default function SuggestedRecipesScreen({ route, navigation }) {
   if (error) {
     return (
       <View style={globalStyles.loader}>
-        <Text style={{ color: "red", fontSize: 16, textAlign: "center" }}>{error}</Text>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CameraScreen')}>
-          <Text style={globalStyles.headerText2}>Retake</Text>
+        <Text style={{ color: "red", fontSize: 16, textAlign: "center", paddingBottom: 16, }}>{error}</Text>
+        <TouchableOpacity style={[globalStyles.primaryButton, {flex:0}]} onPress={() => navigation.navigate('CameraScreen')}>
+          <Text style={globalStyles.primaryButtonText}>Retake</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={globalStyles.mainView}>
-      <Image style={styles.image} source={{ uri: photo.uri }} />
+    <View style={[globalStyles.container, globalStyles.paddingHorizontal, {paddingTop: insets.top - 40}]}>
+      <Image 
+      style={styles.image} 
+      source={{ uri: photo.uri }} 
+      />
 
       <FlatList
         data={suggestedRecipes}
-        style={globalStyles.paddingHorizontal}
         keyExtractor={(item) => item.idMeal?.toString()}
         ListEmptyComponent={() => (
           <Text style={styles.noRecipes}>No recipes found from the image.</Text>
         )}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={[styles.itemContainer, globalStyles.dropshadow]}
+            style={globalStyles.itemContainer}
             onPress={() => navigation.navigate("Recipe Details", { meal: item })}
           >
-            <Image source={{ uri: item.strMealThumb }} style={styles.thumbnail} />
+            <Image source={{ uri: item.strMealThumb }} style={globalStyles.thumbnail} />
 
             <View style={styles.mealCardTextContainer}>
               <Text style={globalStyles.h3}>{item.strMeal}</Text>
@@ -151,9 +153,11 @@ export default function SuggestedRecipesScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   image: {
     width: "100%",
-    height: 200,
+    height: 300,
     resizeMode: "cover",
+    borderRadius: globalStyles.sectionRadius
   },
+
   noRecipes: {
     textAlign: "center",
     marginTop: 20,
@@ -165,7 +169,7 @@ const styles = StyleSheet.create({
     gap: 15,
     backgroundColor: globalStyles.colors.backgroundSecondary,
     padding: 10,
-    borderRadius: 16,
+    borderRadius: globalStyles.sectionValues.sectionRadius,
     borderWidth: 1,
     borderColor: globalStyles.colors.primary,
   },

@@ -75,6 +75,7 @@ function Tabs() {
         name="Grocery List"
         component={GroceryListScreen}
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? "cart" : "cart-outline"}

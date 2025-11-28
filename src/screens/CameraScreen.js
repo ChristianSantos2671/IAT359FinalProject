@@ -54,7 +54,7 @@ export default function CameraScreen({ navigation, route }) {
 
   return (
     <View style={styles.cameraSection}>
-      <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
+      <CameraView ref={cameraRef} style={styles.camera} facing={facing} /> 
 
       <View style={[styles.cameraButtonSection, { paddingBottom: insets.bottom*2 }]}>
         <TouchableOpacity style={styles.cameraButton} onPress={toggleCameraFacing}>
