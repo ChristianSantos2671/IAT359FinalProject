@@ -241,7 +241,7 @@ return (
         <TextInput
         placeholder="Search a recipe"
         clearButtonMode= "always"
-        style={styles.searchBar}
+        style={[globalStyles.input, styles.searchBar]}
         autoCapitalize="none"
         autoCorrect={false}
         value={searchQuery}
@@ -250,13 +250,13 @@ return (
 
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => setSearchQuery("")}>
-            <Ionicons name="close-circle" size={22} />
+            <Ionicons name="close-circle" size={22}  />
           </TouchableOpacity>
         )}
 
         {/* camera icon + add searching with the camera */}
         <TouchableOpacity onPress={() => { navigation.navigate('CameraScreen', {previousScreen: 'Home'}) }}>
-          <Ionicons name="camera" size={30} color="#4CAF50" />
+          <Ionicons name="camera" size={30} color="#4CAF50" style={{marginLeft: 10}} />
         </TouchableOpacity>
       </View>
 
@@ -338,10 +338,12 @@ return (
         style={globalStyles.logMealButton}
         onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home', photo: '../../assets/adaptive-icon.png'})}
       >
-        <Image
-          style={globalStyles.logMealImage}
-          source={require('../../assets/adaptive-icon.png')}
+        <Ionicons 
+          name="journal-outline" 
+          size={32} 
+          color="#ffffff"
         />
+        <Text style={[globalStyles.h3, {color: "white"}]}>+</Text>
       </TouchableOpacity>
     </View>
   );
@@ -357,18 +359,11 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderColor: globalStyles.colors.border,
-    borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: "#fff",
     marginBottom: 10,
-    paddingHorizontal: 10,
   },
   
   searchBar: {
     flex: 1,
-    height: 40,
-    fontSize: 16,
   },
 
 });

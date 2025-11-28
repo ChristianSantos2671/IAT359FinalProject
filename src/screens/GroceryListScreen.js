@@ -1,6 +1,8 @@
 import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+
 
 
 import globalStyles from '../utils/globalStyles';
@@ -85,7 +87,7 @@ return (
                 style={styles.checkButton}
                 onPress={() => toggleIngredient(index)}
               >
-                <Text style={styles.checkmark}>{item.checked ? "✓" : ""}</Text>
+                <Text style={styles.checkmark}>{item.checked ? "●" : ""}</Text>
               </TouchableOpacity>
 
               <Text style={[styles.ingredientName, item.checked && styles.checkedText]}>
@@ -102,15 +104,17 @@ return (
     </ScrollView>
 
     {/* Floating Button */}
-    <TouchableOpacity
-      style={globalStyles.logMealButton}
-      onPress={() => navigation.navigate("Log Meal")}
-    >
-      <Image
-        style={globalStyles.logMealImage}
-        source={require("../../assets/adaptive-icon.png")}
-      />
-    </TouchableOpacity>
+      <TouchableOpacity
+        style={globalStyles.logMealButton}
+        onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home', photo: '../../assets/adaptive-icon.png'})}
+      >
+        <Ionicons 
+          name="journal-outline" 
+          size={32} 
+          color="#ffffff"
+        />
+        <Text style={[globalStyles.h3, {color: "white"}]}>+</Text>
+      </TouchableOpacity>
   </View>
 );
 }
@@ -121,6 +125,7 @@ const styles = StyleSheet.create({
   addIngredientContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
     marginBottom: 15,
   },
@@ -153,8 +158,8 @@ const styles = StyleSheet.create({
   checkButton: {
     width: 24,
     height: 24,
-    borderWidth: 2,
-    borderColor: globalStyles.colors.text,
+    borderWidth: 1,
+    borderColor: globalStyles.colors.primary,
     borderRadius: 12,
     marginRight: 8,
     alignItems: "center",
@@ -166,6 +171,8 @@ const styles = StyleSheet.create({
     color: globalStyles.colors.primary,
     fontSize: 16,
     fontWeight: "bold",
+    alignSelf: "center",
+    justifyContent: "center"
   },
 
   ingredientName: {
@@ -184,6 +191,6 @@ const styles = StyleSheet.create({
   closeButton: {
     fontSize: 18,
     paddingLeft: 10,
-    color: globalStyles.colors.text,
+    color: globalStyles.colors.primary,
   },
 });

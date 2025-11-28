@@ -8,6 +8,8 @@ import { getRecipes, removeRecipe, toggleFavourite } from '../utils/db';
 import { firebase_auth, db } from "../utils/firebaseConfig";
 import { getDoc, doc } from "firebase/firestore";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from "@expo/vector-icons";
+
 
 export default function ProfileScreen({navigation, route}) {
   const [optionBarType, setOptionBarType] = useState('My Logged Meals');
@@ -272,8 +274,16 @@ export default function ProfileScreen({navigation, route}) {
       })()}
 
       {/* Log meal button */}
-      <TouchableOpacity style={globalStyles.logMealButton} onPress={() => navigation.navigate('Log Meal', {photo: '../../assets/adaptive-icon.png'})}>
-        <Image style={globalStyles.logMealImage} source={require('../../assets/adaptive-icon.png')} />
+      <TouchableOpacity
+        style={globalStyles.logMealButton}
+        onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home', photo: '../../assets/adaptive-icon.png'})}
+      >
+        <Ionicons 
+          name="journal-outline" 
+          size={32} 
+          color="#ffffff"
+        />
+        <Text style={[globalStyles.h3, {color: "white"}]}>+</Text>
       </TouchableOpacity>
     </View>
   );

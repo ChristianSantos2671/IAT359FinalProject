@@ -91,6 +91,7 @@ function Tabs() {
         name="Add Recipe"
         component={AddRecipeScreen}
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? "add-circle" : "add-circle-outline"}

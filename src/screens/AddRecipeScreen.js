@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 
 import globalStyles from '../utils/globalStyles';
 import { saveRecipe } from '../utils/db';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 export default function AddRecipeScreen({ navigation, route }) {
   const photo = route?.params?.photo ?? null;
@@ -11,6 +13,8 @@ export default function AddRecipeScreen({ navigation, route }) {
   const [ingredient, setIngredient] = useState('');
   const [instructions, setInstructions] = useState('');
   const [error, setError] = useState('');
+  const insets = useSafeAreaInsets();
+  
 
   const addIngredient = () => {
     if (ingredient.trim()) {
@@ -76,170 +80,179 @@ export default function AddRecipeScreen({ navigation, route }) {
       }
     };
   
-  return (
-    <View style={globalStyles.mainView}>
-      <ScrollView>
-        <View>
-          {/* Camera access or upload photo here */}
-        </View>
+return (
+  <View style={globalStyles.container}>
+    
+    {/* Top Header */}
+    <View style={[globalStyles.topContainer, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
+      <Text style={[globalStyles.h1, globalStyles.textMargins]}>Add Recipe</Text>
+      <Text style={[globalStyles.subheadingstyles, globalStyles.textMargins]}>
+        Add a name, ingredients, instructions, and an image.
+      </Text>
+      
+      {/* Recipe Name */}
+      <Text style={globalStyles.h3}>Recipe name</Text>
+      <TextInput
+        placeholder="Enter recipe name"
+        style={[globalStyles.input, { marginTop: 10 }]}
+        value={recipeName}
+        onChangeText={setRecipeName}
+      />
 
-        <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>Recipe Name</Text>
-          <TextInput 
-            style={globalStyles.textInput} 
-            placeholder="eg. Beef Wellington"
-            value={recipeName}
-            onChangeText={setRecipeName}
-          />
-        </View>
+      {/* Add Ingredient Bar */}
+      <Text style={globalStyles.h3}>Ingredients</Text>
 
-        <View style={[globalStyles.view, styles.addIngriedientSection]}>
-          <TextInput 
-            style={[globalStyles.textInput, styles.enterIngridientInput]} 
-            placeholder="Enter Ingredient"
-            value={ingredient}
-            onChangeText={setIngredient}
-            onSubmitEditing={addIngredient}
-          />
-          <TouchableOpacity 
-            style={styles.ingridientButton}
-            onPress={addIngredient}
-          >
-            <Text style={globalStyles.headerText2}>+</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.addIngredientContainer}>
+        <TextInput
+          placeholder="Enter Ingredient"
+          style={[globalStyles.input, styles.enterIngredientInput]}
+          value={ingredient}
+          onChangeText={setIngredient}
+          onSubmitEditing={addIngredient}
+        />
+        <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
+          <Text style={[globalStyles.h2, { color: "#fff" }]}>+</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
 
-        <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>Recipe Ingrdients</Text>
-          <FlatList
-            style={styles.ingredientsList}
-            scrollEnabled={false}
-            data={ingredients}
-            renderItem={({item, index}) => (
-              <View style={styles.tag}>
-                <Text style={styles.ingridientName}>{item}</Text>
-                <TouchableOpacity
-                  onPress={() => deleteIngredient(index)}
-                >
-                  <Text style={styles.closeButton}>✕</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          />
-        </View>
+    <ScrollView style={globalStyles.paddingHorizontal}>
+      
+      <Text style={[globalStyles.h3, { marginVertical: 10 }]}>All ingredients</Text>
 
-        <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>Instructions</Text>
-          <TextInput
-            style={globalStyles.textInput}
-            multiline={true}
-            placeholder="Step 1: ..."
-            value={instructions}
-            onChangeText={setInstructions}
-          />
-        </View>
+      <FlatList
+        scrollEnabled={false}
+        data={ingredients}
+        renderItem={({ item, index }) => (
+          <View style={styles.tag}>
+            <Text style={styles.ingredientName}>{item}</Text>
+            <TouchableOpacity onPress={() => deleteIngredient(index)}>
+              <Text style={styles.closeButton}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      />
 
-        <View>
-          <Image
-            style={styles.image}
-            source={
-              photo && photo.uri
-                ? { uri: photo.uri }
-                : require('../../assets/adaptive-icon.png')
-            }
-          />
-        </View>
-      </ScrollView>
+      {/* Instructions */}
+      <Text style={[globalStyles.h3, { marginTop: 20 }]}>Instructions</Text>
+      <TextInput
+        style={[globalStyles.input, { height: 120, textAlignVertical: "top" }]}
+        multiline
+        placeholder="Step 1..."
+        value={instructions}
+        onChangeText={setInstructions}
+      />
 
-      <View style={styles.uploadButtonSection}>
+      {/* Image */}
+      <Image
+        style={styles.image}
+        source={
+          photo && photo.uri
+            ? { uri: photo.uri }
+            : require('../../assets/adaptive-icon.png')
+        }
+      />
+
+      {error ? <Text style={{ color: 'red', marginVertical: 10 }}>{error}</Text> : null}
+
+      {/* Bottom Buttons (Instead of Floating Button) */}
+      <View style={{ marginBottom: 40 }}>
         <TouchableOpacity
-          style={[styles.uploadButton, styles.uploadImageButton]}
+          style={[styles.uploadButton, { marginBottom: 10 }]}
           onPress={() => navigation.navigate('CameraScreen', { previousScreen: 'Add Recipe' })}
         >
-          <Text style={globalStyles.headerText2}>Upload Image</Text>
+          <Text style={globalStyles.h3}>Upload Image</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.uploadButton}
           onPress={uploadRecipe}
         >
-          <Text style={globalStyles.headerText2}>Upload Recipe</Text>
+          <Text style={globalStyles.h3}>Upload Recipe</Text>
         </TouchableOpacity>
-        {error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : null}
       </View>
-    </View>
-  );
+
+    </ScrollView>
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
-  image: {
-    flex: 1,
-    width: '100%',
-    height: 150,
-    marginVertical: globalStyles.sectionValues.sectionMargin,
-    resizeMode: 'contain',
-  },
-  addIngriedientSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 0,
-  },
-  enterIngridientInput: {
-    flex: 1,
-  },
-  ingridientButton: {
-    backgroundColor: globalStyles.colors.primary,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    padding: globalStyles.buttonValues.buttonPadding,
-    margin: globalStyles.buttonValues.buttonMargin,
-  },
-  ingredientsList: {
-    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    backgroundColor: globalStyles.colors.backgroundSecondary,
+
+  /* -------- Add Ingredient Bar -------- */
+  addIngredientContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
-    padding: globalStyles.sectionValues.sectionPadding,
+    marginBottom: 15,
   },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    borderRadius: 16,
+
+  enterIngredientInput: {
+    flex: 9,
+  },
+
+  addButton: {
     backgroundColor: globalStyles.colors.primary,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    margin: 10,
-  },
-  ingridientName: {
-    fontSize: globalStyles.tagText.fontSize,
-    marginRight: 5,
-  },
-  closeButton: {
-    padding: 2,
-  },
-  uploadButtonSection: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 10,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
   },
+
+  /* -------- Ingredient Tag (Matches Grocery List) -------- */
+  tag: {
+    backgroundColor: globalStyles.colors.secondary,
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginVertical: 6,
+  },
+
+  ingredientName: {
+    flex: 1,
+    flexWrap: "wrap",
+    fontSize: globalStyles.tagText.fontSize,
+    marginRight: 8,
+    color: globalStyles.colors.text,
+  },
+
+  closeButton: {
+    fontSize: 18,
+    paddingLeft: 10,
+    color: globalStyles.colors.primary,
+  },
+
+  /* -------- Instructions Image -------- */
+  image: {
+    width: "100%",
+    height: 200,
+    resizeMode: "cover",
+    marginVertical: 20,
+    borderRadius: 12,
+    backgroundColor: globalStyles.colors.backgroundSecondary,
+  },
+
+  /* -------- Bottom Buttons -------- */
   uploadButton: {
     backgroundColor: globalStyles.colors.primary,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    paddingVertical: globalStyles.buttonValues.buttonPadding,
-    paddingHorizontal: 100,
-    marginVertical: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
   },
+
+  /* Optional: upload image button slight spacing */
   uploadImageButton: {
-    marginHorizontal: globalStyles.buttonValues.buttonMargin * 3,
+    marginBottom: 10,
   },
+
   errorText: {
     color: 'red',
     marginTop: 5,

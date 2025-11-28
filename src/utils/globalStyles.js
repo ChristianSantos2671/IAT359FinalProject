@@ -69,6 +69,7 @@ const globalStyles = StyleSheet.create({
     bottom: 0,
     width: 60,
     height: 60,
+    flexDirection: "row",
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
@@ -192,7 +193,7 @@ const globalStyles = StyleSheet.create({
   
   input: {
     backgroundColor: '#fff',
-    paddingVertical: 15,
+    paddingVertical: 12,
     paddingHorizontal: 10,
     borderRadius: 10,
     marginVertical: 8,
