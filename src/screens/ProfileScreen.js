@@ -214,9 +214,10 @@ export default function ProfileScreen({navigation, route}) {
                       <View>
                         <Text style={globalStyles.h3}>{item.name}</Text>
                         <View style={styles.recipeIngredientsSection}>
-
+                          <Text style={[globalStyles.h4, styles.sectionTitle]}>Ingredients</Text>
                           <Text style={globalStyles.bodyText}>{item.ingredients}</Text>
                         </View>
+                          <Text style={[globalStyles.h4, styles.sectionTitle]}>Instructions</Text>
                         <Text style={styles.bodyText}>{item.instructions}</Text>
                       </View>
                     </View>
@@ -348,12 +349,14 @@ const styles = StyleSheet.create ({
     flex: 1,
     marginLeft: 4,
   },
+
   mealHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
   },
+
   mealDescription: {
     fontSize: globalStyles.bodyText.fontSize,
     color: globalStyles.colors.text,
@@ -364,15 +367,17 @@ const styles = StyleSheet.create ({
     marginBottom: 2,
     color: globalStyles.colors.primary,
   },
+
   recipe: {
     alignItems: 'flex-start',
     backgroundColor: "white",
     borderRadius: globalStyles.buttonValues.buttonBorderRadius,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    borderColor: globalStyles.colors.text,
+    borderColor: globalStyles.colors.border,
     padding: globalStyles.sectionValues.sectionPadding,
     margin: globalStyles.sectionValues.sectionMargin/2,
   },
+
   recipeImage: {
     width: '100%',
     height: 150,
