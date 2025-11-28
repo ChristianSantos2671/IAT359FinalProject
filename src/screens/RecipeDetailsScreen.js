@@ -22,7 +22,6 @@ export default function RecipeDetailsScreen({navigation, route}) {
   const randomPrepTime = getRandomInt(10, 30);
   const randomCookTime = getRandomInt(15, 60);
   const insets = useSafeAreaInsets();
-  const [favourites, setFavourites] = useState([]);
 
   
   // making the list of ingredients + measurements
@@ -188,7 +187,12 @@ export default function RecipeDetailsScreen({navigation, route}) {
 
             <TouchableOpacity
                 style={globalStyles.primaryButton}
-                onPress={() => navigation.navigate("Log Meal", {photo: '../../assets/adaptive-icon.png'})}
+                onPress={() => 
+                  navigation.navigate("Log Meal", { 
+                    photo: '../../assets/adaptive-icon.png',
+                    mealName: meal.strMeal 
+                  })
+                }
             >
                 <Text style={globalStyles.primaryButtonText}>Log Meal</Text>
             </TouchableOpacity>

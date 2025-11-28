@@ -6,8 +6,8 @@ import globalStyles from '../utils/globalStyles';
 import { saveMeal } from "../utils/storage";
 
 export default function LogMealScreen({ navigation, route }) {
-  const { photo } = route.params;
-  const [recipeName, setRecipeName] = useState('');
+const { photo, mealName } = route.params || {};
+const [recipeName, setRecipeName] = useState(mealName || '');
  // const [recipe, setRecipe] = useState('');
   const [experience, setExperience] = useState('');
   const [error, setError] = useState('');

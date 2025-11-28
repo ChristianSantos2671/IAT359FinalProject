@@ -159,7 +159,12 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
 
         <TouchableOpacity
           style={globalStyles.primaryButton}
-          onPress={() => navigation.navigate("Log Meal", { photo: recipe.image_uri })}
+          onPress={() =>
+            navigation.navigate("Log Meal", { 
+              photo: recipe.image_uri,
+              mealName: recipe.name 
+            })
+          }
         >
           <Text style={globalStyles.primaryButtonText}>Log Meal</Text>
         </TouchableOpacity>
