@@ -208,7 +208,7 @@ export default function ProfileScreen({navigation, route}) {
                       <Text style={[globalStyles.h4, globalStyles.favouriteActive]}>✕</Text>
                     </TouchableOpacity>
 
-                    <Image style={styles.recipeImage} source={item.image_uri ? { uri: item.image_uri } : require('../../assets/adaptive-icon.png')} />
+                    <Image style={styles.recipeImage} source={item.image_uri ? { uri: item.image_uri } : require('../../assets/recipe_default.png')} />
 
                     <View style={styles.recipeContent}>
                       <View>

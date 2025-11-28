@@ -267,7 +267,6 @@ const globalStyles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: buttonValues.buttonBorderRadius,
     flex: 1,
-    marginLeft: 8,
     alignItems: "center",
     },
 
@@ -275,10 +274,10 @@ const globalStyles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     flex: 1,
-    marginRight: 8,
     alignItems: "center",
     borderRadius: buttonValues.buttonBorderRadius,
-    borderWidth: buttonValues.borderWidth
+    borderWidth: buttonValues.buttonBorderWidth,
+    borderColor: colors.primary
     },
 
   primaryButtonText: {

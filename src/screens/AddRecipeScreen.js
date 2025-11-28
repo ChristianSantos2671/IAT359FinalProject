@@ -143,32 +143,30 @@ return (
         onChangeText={setInstructions}
       />
 
-      {/* Image */}
-      <Image
-        style={styles.image}
-        source={
-          photo && photo.uri
-            ? { uri: photo.uri }
-            : require('../../assets/adaptive-icon.png')
-        }
-      />
+      {/*image*/}
+      {photo && photo.uri ? (
+        <Image
+          style={styles.image}
+          source={{ uri: photo.uri }}
+        />
+      ) : null}
 
       {error ? <Text style={{ color: 'red', marginVertical: 10 }}>{error}</Text> : null}
 
       {/* Bottom Buttons (Instead of Floating Button) */}
-      <View style={{ marginBottom: 40 }}>
+      <View style={{ marginVertical: 30 }}>
         <TouchableOpacity
-          style={[styles.uploadButton, { marginBottom: 10 }]}
+          style={[globalStyles.secondaryButton, { marginBottom: 10 }]}
           onPress={() => navigation.navigate('CameraScreen', { previousScreen: 'Add Recipe' })}
         >
-          <Text style={globalStyles.h3}>Upload Image</Text>
+          <Text style={globalStyles.secondaryButtonText}>Upload Image</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.uploadButton}
+          style={globalStyles.primaryButton}
           onPress={uploadRecipe}
         >
-          <Text style={globalStyles.h3}>Upload Recipe</Text>
+          <Text style={globalStyles.primaryButtonText}>Upload Recipe</Text>
         </TouchableOpacity>
       </View>
 
@@ -233,7 +231,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     resizeMode: "cover",
-    marginVertical: 20,
+    marginTop: 20,
     borderRadius: 12,
     backgroundColor: globalStyles.colors.backgroundSecondary,
   },
