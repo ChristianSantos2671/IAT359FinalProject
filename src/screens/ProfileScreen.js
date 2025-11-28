@@ -180,7 +180,7 @@ export default function ProfileScreen({navigation, route}) {
                     <Image style={styles.mealImage} source={item.photo ? { uri: item.photo } : require('../../assets/adaptive-icon.png')} />
 
                     <View style={styles.mealTextContent}>
-                      <View style={styles.mealHeader}>
+                      <View style={globalStyles.h2}>
                         <Text style={globalStyles.h3}>{item.name}</Text>
                         <Text style={globalStyles.h3}>{item.date}</Text>
                       </View>
@@ -371,7 +371,7 @@ const styles = StyleSheet.create ({
   recipe: {
     alignItems: 'flex-start',
     backgroundColor: "white",
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
+    borderRadius: globalStyles.sectionValues.sectionRadius,
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.border,
     padding: globalStyles.sectionValues.sectionPadding,
@@ -392,6 +392,7 @@ const styles = StyleSheet.create ({
   recipeIngredientsSection: {
     marginVertical: globalStyles.sectionValues.sectionMargin/2,
   },
+  
   favouriteButton: {
     position: 'absolute',
     right: '100%',
@@ -402,6 +403,7 @@ const styles = StyleSheet.create ({
     backgroundColor: globalStyles.colors.primary,
     padding: globalStyles.buttonValues.buttonPadding,
   },
+  
   deleteButton: {
     position: 'absolute',
     right: 0,
