@@ -70,22 +70,29 @@ export default function CameraScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+
+// perm message styling
   permissionMessage: {
     textAlign: 'center',
     paddingBottom: globalStyles.sectionValues.sectionPadding,
   },
+
+  // layout for permissions section
   permissionSection: {
     justifyContent: 'center',
     padding: globalStyles.sectionValues.sectionPadding,
   },
 
+  // camera spacing
   cameraSection: {
     flex: 1,
   },
+
   camera: {
     flex: 1,
   },
   
+  // layout for camera buttons
   cameraButtonSection: {
     position: 'absolute',
     bottom: 0,
@@ -94,6 +101,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
+  // styling for camera buttons
   cameraButton: {
     padding: globalStyles.buttonValues.buttonPadding*2,
     borderWidth: globalStyles.buttonValues.buttonBorderWidth,

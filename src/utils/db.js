@@ -2,16 +2,36 @@ import { openDatabaseAsync } from "expo-sqlite";
 
 let dbPromise;
 
+/**
+ * Opens (or returns an existing reference to) the SQLite database.
+ * The function ensures a single shared connection using a cached promise.
+ */
+
 export function getDb() {
   if (!dbPromise) dbPromise = openDatabaseAsync('app.db');
   return dbPromise;
 }
 
-// Initialize recipes table
+/**
+ * Initializes the main `recipes` table in the database if it doesn't exist.
+ * Also attempts to add an `image_uri` column if it's missing.
+ * Table schema:
+ *  - id: unique integer ID (auto-incremented)
+ *  - name: recipe name (text)
+ *  - ingredients: list or description of ingredients (text)
+ *  - instructions: cooking steps (text)
+ *  - is_favourite: 0 or 1 (boolean flag)
+ *  - created_at: timestamp in milliseconds (integer)
+ *  - image_uri: optional image path or URL (text)
+ *  - category: category tags
+ *  - area: area tags 
+ *  - tags: as the general otherTags
+ */
+
 export async function initRecipesTable() {
   const db = await getDb();
 
-  // Create table (with all columns, works for brand-new installs)
+  // Create the table if it doesn’t exist already.
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS recipes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,6 +55,8 @@ export async function initRecipesTable() {
     `ALTER TABLE recipes ADD COLUMN tags TEXT;`
   ];
 
+  // Add missing columns if it doesn't already exist (ignores duplicate errors).
+
   for (let sql of migrationSQL) {
     try {
       await db.execAsync(sql);
@@ -47,13 +69,20 @@ export async function initRecipesTable() {
   }
 }
 
-// Get all recipes
+/**
+ * Retrieves all recipes (both favourite and non-favourite).
+ * sorted by creation date (newest first).
+ */
 export async function getRecipes() {
   const db = await getDb();
   return await db.getAllAsync("SELECT * FROM recipes ORDER BY created_at DESC;");
 }
 
-// Save new recipe
+
+/**
+ * Inserts a new recipe record into the database.
+ * Automatically sets a creation timestamp.
+ */
 export async function saveRecipe(recipe) {
   const db = await getDb();
 
@@ -80,14 +109,21 @@ export async function saveRecipe(recipe) {
   return true;
 }
 
-// Remove a recipe
+/**
+ * Deletes a recipe row from the database by ID.
+ */
+
 export async function removeRecipe(recipeId) {
   const db = await getDb();
   await db.runAsync("DELETE FROM recipes WHERE id = ?;", [recipeId]);
   return true;
 }
 
-// Toggle favourite
+/**
+ * Toggles the `is_favourite` flag for a given recipe.
+ * Updates the value between 1 (favourite) and 0 (not favourite).
+ */
+
 export async function toggleFavourite(recipeId, currentValue) {
   const db = await getDb();
   const newValue = currentValue === 1 ? 0 : 1;
@@ -95,7 +131,11 @@ export async function toggleFavourite(recipeId, currentValue) {
   return newValue;
 }
 
-// Get favourite recipes only
+/**
+ * Retrieves only recipes marked as favourites.
+ * Sorted by creation date (newest first).
+ */
+
 export async function getFavourites() {
   const db = await getDb();
   return await db.getAllAsync("SELECT * FROM recipes WHERE is_favourite = 1 ORDER BY created_at DESC;");

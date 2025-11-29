@@ -11,16 +11,43 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from "@expo/vector-icons";
 
 
+/**
+ * ProfileScreen
+ * ---------------
+ * Handles:
+ *  - Displaying user profile (initials, name)
+ *  - Displaying logged meals, saved recipes, and favourites
+ *  - Fetching data from AsyncStorage + Firestore
+ *  - Deleting meals or recipes
+ *  - Toggling favourites
+ *  - Switching between 3 tabs in the top bar
+ */
+
 export default function ProfileScreen({navigation, route}) {
+
+  // Tab state (My Logged Meals / My Recipes / Favourites)
   const [optionBarType, setOptionBarType] = useState('My Logged Meals');
+
+  // Storage + DB data
   const [meals, setMeals] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [favourites, setFavourites] = useState([]);
+
+  // User display name (Firestore)
   const [firstname, setFirstName] = useState("");
   const [lastname, setLastName] = useState("");
+
   const insets = useSafeAreaInsets();
 
-  // load meals & recipes from DB and separate favourites
+/**
+   * loadData()
+   * -----------
+   * Fetches:
+   *  - All recipes from local DB
+   *  - Separates them into favourites + non-favourites
+   *  - Loads logged meals from AsyncStorage
+   */
+  
   const loadData = async () => {
     try {
       const allRecipes = await getRecipes();
@@ -32,64 +59,81 @@ export default function ProfileScreen({navigation, route}) {
       setRecipes(nonFavs); // only non-favourites
       setFavourites(favs); // only favourites
 
+      // Load logged meals from AsyncStorage
       const loadedMeals = await getMeals();
       setMeals(loadedMeals || []);
     } catch (e) {
       console.error('Error loading data:', e);
+      
+      // Reset lists if it fails
       setMeals([]);
       setRecipes([]);
       setFavourites([]);
     }
   };
 
+  /**
+   * useFocusEffect()
+   * ----------------
+   * Runs every time the user lands on this page specifically.
+   * Handles:
+   *  - Switching tabs when coming from other screens
+   *  - Updating displayed user name from Firestore
+   *  - Refreshing meals and recipe lists
+   */
+
   useFocusEffect(
     React.useCallback(() => {
+      // If navigating here with a tab selection, apply it
       if (route?.params?.activeTab) {
         setOptionBarType(route.params.activeTab);
       }
 
-      if (route?.params?.firstname) {
-        setFirstName(route.params.firstname || "N/A");
-        setLastName(route.params.lastname || "N/A");
-      } else {
-        const loadUser = async () => {
-          const user = firebase_auth.currentUser;
-          if (!user) return;
+      // Load user info from Firestore
+      const loadUser = async () => {
+        const user = firebase_auth.currentUser;
+        if (!user) return;
 
+        try {
           const snap = await getDoc(doc(db, "Users", user.uid));
           if (snap.exists()) {
             const data = snap.data();
             setFirstName(data.firstName || "N/A");
             setLastName(data.lastName || "N/A");
           }
-        };
-        loadUser();
-      }
+        } catch (e) {
+          console.error("Error loading user:", e);
+          setFirstName("N/A");
+          setLastName("N/A");
+        }
+      };
 
-      loadData();
-    }, [route?.params])
+      loadUser();
+      loadData(); // meals + recipes
+
+    }, [route?.params?.activeTab])
   );
 
-  // delete meal from storage & state
-  const deleteMeal = async (item) => {
-    try {
-      await removeMeal(item.timestamp);
-      setMeals(prev => prev.filter(meal => meal.timestamp !== item.timestamp));
-    } catch (e) {
-      console.error("Error deleting meal:", e);
-    }
-  };
+    // delete meal from storage & state
+    const deleteMeal = async (item) => {
+      try {
+        await removeMeal(item.timestamp);
+        setMeals(prev => prev.filter(meal => meal.timestamp !== item.timestamp));
+      } catch (e) {
+        console.error("Error deleting meal:", e);
+      }
+    };
 
-  // delete recipe from DB & remove from both lists
-  const deleteRecipe = async (item) => {
-    try {
-      await removeRecipe(item.id);
-      setRecipes(prev => prev.filter(recipe => recipe.id !== item.id));
-      setFavourites(prev => prev.filter(fav => fav.id !== item.id));
-    } catch (e) {
-      console.error("Error deleting recipe:", e);
-    }
-  };
+    // delete recipe from DB & remove from both lists
+    const deleteRecipe = async (item) => {
+      try {
+        await removeRecipe(item.id);
+        setRecipes(prev => prev.filter(recipe => recipe.id !== item.id));
+        setFavourites(prev => prev.filter(fav => fav.id !== item.id));
+      } catch (e) {
+        console.error("Error deleting recipe:", e);
+      }
+    };
 
   // toggle favourite status and move recipe between lists
   const toggleFavouriteRecipe = async (item) => {
@@ -117,6 +161,7 @@ export default function ProfileScreen({navigation, route}) {
   };
 
   return (
+    // top container with profile into such as profile icon with initials, name, number of meals + recipes
     <View style={globalStyles.container}>
       {/* Profile section */}
       <View style={[globalStyles.topContainer, styles.profileSection, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
@@ -128,13 +173,15 @@ export default function ProfileScreen({navigation, route}) {
             <Text style={[globalStyles.h1, {alignSelf: 'center'}]}>{(firstname || "N/A")} {(lastname || "A")}</Text>
 
           <View style={styles.profileSpecs}>
-            <Text><Text style={globalStyles.headerText.fontWeight}>{meals.length}</Text> Meals</Text>
+            <Text><Text style={globalStyles.headerText.fontWeight}>{meals.length}</Text> Logged Meals</Text>
             <Text>•</Text>
             <Text><Text style={globalStyles.headerText.fontWeight}>{recipes.length}</Text> Recipes</Text>
           </View>
         </View>
 
-        {/* Option bar */}
+        {/* Option bar - tabs to switch between My Logged Meals, My Recipes, and Favourites section
+            The UI will change when the user switches to respective sections
+        */}
         <View style={globalStyles.optionsBar}>
           <TouchableOpacity
             style={[globalStyles.optionButtonFlex, optionBarType === 'My Logged Meals' ? globalStyles.optionButtonActive : null]}
@@ -161,6 +208,7 @@ export default function ProfileScreen({navigation, route}) {
 
       {/* Render content based on selected tab */}
       {(() => {
+        {/* UI for my Logged meals as a list - renders data from log meal */}
         switch (optionBarType) {
           case 'My Logged Meals':
             return (
@@ -170,6 +218,8 @@ export default function ProfileScreen({navigation, route}) {
                 ListEmptyComponent={<Text style={styles.emptyContent}>No Logged Meals</Text>}
                 renderItem={({item}) => (
                   <View style={styles.meal}>
+
+                    {/* X button to delete logged meal  */}
                     <TouchableOpacity
                       style={[globalStyles.deleteButton, globalStyles.deletePosition]}
                       onPress={() => deleteMeal(item)}
@@ -177,15 +227,17 @@ export default function ProfileScreen({navigation, route}) {
                       <Text style={[globalStyles.h4, globalStyles.favouriteActive]}>✕</Text>
                     </TouchableOpacity>
 
+                    {/* image */}
                     <Image style={styles.mealImage} source={item.photo ? { uri: item.photo } : require('../../assets/adaptive-icon.png')} />
 
+                    {/* text block */}
                     <View style={styles.mealTextContent}>
                       <View style={globalStyles.h2}>
                         <Text style={globalStyles.h3}>{item.name}</Text>
                         <Text style={globalStyles.h3}>{item.date}</Text>
                       </View>
                       {/*<Text style={[globalStyles.h4, styles.sectionTitle]}>Recipe</Text>
-                      <Text style={styles.mealDescription} numberOfLines={2}>{item.recipe}</Text> */}
+                      <Text style={globalStyles.bodyText} numberOfLines={2}>{item.recipe}</Text> */}
                       <Text style={[globalStyles.h4, styles.sectionTitle]}>Experience</Text>
                       <Text style={globalStyles.bodyText} numberOfLines={2}>{item.experience}</Text>
                     </View>
@@ -194,6 +246,7 @@ export default function ProfileScreen({navigation, route}) {
               />
             );
           case 'My Recipes':
+          {/* UI for my Recipes as a list - renders data from add recipes screen */}
             return (
               <FlatList
                 style={styles.optionContent}
@@ -201,15 +254,17 @@ export default function ProfileScreen({navigation, route}) {
                 ListEmptyComponent={<Text style={styles.emptyContent}>No Recipes</Text>}
                 renderItem={({ item }) => (
                   <View style={styles.recipe}>
+                    {/* X button to delete logged meal  */}
                     <TouchableOpacity
                       style={[globalStyles.deleteButton, globalStyles.deletePosition]}
                       onPress={() => deleteRecipe(item)}
                     >
                       <Text style={[globalStyles.h4, globalStyles.favouriteActive]}>✕</Text>
                     </TouchableOpacity>
-
+                    {/* image, renders a default image if user doesn't add one */}
                     <Image style={styles.recipeImage} source={item.image_uri ? { uri: item.image_uri } : require('../../assets/recipe_default.png')} />
-
+                    
+                    {/* text block */}
                     <View style={styles.recipeContent}>
                       <View>
                         <Text style={globalStyles.h3}>{item.name}</Text>
@@ -226,6 +281,8 @@ export default function ProfileScreen({navigation, route}) {
               />
             );
           case 'Favourites':
+          {/* UI for Favourites as a list - renders data the user has favourited screen.  Uses the same component from homescreen */}
+
             return (
               <FlatList
                 style={styles.optionContent}
@@ -254,6 +311,7 @@ export default function ProfileScreen({navigation, route}) {
                         </Text>
                       </TouchableOpacity>
                     </View>
+                    {/* recipe tags */}
                     <View style={[globalStyles.tagContainer, {maxWidth: '80%'}]}>
                       <Text style={[globalStyles.tag, globalStyles.categoryTag]}> {item.category} </Text>
                       <Text style={[globalStyles.tag, globalStyles.areaTag]}> {item.area} </Text>
@@ -274,7 +332,7 @@ export default function ProfileScreen({navigation, route}) {
         }
       })()}
 
-      {/* Log meal button */}
+      {/* floating Log meal button */}
       <TouchableOpacity
         style={globalStyles.logMealButton}
         onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home', photo: '../../assets/adaptive-icon.png'})}
@@ -291,12 +349,15 @@ export default function ProfileScreen({navigation, route}) {
 }
 
 const styles = StyleSheet.create ({
+
+// layout for the profile section
   profileSection: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
+  // styling for profile circle 
   profileCircle: {
     width: 75,
     height: 75,
@@ -307,27 +368,33 @@ const styles = StyleSheet.create ({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  // styling for profile initials in the circle 
   profileInitials: {
     fontSize: 24, 
     color: globalStyles.colors.text,
     fontWeight: 'bold',
   },
+
+  // layout for profile specs such as number of meals and recipes
   profileSpecs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: 200,
     marginVertical: globalStyles.sectionValues.sectionMargin,
   },
-  
+
+  // option bar 
   optionContent: {
     flex: 1,
     padding: globalStyles.sectionValues.sectionPadding,
   },
   
+  // stlying for no content text 
   emptyContent: {
     textAlign: 'center',
   },
   
+  // logged meal card styling + layout
   meal: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -340,16 +407,20 @@ const styles = StyleSheet.create ({
     gap: 6,
   },
   
+  // meal image size + style
   mealImage: {
     width: '40%',
     height: 150,
     borderRadius:8,
   },
+
+  // meal content layout
   mealTextContent: {
     flex: 1,
     marginLeft: 4,
   },
 
+  // meal header layout
   mealHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -357,17 +428,14 @@ const styles = StyleSheet.create ({
     marginBottom: 10,
   },
 
-  mealDescription: {
-    fontSize: globalStyles.bodyText.fontSize,
-    color: globalStyles.colors.text,
-    marginBottom: 8,
-  },
+  // section title layout 
   sectionTitle: {
     marginTop: 4,
     marginBottom: 2,
     color: globalStyles.colors.primary,
   },
 
+  // recipe card styling + layout
   recipe: {
     alignItems: 'flex-start',
     backgroundColor: "white",
@@ -378,21 +446,28 @@ const styles = StyleSheet.create ({
     margin: globalStyles.sectionValues.sectionMargin/2,
   },
 
+  // recipe card image 
+
   recipeImage: {
     width: '100%',
     height: 150,
     borderRadius: 10,
     marginBottom: 10,
   },
+
+  // spacing for recipe card content
   recipeContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
   },
+
+  // spacing for recipe ingredients 
   recipeIngredientsSection: {
     marginVertical: globalStyles.sectionValues.sectionMargin/2,
   },
   
+  // position for favourite button
   favouriteButton: {
     position: 'absolute',
     right: '100%',
@@ -404,6 +479,7 @@ const styles = StyleSheet.create ({
     padding: globalStyles.buttonValues.buttonPadding,
   },
   
+  // spacing for delete button
   deleteButton: {
     position: 'absolute',
     right: 0,
@@ -411,6 +487,8 @@ const styles = StyleSheet.create ({
     margin: globalStyles.sectionValues.sectionMargin,
     zIndex: 1,
   },
+
+  // spacing for favourites
 
   favouriteSpacing:{
     marginTop: 0, 

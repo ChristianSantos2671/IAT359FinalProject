@@ -3,22 +3,22 @@ import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'rea
 import globalStyles from '../utils/globalStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// Random time generator
+// Function to generate a random integer between min and max (inclusive)
 const getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 export default function FaveRecipeDetailsScreen({ navigation, route }) {
-  const { recipe } = route.params; // <<---- DB RECIPE HERE
+  const { recipe } = route.params; // sending db recipe parameters
   const insets = useSafeAreaInsets();
   const [optionBarType, setOptionBarType] = useState("Details");
 
-  // Random values to match HomeScreen style
+  // Random values for details section
   const randomServings = getRandomInt(1, 6);
   const randomPrepTime = getRandomInt(10, 30);
   const randomCookTime = getRandomInt(15, 60);
 
-  // Build ingredients list (DB stores "ingredient1, ingredient2, ingredient3")
+  // Build ingredients list from DB
   const ingredientsList = recipe.ingredients
     ? recipe.ingredients.split(",").map((i, index) => `${index + 1}. ${i.trim()}`)
     : [];
@@ -27,13 +27,16 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
     <View style={globalStyles.container}>
       <ScrollView>
 
-        {/* HEADER SECTION */}
+      {/* top container for image + recipe details like tags, name etc */}
         <View style={[globalStyles.paddingHorizontal, globalStyles.topContainer]}>
+
+        {/*recipe image*/}
 
           <Image
             source={{ uri: recipe.image_uri }}
             style={styles.image}
           />
+        {/* recipe name */}
 
           <Text style={[globalStyles.h2, globalStyles.textMargins]}>
             {recipe.name}
@@ -43,7 +46,7 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
             A delightful dish that combines flavors and textures to create a memorable culinary experience.
           </Text>
 
-          {/* TAGS */}
+          {/* tags */}
           <View style={globalStyles.tagContainer}>
             {recipe.category ? (
               <Text style={[globalStyles.tag, globalStyles.categoryTag]}>
@@ -66,7 +69,7 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
             }
           </View>
 
-          {/* OPTION BAR */}
+          {/* Option bar for Details, Ingredients, Instructions */}
           <View style={globalStyles.optionsBar}>
             <TouchableOpacity
               style={[globalStyles.optionButtonFlex, optionBarType === "Details" ? globalStyles.optionButtonActive : null]}
@@ -97,9 +100,10 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
           </View>
         </View>
 
-        {/* CONTENT SECTION (BASED ON TAB) */}
+        {/* CONTENT SECTION*/}
         {(() => {
           switch (optionBarType) {
+            // all the recipe details
             case "Details":
               return (
                 <View>
@@ -121,6 +125,8 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
               );
 
             case "Ingredients":
+            // list of ingredients + measurements mapped into a list 
+
               return (
                 <View style={[globalStyles.paddingHorizontal, globalStyles.textSection]}>
                   <Text style={globalStyles.h3}>Ingredients</Text>
@@ -133,6 +139,8 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
               );
 
             case "Instructions":
+              // recipe instructions
+
               return (
                 <View style={[globalStyles.paddingHorizontal, globalStyles.textSection]}>
                   <Text style={globalStyles.h3}>Instructions</Text>
@@ -148,8 +156,9 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
         })()}
       </ScrollView>
 
-      {/* BOTTOM BUTTONS */}
+      {/* Bottom buttons for Grocery List and Log Meal */}
       <View style={styles.bottomButtons}>
+        {/* Shop ingredients will pass the recipe ingredients to the Grocery list screen */}
         <TouchableOpacity
           style={globalStyles.secondaryButton}
           onPress={() => navigation.navigate("Grocery List", { ingredients: ingredientsList })}
@@ -157,6 +166,7 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
           <Text style={globalStyles.secondaryButtonText}>Shop Ingredients</Text>
         </TouchableOpacity>
 
+        {/* Log meal button will push the meal name and redirect the user */}
         <TouchableOpacity
           style={globalStyles.primaryButton}
           onPress={() =>
@@ -175,12 +185,15 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  // image styling
   image: {
     width: "100%",
     height: 200,
     borderRadius: 10,
     marginBottom: 10,
   },
+  
+  // spacing for the bottom buttons
   bottomButtons: {
     flexDirection: "row",
     justifyContent: "space-between",

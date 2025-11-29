@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import globalStyles from '../utils/globalStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getFavourites, toggleFavourite } from '../utils/db';
 
 
 import { get } from 'lodash';
@@ -12,11 +11,14 @@ const getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-
-
 export default function RecipeDetailsScreen({navigation, route}) {
+  // Grabbing the full "meal" object from navigation params
+
   const { meal } = route.params; 
+
+  // controling which tab is selected 
   const [optionBarType, setOptionBarType] = useState('Details');
+
   // Generate random numbers
   const randomServings = getRandomInt(1, 6);
   const randomPrepTime = getRandomInt(10, 30);
@@ -38,41 +40,20 @@ export default function RecipeDetailsScreen({navigation, route}) {
     }
   }; 
 
-  {/* favouriting the recipes 
-  const toggleFavouriteRecipe = async (item) => {
-      const isAlreadyFavourite = item.is_favourite === 1;
-      try {
-        await toggleFavourite(item.id, !isAlreadyFavourite);
-        // Update local state
-        setRecipes(prev => prev.map(recipe => 
-          recipe.id === item.id 
-            ? { ...recipe, is_favourite: isAlreadyFavourite ? 0 : 1 }
-            : recipe
-        ));
-        // Update favourites list
-        if (isAlreadyFavourite) {
-          setFavourites(prev => prev.filter(fav => fav.id !== item.id));
-        } else {
-          const updatedItem = { ...item, is_favourite: 1 };
-          setFavourites(prev => [...prev, updatedItem]);
-        }
-      } catch (e) {
-        console.error("Error toggling favourite:", e);
-      }
-    }; */}
-
-
   return (
     <View style={globalStyles.container}> 
     <ScrollView>  
 
+      {/* top container for image + recipe details like tags, name etc */}
+
       <View style={[globalStyles.paddingHorizontal, globalStyles.topContainer]}>
 
+      {/*recipe image*/}
       <Image 
         source={{ uri: meal.strMealThumb }} 
         style={styles.Image} 
       />
-
+      {/* recipe name */}
       <Text style={[globalStyles.h2, globalStyles.textMargins]}>{meal.strMeal}</Text>
 
       {/* Later use Gemini to create a short text description of the recipe*/}
@@ -89,15 +70,6 @@ export default function RecipeDetailsScreen({navigation, route}) {
               </Text>
             ))}
        </View>
-
-       {/* <TouchableOpacity
-          style={styles.favouriteButton}
-          onPress={() => toggleFavouriteRecipe(item)}
-        >
-          <Text style={globalStyles.headerText}>
-            {item.is_favourite === 1 ? '♥︎' : '♡'}
-          </Text>
-        </TouchableOpacity> */}
       
       {/* Option bar for Details, Ingredients, Instructions */}
         <View style={globalStyles.optionsBar}>
@@ -126,6 +98,7 @@ export default function RecipeDetailsScreen({navigation, route}) {
 
       {(() => {
         switch (optionBarType) {
+          // all the recipe details
             case 'Details':
             return (
                 <ScrollView style={styles.optionContent}>
@@ -147,6 +120,7 @@ export default function RecipeDetailsScreen({navigation, route}) {
             );
 
             case 'Ingredients':
+            // list of ingredients + measurements mapped into a list 
             return (
                 <ScrollView> 
                   <View style={[globalStyles.paddingHorizontal, globalStyles.textSection]}>
@@ -160,6 +134,7 @@ export default function RecipeDetailsScreen({navigation, route}) {
             );
 
             case 'Instructions':
+            // recipe instructions
             return (
                 <ScrollView>
                     <View style={[globalStyles.paddingHorizontal, globalStyles.textSection]}>
@@ -178,13 +153,14 @@ export default function RecipeDetailsScreen({navigation, route}) {
 
         {/* Bottom buttons for Grocery List and Log Meal */}
          <View style={styles.bottomButtons}>
+          {/* Shop ingredients will pass the recipe ingredients to the Grocery list screen */}
             <TouchableOpacity 
             style={globalStyles.secondaryButton}
             onPress={() => navigation.navigate("Grocery List", {ingredients: ingredientsList})}
             >
                 <Text style={globalStyles.secondaryButtonText}>Shop Ingredients</Text>
             </TouchableOpacity>
-
+            {/* Log meal button will push the meal name and redirect the user */}
             <TouchableOpacity
                 style={globalStyles.primaryButton}
                 onPress={() => 
@@ -203,7 +179,7 @@ export default function RecipeDetailsScreen({navigation, route}) {
 } 
 
 const styles = StyleSheet.create({
-  
+  // image styling
   Image: {
     width: '100%',
     height: 200,
@@ -211,6 +187,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
+  // spacing for the bottom buttons
   bottomButtons: {
   flexDirection: "row",
   justifyContent: "space-between",

@@ -6,6 +6,7 @@ import globalStyles from '../utils/globalStyles';
 import { saveMeal } from "../utils/storage";
 
 export default function LogMealScreen({ navigation, route }) {
+// pass parameters from faveRecipe details + regular recipe details screen
 const { photo, mealName } = route.params || {};
 const [recipeName, setRecipeName] = useState(mealName || '');
  // const [recipe, setRecipe] = useState('');
@@ -17,11 +18,12 @@ const [recipeName, setRecipeName] = useState(mealName || '');
   const uploadMeal = async () => {
     setError('');
 
-    // Check all fields
+    // Validate user input.
     if (!recipeName.trim()) {
       setError('Please enter a recipe name');
       return;
     }
+
   {/*  if (!recipe.trim()) {
       setError('Please enter the recipe');
       return;
@@ -72,7 +74,7 @@ return (
       <Text style={[globalStyles.subheadingstyles, globalStyles.textMargins]}>
         Add a meal name, tags, experience, and an image.
       </Text>
-      {/* Recipe Name */}
+      {/* Recipe Name --> it will pass the parameters */}
       <Text style={globalStyles.h3}>Meal Name</Text>
       <TextInput
         placeholder="Enter meal name"
@@ -120,6 +122,7 @@ return (
 
       {/* Bottom Buttons */}
       <View style={{ marginVertical: 30 }}>
+        {/* Button to upload meal image -- image hidden until the user uploads it */}
         <TouchableOpacity
           style={[globalStyles.secondaryButton, { marginBottom: 10 }]}
           onPress={() =>
@@ -128,7 +131,7 @@ return (
         >
           <Text style={globalStyles.secondaryButtonText}>Upload Image</Text>
         </TouchableOpacity>
-
+        {/* Upload button --> redirect user to the logged meal section in profile */}
         <TouchableOpacity
           style={globalStyles.primaryButton}
           onPress={uploadMeal}
@@ -143,6 +146,7 @@ return (
 }
 
 const styles = StyleSheet.create({
+  // image spacing and style
   image: {
     flex: 1,
     width: '100%',
@@ -150,27 +154,8 @@ const styles = StyleSheet.create({
     marginVertical: globalStyles.sectionValues.sectionMargin,
     resizeMode: 'contain',
   },
-  uploadButtonSection: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-  },
-  uploadButton: {
-    backgroundColor: globalStyles.colors.primary,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    paddingVertical: globalStyles.buttonValues.buttonPadding,
-    paddingHorizontal: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  uploadImageButton: {
-    marginHorizontal: globalStyles.buttonValues.buttonMargin * 3,
-  },
+
+  // error text
   errorText: {
     color: 'red',
     marginTop: 10,

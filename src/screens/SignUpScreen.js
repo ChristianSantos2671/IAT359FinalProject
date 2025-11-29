@@ -14,16 +14,18 @@ export default function SignUpScreen({navigation}) {
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(false);
-      const insets = useSafeAreaInsets();
+    const insets = useSafeAreaInsets();
 
 
+    // function that handles a new user account
     const handleSignUp = async () => {
-
+      // checks if the user has filled in all the fields or else sent an error
       if (!email || !password || !lastName || !firstName || !username) {
         Alert.alert("Please fill in all fields");
         return;
       }
 
+      // creates an new account if all fields are in, and the user doesn't already exist
       try {
           setLoading(true);
           const userCredential = await createUserWithEmailAndPassword(firebase_auth, email.trim(), password);
@@ -122,6 +124,7 @@ export default function SignUpScreen({navigation}) {
 
         {/* BUTTONS */}
         <View style={styles.buttonContainer}>
+          {/* sign up button */}
           <TouchableOpacity
             onPress={handleSignUp}
             style={[globalStyles.primaryButton, globalStyles.buttonFix]}
@@ -129,6 +132,7 @@ export default function SignUpScreen({navigation}) {
             <Text style={globalStyles.primaryButtonText}>Sign Up</Text>
           </TouchableOpacity>
 
+          {/* button if the user already has an account to the log in screen */}
           <Text style={[globalStyles.bodyText, styles.alignments]}>
             Already have an account?{' '}
             <Text
@@ -147,16 +151,19 @@ export default function SignUpScreen({navigation}) {
 }
 
 const styles = StyleSheet.create({
+
   background: {
     backgroundColor: 'white',
   },
 
+  // styling for button containers
   buttonContainer: {
     width: "80%",
     alignSelf: "center",
     marginTop: 10,
   },
 
+  // aligning text
   alignments: {
     marginTop: 20,
     textAlign: "center",

@@ -58,7 +58,7 @@ return (
         Add, check off, and manage your recipe ingredients.
       </Text>
 
-      {/* Add Ingredient Bar */}
+      {/* Ingredients input field */}
       <View style={styles.addIngredientContainer}>
         <TextInput
           placeholder="Enter Ingredient"
@@ -67,13 +67,14 @@ return (
           onChangeText={setIngredient}
           onSubmitEditing={addIngredient}
         />
+        {/* Button to add ingredients from input */}
         <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
           <Text style={[globalStyles.h2, { color: "#fff" }]}>+</Text>
         </TouchableOpacity>
       </View>
     </View>
 
-    {/* Ingredient List */}
+    {/* Ingredient List display */}
     <ScrollView style={globalStyles.paddingHorizontal}>
       <Text style={[globalStyles.h3, { marginVertical: 10 }]}>Recipe Ingredients</Text>
 
@@ -83,6 +84,7 @@ return (
           data={ingredients}
           renderItem={({ item, index }) => (
             <View style={styles.tag}>
+              {/* Checkbox button (toggles checked/unchecked state) */}
               <TouchableOpacity
                 style={styles.checkButton}
                 onPress={() => toggleIngredient(index)}
@@ -90,10 +92,12 @@ return (
                 <Text style={styles.checkmark}>{item.checked ? "●" : ""}</Text>
               </TouchableOpacity>
 
+              {/* Ingredient title (crossed out if checked) */}
               <Text style={[styles.ingredientName, item.checked && styles.checkedText]}>
                 {item.title}
               </Text>
 
+              {/* Delete ingredient (✕) */}
               <TouchableOpacity onPress={() => deleteIngredient(index)}>
                 <Text style={styles.h3}>✕</Text>
               </TouchableOpacity>
@@ -103,7 +107,7 @@ return (
       </View>
     </ScrollView>
 
-    {/* Floating Button */}
+      {/* Floating button (bottom right) — navigates to Log Meal screen */}
       <TouchableOpacity
         style={globalStyles.logMealButton}
         onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home', photo: '../../assets/adaptive-icon.png'})}
@@ -122,6 +126,7 @@ return (
 
 const styles = StyleSheet.create({
 
+  // spacing for adding an ingredient
   addIngredientContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -130,10 +135,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
+  // spacing for ingredient input
   enterIngredientInput: {
     flex: 9,
   },
 
+  // styling + spacing for adding an ingredient button
   addButton: {
     backgroundColor: globalStyles.colors.primary,
     borderRadius: 8,
@@ -143,7 +150,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
 
-
+  // styling + layout of the ingredient tags / outputs
   tag: {
     backgroundColor: globalStyles.colors.secondary,
     borderRadius: 16,
@@ -155,6 +162,7 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
 
+  // styling for checked button
   checkButton: {
     width: 24,
     height: 24,
@@ -167,6 +175,7 @@ const styles = StyleSheet.create({
     backgroundColor: globalStyles.colors.background,
   },
 
+  // styling one item as been checked
   checkmark: {
     color: globalStyles.colors.primary,
     fontSize: 16,
@@ -175,6 +184,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
 
+  // Ingredient name styling
   ingredientName: {
     flex: 1,
     flexWrap: "wrap",
@@ -183,11 +193,13 @@ const styles = StyleSheet.create({
     color: globalStyles.colors.text,
   },
 
+  // checked text styling
   checkedText: {
     textDecorationLine: "line-through",
     opacity: 0.7,
   },
 
+  // styling for the X or delete button
   closeButton: {
     fontSize: 18,
     paddingLeft: 10,

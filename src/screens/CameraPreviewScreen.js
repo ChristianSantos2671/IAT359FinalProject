@@ -2,7 +2,6 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import globalStyles from '../utils/globalStyles';
 
-// This screen shows the photo taken, a retake button to go back to the previous screen, and a Use Photo button that will go to the Suggested Recipes screen passing it the photo taken.
 export default function CameraPreviewScreen({ route, navigation }) {
   const { previousScreen, photo } = route.params;
 
@@ -45,11 +44,14 @@ export default function CameraPreviewScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  // styling once photo has been taken
   image: {
     flex: 1,
     width: '100%',
     resizeMode: 'contain',
   },
+
+  // spacing for button section
   buttonSection: {
     flexDirection: 'row',
     justifyContent: 'space-around',

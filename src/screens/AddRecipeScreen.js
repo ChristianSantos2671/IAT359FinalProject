@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 export default function AddRecipeScreen({ navigation, route }) {
+  
   const photo = route?.params?.photo ?? null;
   const [recipeName, setRecipeName] = useState('');
   const [ingredients, setIngredients] = useState([]);
@@ -63,7 +64,7 @@ export default function AddRecipeScreen({ navigation, route }) {
 
         await saveRecipe(recipe);
       
-        // Reset form
+        // Reset form fields
         setRecipeName('');
         setIngredients([]);
         setInstructions('');
@@ -90,7 +91,7 @@ return (
         Add a name, ingredients, instructions, and an image.
       </Text>
       
-      {/* Recipe Name */}
+      {/* Recipe Name Input */}
       <Text style={globalStyles.h3}>Recipe name</Text>
       <TextInput
         placeholder="Enter recipe name"
@@ -99,7 +100,7 @@ return (
         onChangeText={setRecipeName}
       />
 
-      {/* Add Ingredient Bar */}
+      {/* Add Ingredients section by pressing the button */}
       <Text style={globalStyles.h3}>Ingredients</Text>
 
       <View style={styles.addIngredientContainer}>
@@ -118,6 +119,7 @@ return (
 
     <ScrollView style={globalStyles.paddingHorizontal}>
       
+      {/* Ingredient list display */}
       <Text style={[globalStyles.h3, { marginVertical: 10 }]}>All ingredients</Text>
 
       <FlatList
@@ -133,7 +135,7 @@ return (
         )}
       />
 
-      {/* Instructions */}
+      {/* Recipe instructions input */}
       <Text style={[globalStyles.h3, { marginTop: 20 }]}>Instructions</Text>
       <TextInput
         style={[globalStyles.input, { height: 120, textAlignVertical: "top" }]}
@@ -143,7 +145,7 @@ return (
         onChangeText={setInstructions}
       />
 
-      {/*image*/}
+      {/*Recipe image preview, it will be empty until an image is uploaded*/}
       {photo && photo.uri ? (
         <Image
           style={styles.image}
@@ -151,17 +153,21 @@ return (
         />
       ) : null}
 
+      {/* show error message if the field are not there */}
       {error ? <Text style={{ color: 'red', marginVertical: 10 }}>{error}</Text> : null}
 
-      {/* Bottom Buttons (Instead of Floating Button) */}
+      {/* Grouping buttons here */}
       <View style={{ marginVertical: 30 }}>
+      
+      {/* Button to upload image */}
         <TouchableOpacity
           style={[globalStyles.secondaryButton, { marginBottom: 10 }]}
           onPress={() => navigation.navigate('CameraScreen', { previousScreen: 'Add Recipe' })}
         >
           <Text style={globalStyles.secondaryButtonText}>Upload Image</Text>
         </TouchableOpacity>
-
+        
+        {/* Button to upload recipe to the database */}
         <TouchableOpacity
           style={globalStyles.primaryButton}
           onPress={uploadRecipe}
@@ -177,7 +183,7 @@ return (
 
 const styles = StyleSheet.create({
 
-  /* -------- Add Ingredient Bar -------- */
+  // layout for adding ingredients section
   addIngredientContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -186,10 +192,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
+  // spacing for add ingredients input
+
   enterIngredientInput: {
     flex: 9,
   },
 
+  // styling for adding ingredients button
   addButton: {
     backgroundColor: globalStyles.colors.primary,
     borderRadius: 8,
@@ -200,7 +209,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
 
-  /* -------- Ingredient Tag (Matches Grocery List) -------- */
+  //Ingredient Tag styling
   tag: {
     backgroundColor: globalStyles.colors.secondary,
     borderRadius: 16,
@@ -212,6 +221,7 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
 
+  // styling for the ingredient name 
   ingredientName: {
     flex: 1,
     flexWrap: "wrap",
@@ -220,13 +230,14 @@ const styles = StyleSheet.create({
     color: globalStyles.colors.text,
   },
 
+  // delete button styling
   closeButton: {
     fontSize: 18,
     paddingLeft: 10,
     color: globalStyles.colors.primary,
   },
 
-  /* -------- Instructions Image -------- */
+  //Instructions Image 
   image: {
     width: "100%",
     height: 200,
@@ -236,21 +247,12 @@ const styles = StyleSheet.create({
     backgroundColor: globalStyles.colors.backgroundSecondary,
   },
 
-  /* -------- Bottom Buttons -------- */
-  uploadButton: {
-    backgroundColor: globalStyles.colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-
-  /* Optional: upload image button slight spacing */
+  // spacing for upload button
   uploadImageButton: {
     marginBottom: 10,
   },
 
+  // styling for error text
   errorText: {
     color: 'red',
     marginTop: 5,
