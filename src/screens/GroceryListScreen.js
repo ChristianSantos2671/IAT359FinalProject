@@ -3,10 +3,23 @@ import { useEffect, useState } from "react";
 
 import globalStyles from '../utils/globalStyles';
 
-export default function GroceryListScreen({navigation, route}) {
+/**
+ * This screen lets the user build and manage a grocery list.
+ * Users can:
+ * - Import ingredients from another screen (e.g., a recipe).
+ * - Add new ingredients manually.
+ * - Check/uncheck ingredients as completed.
+ * - Delete ingredients from the list.
+ */
+export default function GroceryListScreen({ navigation, route }) {
   const [ingredients, setIngredients] = useState([]);
   const [ingredient, setIngredient] = useState('');
 
+  /**
+   * If this screen was opened with a list of ingredients (via route.params),
+   * map each ingredient string into an object with `title` and `checked` state.
+   * Runs again if route params change.
+   */
   useEffect(() => {
     if (route?.params?.ingredients) {
       const initialIngredients = route.params.ingredients.map(item => ({
@@ -17,6 +30,11 @@ export default function GroceryListScreen({navigation, route}) {
     }
   }, [route?.params?.ingredients]);
 
+  /**
+   * Adds a new ingredient from the TextInput field to the list.
+   * - Trims whitespace.
+   * - Resets the input field after adding.
+   */
   const addIngredient = () => {
     if (ingredient.trim()) {
       setIngredients([...ingredients, { 
@@ -27,6 +45,9 @@ export default function GroceryListScreen({navigation, route}) {
     }
   };
 
+  /**
+   * Marks an ingredient as checked/unchecked when the user taps the checkbox.
+   */
   const toggleIngredient = (index) => {
     const newIngredients = [...ingredients];
     newIngredients[index] = {
@@ -36,19 +57,24 @@ export default function GroceryListScreen({navigation, route}) {
     setIngredients(newIngredients);
   };
 
+  /**
+   * Removes an ingredient from the list at a specific index.
+   */
   const deleteIngredient = (index) => {
     let newIngredients = [...ingredients];
     newIngredients.splice(index, 1);
     setIngredients(newIngredients);
-  }
+  };
   
   return (
     <View style={globalStyles.mainView}>
       <ScrollView>
+        {/* Placeholder section for potential camera or image upload */}
         <View>
           {/* Camera access or upload photo here */}
         </View>
 
+        {/* Add ingredient input and "+" button */}
         <View style={[globalStyles.view, styles.addIngriedientSection]}>
           <TextInput 
             style={[globalStyles.textInput, styles.enterIngridientInput]} 
@@ -65,27 +91,33 @@ export default function GroceryListScreen({navigation, route}) {
           </TouchableOpacity>
         </View>
 
+        {/* Ingredient list display */}
         <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>Recipe Ingrdients</Text>
+          <Text style={globalStyles.headerText2}>Recipe Ingredients</Text>
           <FlatList
             style={styles.ingredientsList}
             scrollEnabled={false}
             data={ingredients}
             renderItem={({item, index}) => (
               <View style={styles.tag}>
+                {/* Checkbox button (toggles checked/unchecked state) */}
                 <TouchableOpacity
                   style={styles.checkButton}
                   onPress={() => toggleIngredient(index)}
                 >
                   <Text style={styles.checkmark}>{item.checked ? '✓' : ''}</Text>
                 </TouchableOpacity>
+
+                {/* Ingredient title (crossed out if checked) */}
                 <Text style={[
                   styles.ingridientName,
                   item.checked && styles.checkedText
-                ]}>{item.title}</Text>
-                <TouchableOpacity
-                  onPress={() => deleteIngredient(index)}
-                >
+                ]}>
+                  {item.title}
+                </Text>
+
+                {/* Delete ingredient (✕) */}
+                <TouchableOpacity onPress={() => deleteIngredient(index)}>
                   <Text style={styles.closeButton}>✕</Text>
                 </TouchableOpacity>
               </View>
@@ -94,6 +126,7 @@ export default function GroceryListScreen({navigation, route}) {
         </View>
       </ScrollView>
 
+      {/* Floating button (bottom right) — navigates to Log Meal screen */}
       <TouchableOpacity
         style={globalStyles.logMealButton}
         onPress={() => navigation.navigate('Log Meal')}

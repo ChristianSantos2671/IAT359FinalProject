@@ -5,13 +5,20 @@ import globalStyles from '../utils/globalStyles';
 import { saveRecipe } from '../utils/db';
 
 export default function AddRecipeScreen({ navigation, route }) {
+  // Get optional photo passed from the Camera screen
   const photo = route?.params?.photo ?? null;
+
   const [recipeName, setRecipeName] = useState('');
   const [ingredients, setIngredients] = useState([]);
   const [ingredient, setIngredient] = useState('');
   const [instructions, setInstructions] = useState('');
   const [error, setError] = useState('');
 
+  /**
+   * Adds a single ingredient to the ingredients list.
+   * - Trims whitespace.
+   * - Resets the input field after adding.
+   */
   const addIngredient = () => {
     if (ingredient.trim()) {
       setIngredients([...ingredients, ingredient.trim()]);
@@ -19,62 +26,79 @@ export default function AddRecipeScreen({ navigation, route }) {
     }
   };
 
+  // Removes an ingredient from the ingredients list by index.
   const deleteIngredient = (index) => {
     let newIngredients = [...ingredients];
     newIngredients.splice(index, 1);
     setIngredients(newIngredients);
-  }
+  };
 
-    const validateForm = () => {
-      if (!recipeName.trim()) {
-        setError('Please enter a recipe name');
-        return false;
+  /**
+   * Ensures all required fields are filled out before submission.
+   * Returns true if the form is valid, otherwise sets an error message and returns false.
+   */
+  const validateForm = () => {
+    if (!recipeName.trim()) {
+      setError('Please enter a recipe name');
+      return false;
+    }
+
+    if (ingredients.length === 0) {
+      setError('Please add at least one ingredient');
+      return false;
+    }
+
+    if (!instructions.trim()) {
+      setError('Please add recipe instructions');
+      return false;
+    }
+
+    // Clear error if everything passes validation.
+    setError('');
+    return true;
+  };
+
+  /**
+   * Validates form inputs, saves the recipe to SQLite using saveRecipe(),
+   * resets the form, and navigates the user back to the Profile screen.
+   * Displays a success or error alert accordingly.
+   */
+  const uploadRecipe = async () => {
+    try {
+      // Validate inputs before saving
+      if (!validateForm()) {
+        return;
       }
 
-      if (ingredients.length === 0) {
-        setError('Please add at least one ingredient');
-        return false;
-      }
+      // Create recipe object in proper DB format
+      const recipe = {
+        name: recipeName.trim(),
+        ingredients: ingredients.join(', '),
+        instructions: instructions.trim(),
+        image_uri: photo?.uri ?? '',
+      };
 
-      if (!instructions.trim()) {
-        setError('Please add recipe instructions');
-        return false;
-      }
+      // Save recipe to local database
+      await saveRecipe(recipe);
+    
+      // Reset form fields
+      setRecipeName('');
+      setIngredients([]);
+      setInstructions('');
+      setError('');
 
-      return true;
-    };
-
-    const uploadRecipe = async () => {
-      try {
-        if (!validateForm()) {
-          return;
-        }
-
-        const recipe = {
-          name: recipeName.trim(),
-          ingredients: ingredients.join(', '),
-          instructions: instructions.trim(),
-          image_uri: photo?.uri ?? '',
-        };
-
-        await saveRecipe(recipe);
-      
-        // Reset form
-        setRecipeName('');
-        setIngredients([]);
-        setInstructions('');
-        setError('');
-
-        Alert.alert(
-          'Success',
-          'Recipe uploaded successfully!',
-        );
-        navigation.navigate("Profile", { activeTab: "My Recipes" });
-      } catch (e) {
-        setError('Failed to upload recipe. Please try again.');
-        console.error('Error uploading recipe:', e);
-      }
-    };
+      // Show success message and navigate to Profile tab
+      Alert.alert(
+        'Success',
+        'Recipe uploaded successfully!'
+      );
+      navigation.navigate("Profile", { activeTab: "My Recipes" });
+    } catch (e) {
+      // Handle DB or validation errors gracefully
+      setError('Failed to upload recipe. Please try again.');
+      console.error('Error uploading recipe:', e);
+    }
+  };
   
   return (
     <View style={globalStyles.mainView}>
@@ -83,6 +107,7 @@ export default function AddRecipeScreen({ navigation, route }) {
           {/* Camera access or upload photo here */}
         </View>
 
+        {/* Recipe name input */}
         <View style={globalStyles.view}>
           <Text style={globalStyles.headerText2}>Recipe Name</Text>
           <TextInput 
@@ -93,6 +118,7 @@ export default function AddRecipeScreen({ navigation, route }) {
           />
         </View>
 
+        {/* Ingredient entry section */}
         <View style={[globalStyles.view, styles.addIngriedientSection]}>
           <TextInput 
             style={[globalStyles.textInput, styles.enterIngridientInput]} 
@@ -109,8 +135,9 @@ export default function AddRecipeScreen({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
+        {/* Ingredient list display */}
         <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>Recipe Ingrdients</Text>
+          <Text style={globalStyles.headerText2}>Recipe Ingredients</Text>
           <FlatList
             style={styles.ingredientsList}
             scrollEnabled={false}
@@ -128,6 +155,7 @@ export default function AddRecipeScreen({ navigation, route }) {
           />
         </View>
 
+        {/* Recipe instructions input */}
         <View style={globalStyles.view}>
           <Text style={globalStyles.headerText2}>Instructions</Text>
           <TextInput
@@ -139,6 +167,7 @@ export default function AddRecipeScreen({ navigation, route }) {
           />
         </View>
 
+        {/* Recipe image preview */}
         <View>
           <Image
             style={styles.image}
@@ -151,19 +180,25 @@ export default function AddRecipeScreen({ navigation, route }) {
         </View>
       </ScrollView>
 
+      {/* Upload & image buttons */}
       <View style={styles.uploadButtonSection}>
+        {/* Navigate to camera for image upload */}
         <TouchableOpacity
           style={[styles.uploadButton, styles.uploadImageButton]}
           onPress={() => navigation.navigate('CameraScreen', { previousScreen: 'Add Recipe' })}
         >
           <Text style={globalStyles.headerText2}>Upload Image</Text>
         </TouchableOpacity>
+
+        {/* Upload recipe to database */}
         <TouchableOpacity 
           style={styles.uploadButton}
           onPress={uploadRecipe}
         >
           <Text style={globalStyles.headerText2}>Upload Recipe</Text>
         </TouchableOpacity>
+
+        {/* Error message display */}
         {error ? (
           <Text style={styles.errorText}>{error}</Text>
         ) : null}
