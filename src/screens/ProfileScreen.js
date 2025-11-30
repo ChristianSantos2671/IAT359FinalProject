@@ -25,8 +25,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function ProfileScreen({navigation, route}) {
 
-  // Tab state (My Logged Meals / My Recipes / Favourites)
-  const [optionBarType, setOptionBarType] = useState('My Logged Meals');
+  // Tab state (My Logs / My Recipes / Favourites)
+  const [optionBarType, setOptionBarType] = useState('My Logs');
 
   // Storage + DB data
   const [meals, setMeals] = useState([]);
@@ -52,12 +52,12 @@ export default function ProfileScreen({navigation, route}) {
     try {
       const allRecipes = await getRecipes();
 
-      // Separate favourites and non-favourites.
+      // Separate favourites and non-favourites
       const favs = allRecipes.filter(r => r.is_favourite === 1);
       const nonFavs = allRecipes.filter(r => r.is_favourite !== 1);
 
-      setRecipes(nonFavs);   // Show only non-favourite recipes in “My Recipes”.
-      setFavourites(favs);   // Show only favourites in “Favourites”.
+      setRecipes(nonFavs); // only non-favourites
+      setFavourites(favs); // only favourites
 
       // Load logged meals from AsyncStorage
       const loadedMeals = await getMeals();
@@ -135,15 +135,11 @@ export default function ProfileScreen({navigation, route}) {
       }
     };
 
-  /**
-   * Toggles the favourite status of a recipe.
-   * - If it’s a favourite → remove it completely from DB and UI.
-   * - If not → add it to favourites (via saveRecipe).
-   */
+  // toggle favourite status and move recipe between lists
   const toggleFavouriteRecipe = async (item) => {
     try {
       if (item.is_favourite === 1) {
-        // Removing a favourite recipe entirely.
+        // If currently a favourite → remove completely
         await removeRecipe(item.id);
         setFavourites(prev => prev.filter(fav => fav.id !== item.id));
         setRecipes(prev => prev.filter(r => r.id !== item.id));
@@ -167,99 +163,60 @@ export default function ProfileScreen({navigation, route}) {
   return (
     // top container with profile into such as profile icon with initials, name, number of meals + recipes
     <View style={globalStyles.container}>
-      {/* User Profile Section */}
-      <View style={[
-        globalStyles.topContainer,
-        styles.profileSection,
-        globalStyles.paddingHorizontal,
-        { paddingTop: insets.top + 5 }
-      ]}>
-        {/* Profile avatar (initials circle) */}
+      {/* Profile section */}
+      <View style={[globalStyles.topContainer, styles.profileSection, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
         <View style={styles.profileCircle}>
-          <Text style={styles.profileInitials}>
-            {(firstname || "N/A")[0]}{(lastname || "A")[0]}
-          </Text>
+          <Text style={styles.profileInitials}>{(firstname || "N/A")[0]}{(lastname || "A")[0]}</Text>
         </View>
 
-        {/* Display user's name and stats */}
         <View>
             <Text style={[globalStyles.h1, {alignSelf: 'center'}]}>{(firstname || "N/A")} {(lastname || "A")}</Text>
 
           <View style={styles.profileSpecs}>
             <Text><Text style={globalStyles.headerText.fontWeight}>{meals.length}</Text> Logged Meals</Text>
             <Text>•</Text>
-            <Text>
-              <Text style={globalStyles.headerText.fontWeight}>{recipes.length}</Text> Recipes
-            </Text>
+            <Text><Text style={globalStyles.headerText.fontWeight}>{recipes.length}</Text> Recipes</Text>
           </View>
         </View>
 
-        {/* Option bar - tabs to switch between My Logged Meals, My Recipes, and Favourites section
+        {/* Option bar - tabs to switch between My Logs, My Recipes, and Favourites section
             The UI will change when the user switches to respective sections
         */}
         <View style={globalStyles.optionsBar}>
           <TouchableOpacity
-            style={[
-              globalStyles.optionButtonFlex,
-              optionBarType === 'My Logged Meals' ? globalStyles.optionButtonActive : null
-            ]}
-            onPress={() => setOptionBarType('My Logged Meals')}
+            style={[globalStyles.optionButtonFlex, optionBarType === 'My Logs' ? globalStyles.optionButtonActive : null]}
+            onPress={() => setOptionBarType('My Logs')}
           >
-            <Text style={
-              optionBarType === 'My Logged Meals'
-                ? globalStyles.optionButtonTextActive
-                : globalStyles.optionButtonText
-            }>
-              My Logged Meals
-            </Text>
+            <Text style={optionBarType === 'My Logs' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>My Logs</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              globalStyles.optionButtonFlex,
-              optionBarType === 'My Recipes' ? globalStyles.optionButtonActive : null
-            ]}
+            style={[globalStyles.optionButtonFlex, optionBarType === 'My Recipes' ? globalStyles.optionButtonActive : null]}
             onPress={() => setOptionBarType('My Recipes')}
           >
-            <Text style={
-              optionBarType === 'My Recipes'
-                ? globalStyles.optionButtonTextActive
-                : globalStyles.optionButtonText
-            }>
-              My Recipes
-            </Text>
+            <Text style={optionBarType === 'My Recipes' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>My Recipes</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              globalStyles.optionButtonFlex,
-              optionBarType === 'Favourites' ? globalStyles.optionButtonActive : null
-            ]}
+            style={[globalStyles.optionButtonFlex, optionBarType === 'Favourites' ? globalStyles.optionButtonActive : null]}
             onPress={() => setOptionBarType('Favourites')}
           >
-            <Text style={
-              optionBarType === 'Favourites'
-                ? globalStyles.optionButtonTextActive
-                : globalStyles.optionButtonText
-            }>
-              Favourites
-            </Text>
+            <Text style={optionBarType === 'Favourites' ? globalStyles.optionButtonTextActive : globalStyles.optionButtonText}>Favourites</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Tab Content Section */}
+      {/* Render content based on selected tab */}
       {(() => {
-        {/* UI for my Logged meals as a list - renders data from log meal */}
+        {/* UI for my Logs as a list - renders data from log meal */}
         switch (optionBarType) {
-          /* My Logged Meals */
-          case 'My Logged Meals':
+          case 'My Logs':
             return (
               <FlatList
                 style={styles.optionContent}
                 data={meals}
                 ListEmptyComponent={<Text style={styles.emptyContent}>No Logged Meals</Text>}
-                renderItem={({ item }) => (
+                renderItem={({item}) => (
                   <View style={styles.meal}>
 
                     {/* X button to delete logged meal  */}
@@ -288,8 +245,6 @@ export default function ProfileScreen({navigation, route}) {
                 )}
               />
             );
-
-          /* My Recipes */
           case 'My Recipes':
           {/* UI for my Recipes as a list - renders data from add recipes screen */}
             return (
@@ -325,8 +280,6 @@ export default function ProfileScreen({navigation, route}) {
                 )}
               />
             );
-
-          /* Favourites */
           case 'Favourites':
           {/* UI for Favourites as a list - renders data the user has favourited screen.  Uses the same component from homescreen */}
 
@@ -374,7 +327,6 @@ export default function ProfileScreen({navigation, route}) {
               )}
             />
             );
-
           default:
             return null;
         }
@@ -418,7 +370,7 @@ const styles = StyleSheet.create ({
   },
   // styling for profile initials in the circle 
   profileInitials: {
-    fontSize: 24,
+    fontSize: 24, 
     color: globalStyles.colors.text,
     fontWeight: 'bold',
   },
@@ -491,7 +443,7 @@ const styles = StyleSheet.create ({
     borderWidth: globalStyles.sectionValues.sectionBorderWidth,
     borderColor: globalStyles.colors.border,
     padding: globalStyles.sectionValues.sectionPadding,
-    margin: globalStyles.sectionValues.sectionMargin / 2,
+    margin: globalStyles.sectionValues.sectionMargin/2,
   },
 
   // recipe card image 
@@ -512,7 +464,7 @@ const styles = StyleSheet.create ({
 
   // spacing for recipe ingredients 
   recipeIngredientsSection: {
-    marginVertical: globalStyles.sectionValues.sectionMargin / 2,
+    marginVertical: globalStyles.sectionValues.sectionMargin/2,
   },
   
   // position for favourite button

@@ -9,12 +9,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function AddRecipeScreen({ navigation, route }) {
   
   const photo = route?.params?.photo ?? null;
-
   const [recipeName, setRecipeName] = useState('');
   const [ingredients, setIngredients] = useState([]);
   const [ingredient, setIngredient] = useState('');
   const [instructions, setInstructions] = useState('');
   const [error, setError] = useState('');
+  const insets = useSafeAreaInsets();
+  
 
   const addIngredient = () => {
     if (ingredient.trim()) {
@@ -23,57 +24,43 @@ export default function AddRecipeScreen({ navigation, route }) {
     }
   };
 
-  // Removes an ingredient from the ingredients list by index.
   const deleteIngredient = (index) => {
     let newIngredients = [...ingredients];
     newIngredients.splice(index, 1);
     setIngredients(newIngredients);
-  };
+  }
 
-  /**
-   * Ensures all required fields are filled out before submission.
-   * Returns true if the form is valid, otherwise sets an error message and returns false.
-   */
-  const validateForm = () => {
-    if (!recipeName.trim()) {
-      setError('Please enter a recipe name');
-      return false;
-    }
-
-    if (ingredients.length === 0) {
-      setError('Please add at least one ingredient');
-      return false;
-    }
-
-    if (!instructions.trim()) {
-      setError('Please add recipe instructions');
-      return false;
-    }
-
-    // Clear error if everything passes validation.
-    setError('');
-    return true;
-  };
-
-  /**
-   * Validates form inputs, saves the recipe to SQLite using saveRecipe(),
-   * resets the form, and navigates the user back to the Profile screen.
-   * Displays a success or error alert accordingly.
-   */
-  const uploadRecipe = async () => {
-    try {
-      // Validate inputs before saving
-      if (!validateForm()) {
-        return;
+    const validateForm = () => {
+      if (!recipeName.trim()) {
+        setError('Please enter a recipe name');
+        return false;
       }
 
-      // Create recipe object in proper DB format
-      const recipe = {
-        name: recipeName.trim(),
-        ingredients: ingredients.join(', '),
-        instructions: instructions.trim(),
-        image_uri: photo?.uri ?? '',
-      };
+      if (ingredients.length === 0) {
+        setError('Please add at least one ingredient');
+        return false;
+      }
+
+      if (!instructions.trim()) {
+        setError('Please add recipe instructions');
+        return false;
+      }
+
+      return true;
+    };
+
+    const uploadRecipe = async () => {
+      try {
+        if (!validateForm()) {
+          return;
+        }
+
+        const recipe = {
+          name: recipeName.trim(),
+          ingredients: ingredients.join(', '),
+          instructions: instructions.trim(),
+          image_uri: photo?.uri ?? '',
+        };
 
         await saveRecipe(recipe);
       
@@ -83,18 +70,16 @@ export default function AddRecipeScreen({ navigation, route }) {
         setInstructions('');
         setError('');
 
-      // Show success message and navigate to Profile tab
-      Alert.alert(
-        'Success',
-        'Recipe uploaded successfully!'
-      );
-      navigation.navigate("Profile", { activeTab: "My Recipes" });
-    } catch (e) {
-      // Handle DB or validation errors gracefully
-      setError('Failed to upload recipe. Please try again.');
-      console.error('Error uploading recipe:', e);
-    }
-  };
+        Alert.alert(
+          'Success',
+          'Recipe uploaded successfully!',
+        );
+        navigation.navigate("Profile", { activeTab: "My Recipes" });
+      } catch (e) {
+        setError('Failed to upload recipe. Please try again.');
+        console.error('Error uploading recipe:', e);
+      }
+    };
   
 return (
   <View style={globalStyles.container}>
