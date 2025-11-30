@@ -17,7 +17,7 @@ const sectionValues = {
   sectionBorderWidth: 1,
   sectionPadding: 16,
   sectionMargin: 16,
-  sectionRadius: 8,
+  sectionRadius: 16,
 };
 
 const buttonValues = {
@@ -30,9 +30,11 @@ const buttonValues = {
 };
 
 const globalStyles = StyleSheet.create({
+
   colors,
   buttonValues,
   sectionValues,
+
   mainView: {
     flex: 1,
     backgroundColor: colors.background,
@@ -47,9 +49,6 @@ const globalStyles = StyleSheet.create({
   headerText2: {
     fontSize: 14,
     fontWeight: 'bold',
-  },
-  bodyText: {
-    fontSize: 10,
   },
 
   tagText: {
@@ -70,6 +69,7 @@ const globalStyles = StyleSheet.create({
     bottom: 0,
     width: 60,
     height: 60,
+    flexDirection: "row",
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
@@ -95,6 +95,17 @@ const globalStyles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
+  // TAB NAVIGATION STYLING 
+
+  tabLabelStyle: {
+    fontSize: 12,
+  },
+
+  tabBarActiveTint: colors.primary,       
+  tabBarInactiveTint: colors.subtext,     
+
+
+  // text styling
   h1: {
     fontSize: 26,
     fontWeight: "bold",
@@ -102,19 +113,19 @@ const globalStyles = StyleSheet.create({
   },
   h2: {
     fontSize: 22,
-    fontWeight: "600",
+    fontWeight: 'bold',
     color: colors.text,
   },
 
   h3: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: 'bold',
     color: colors.text,
   },
 
   h4: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: 'bold',
     color: colors.text,
   },
   
@@ -182,7 +193,7 @@ const globalStyles = StyleSheet.create({
   
   input: {
     backgroundColor: '#fff',
-    paddingVertical: 15,
+    paddingVertical: 12,
     paddingHorizontal: 10,
     borderRadius: 10,
     marginVertical: 8,
@@ -256,17 +267,17 @@ const globalStyles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: buttonValues.buttonBorderRadius,
     flex: 1,
-    marginLeft: 8,
     alignItems: "center",
     },
 
   secondaryButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
     flex: 1,
-    marginRight: 8,
     alignItems: "center",
+    borderRadius: buttonValues.buttonBorderRadius,
+    borderWidth: buttonValues.buttonBorderWidth,
+    borderColor: colors.primary
     },
 
   primaryButtonText: {
@@ -297,7 +308,7 @@ const globalStyles = StyleSheet.create({
     gap: 15,   
     backgroundColor: "#f9f9f9",
     padding: 10,
-    borderRadius: 16,
+    borderRadius: sectionValues.sectionRadius,
     borderWidth: sectionValues.sectionBorderWidth,
     borderColor: colors.border,
   },
@@ -321,6 +332,7 @@ const globalStyles = StyleSheet.create({
     margin: 4
   },
 
+   
    favouriteButton: {
     width: '10%',
     alignItems: 'center',
@@ -329,9 +341,25 @@ const globalStyles = StyleSheet.create({
     padding: 0,
   },
 
+  deletePosition: {
+    position: 'absolute',
+    left: '95%',
+    top: 18,
+    zIndex: 1,
+  },
+
+  deleteButton: {
+    alignItems: 'center',
+    width: '10%',
+    alignItems: 'center',
+    borderRadius: 100,
+    backgroundColor: colors.secondary,
+    paddingVertical: 6,
+  },
+
   favouriteActive: {
     color: colors.primary
-  }
+  },
 
 });
 

@@ -5,12 +5,13 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { firebase_auth } from './src/utils/firebaseConfig.js';
 import { initRecipesTable } from './src/utils/db.js';
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 import { ActivityIndicator, View, TextInput, Text } from 'react-native';
 
-//fonts
-import { useFonts } from "expo-font";
-import { Quicksand_300Light, Quicksand_400Regular, Quicksand_500Medium, Quicksand_600SemiBold, Quicksand_700Bold } from "@expo-google-fonts/quicksand";
+
 
 
 // Importing screens
@@ -25,36 +26,94 @@ import RecipeDetailsScreen from './src/screens/RecipeDetailsScreen';
 import CameraScreen from './src/screens/CameraScreen';
 import CameraPreviewScreen from './src/screens/CameraPreviewScreen';
 import SuggestedRecipesScreen from './src/screens/SuggestedRecipesScreen';
+import FaveRecipeDetailsScreen from './src/screens/FaveRecipeDetailsScreen.js';
+import globalStyles from './src/utils/globalStyles.js';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+
 // These tabs are used the show the four major sections of the app.
 function Tabs() {
+  const insets = useSafeAreaInsets();
+
   return (
-    <Tab.Navigator>
+    <Tab.Navigator 
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: "#fff",
+          paddingTop: 6,
+          paddingBottom: insets.bottom + 6,
+          height: 65 + insets.bottom,
+          borderTopWidth: 0,
+        }, 
+        tabLabelStyle: globalStyles.tabLabelStyle,         
+        tabBarActiveTintColor: globalStyles.tabBarActiveTint,
+        tabBarInactiveTintColor: globalStyles.tabBarInactiveTint,
+        }}
+    >
+{/* HOME */}
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-        headerShown: false }}
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={26}
+              color={color}
+            />
+          ),
+        }}
       />
 
+      {/* GROCERY LIST */}
       <Tab.Screen
         name="Grocery List"
         component={GroceryListScreen}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "cart" : "cart-outline"}
+              size={26}
+              color={color}
+            />
+          ),
+        }}
       />
 
+      {/* ADD RECIPE */}
       <Tab.Screen
         name="Add Recipe"
         component={AddRecipeScreen}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "add-circle" : "add-circle-outline"}
+              size={28}
+              color={color}
+            />
+          ),
+        }}
       />
 
+      {/* PROFILE */}
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
-        headerShown: false }}
+          headerShown: false, 
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={26}
+              color={color}
+            />
+          ),
+        }}
       />
     </Tab.Navigator>
   );
@@ -64,26 +123,6 @@ export default function App() {
 
   const [user, setUser] = useState(null)
   const [initializing, setInitializing] = useState(true);
-  
-  // ------------------------------
-  // LOAD FONTS
-  // ------------------------------
-  const [fontsLoaded] = useFonts({
-    Quicksand_300Light,
-    Quicksand_400Regular,
-    Quicksand_500Medium,
-    Quicksand_600SemiBold,
-    Quicksand_700Bold,
-  });
-
-  if (fontsLoaded) {
-    // Default for ALL <Text>
-    Text.defaultProps = Text.defaultProps || {};
-    Text.defaultProps.style = { fontFamily: "Quicksand_400Regular" };
-
-    TextInput.defaultProps = TextInput.defaultProps || {};
-    TextInput.defaultProps.style = { fontFamily: "Quicksand_400Regular" };
-  }
 
   useEffect(() => {
     // Initialize the recipes database table.
@@ -129,6 +168,12 @@ export default function App() {
               name="Recipe Details" 
               component={RecipeDetailsScreen} 
             />
+
+            <Stack.Screen 
+            name="Saved Recipe Details" 
+            component={FaveRecipeDetailsScreen} 
+            />
+
 
             {/* These are the three screens for the camer and image recognition feature. */}
             <Stack.Screen

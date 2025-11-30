@@ -2,12 +2,6 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import globalStyles from '../utils/globalStyles';
 
-/**
- * This screen displays the photo that was just taken using the camera.
- * It provides two options:
- *   1. Retake — goes back to the camera to capture again.
- *   2. Use Photo — navigates to the correct next screen, depending on where the user came from.
- */
 export default function CameraPreviewScreen({ route, navigation }) {
   // Destructure passed parameters from route.
   const { previousScreen, photo } = route.params;
@@ -39,27 +33,21 @@ export default function CameraPreviewScreen({ route, navigation }) {
         style={styles.image}
         source={{ uri: photo.uri }}
       />
-      
-      {/* Action buttons: Retake / Use Photo */}
       <View style={styles.buttonSection}>
         {/* Retake button — returns to previous camera screen */}
         <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: globalStyles.colors.background },
-            { marginBottom: insets.bottom }
-          ]}
+          style={[globalStyles.secondaryButton, styles.button, {marginBottom: insets.bottom}]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={globalStyles.headerText2}>Retake</Text>
+          <Text style={globalStyles.secondaryButtonText}>Retake</Text>
         </TouchableOpacity>
 
         {/* Use Photo button — navigates based on previous screen */}
         <TouchableOpacity
-          style={[styles.button, { marginBottom: insets.bottom }]}
+          style={[globalStyles.primaryButton, {marginBottom: insets.bottom}]}
           onPress={() => navigateToCertainScreen()}
         >
-          <Text style={globalStyles.headerText2}>Use Photo</Text>
+          <Text style={globalStyles.primaryButtonText}>Use Photo</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -67,21 +55,18 @@ export default function CameraPreviewScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  // styling once photo has been taken
   image: {
     flex: 1,
     width: '100%',
     resizeMode: 'contain',
   },
+
+  // spacing for button section
   buttonSection: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: globalStyles.sectionValues.sectionPadding,
   },
-  button: {
-    backgroundColor: globalStyles.colors.primary,
-    padding: globalStyles.buttonValues.buttonPadding,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderColor: globalStyles.colors.text,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-  },
+
 });

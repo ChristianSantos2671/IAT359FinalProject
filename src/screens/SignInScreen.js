@@ -14,6 +14,7 @@ export default function SignInScreen({navigation}) {
   const insets = useSafeAreaInsets();
 
 
+  // function that handles logging in the user by checking if the credentials are correct to what is on firebase
   const handleLogin = async () => {
     try {
       setLoading(true);
@@ -49,6 +50,8 @@ return (
         <View style={globalStyles.textSection}>
           <Text style={[globalStyles.h2, globalStyles.textMargins]}>Login</Text>
         </View> 
+
+        {/* Email input */}
         <Text style={globalStyles.h3}>Email</Text>
         <TextInput
           placeholder="Enter your email"
@@ -59,7 +62,7 @@ return (
           keyboardType="email-address"
         />
       </View>
-
+      {/* Password input */}
       <View style={[globalStyles.inputContainer, styles.buttonContainer]}>
         <Text style={globalStyles.h3}>Password</Text>
         <TextInput
@@ -71,8 +74,9 @@ return (
         />
       </View>
 
-      {/* Button container aligned with input width */}
+      {/* Button container */}
       <View style={styles.buttonContainer}>
+        {/*button logging the user in */}
         <TouchableOpacity
           onPress={handleLogin}
           style={[globalStyles.primaryButton, globalStyles.buttonFix]}
@@ -80,7 +84,7 @@ return (
         >
           <Text style={globalStyles.primaryButtonText}>Login</Text>
         </TouchableOpacity>
-
+      {/* redirect user to the sign up */}
         <Text style={[globalStyles.bodyText, styles.alignments]}>
           Don't have an account yet?{' '}
           <Text

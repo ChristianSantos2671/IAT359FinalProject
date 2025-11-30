@@ -6,6 +6,7 @@ let dbPromise;
  * Opens (or returns an existing reference to) the SQLite database.
  * The function ensures a single shared connection using a cached promise.
  */
+
 export function getDb() {
   if (!dbPromise) dbPromise = openDatabaseAsync('app.db');
   return dbPromise;
@@ -22,7 +23,11 @@ export function getDb() {
  *  - is_favourite: 0 or 1 (boolean flag)
  *  - created_at: timestamp in milliseconds (integer)
  *  - image_uri: optional image path or URL (text)
+ *  - category: category tags
+ *  - area: area tags 
+ *  - tags: as the general otherTags
  */
+
 export async function initRecipesTable() {
   const db = await getDb();
 
@@ -33,25 +38,33 @@ export async function initRecipesTable() {
       name TEXT NOT NULL,
       ingredients TEXT NOT NULL,
       instructions TEXT NOT NULL,
+      image_uri TEXT,
+      category TEXT,
+      area TEXT,
+      tags TEXT,
       is_favourite INTEGER DEFAULT 0,
       created_at INTEGER NOT NULL
     );
   `);
 
-  // Add image_uri column if it doesn't already exist (ignores duplicate errors).
-  try {
-    await db.execAsync(`
-      ALTER TABLE recipes
-      ADD COLUMN image_uri TEXT;
-    `);
-  } catch (e) {
+  // Run migrations for users who already had the old DB
+  const migrationSQL = [
+    `ALTER TABLE recipes ADD COLUMN image_uri TEXT;`,
+    `ALTER TABLE recipes ADD COLUMN category TEXT;`,
+    `ALTER TABLE recipes ADD COLUMN area TEXT;`,
+    `ALTER TABLE recipes ADD COLUMN tags TEXT;`
+  ];
+
+  // Add missing columns if it doesn't already exist (ignores duplicate errors).
+
+  for (let sql of migrationSQL) {
     try {
-      // Ignore “duplicate column name” errors, throw others.
-      if (!e.message.includes('duplicate column name')) {
-        throw e;
+      await db.execAsync(sql);
+    } catch (e) {
+      // Ignore errors for duplicate columns
+      if (!e.message?.includes("duplicate column name")) {
+        console.error("Migration error:", e);
       }
-    } catch (innerError) {
-      console.error("Error adding image_uri column:", innerError);
     }
   }
 }
@@ -67,22 +80,32 @@ export async function getRecipes() {
   );
 }
 
+
 /**
  * Inserts a new recipe record into the database.
  * Automatically sets a creation timestamp.
  */
 export async function saveRecipe(recipe) {
   const db = await getDb();
-  const { name, ingredients, instructions, image_uri, is_favourite = 0 } = recipe;
+
+  const {
+    name,
+    ingredients,
+    instructions,
+    image_uri = "",
+    category = "",
+    area = "",
+    tags = "",
+    is_favourite = 0
+  } = recipe;
+
   const created_at = Date.now();
 
   await db.runAsync(
-    `
-    INSERT INTO recipes 
-      (name, ingredients, instructions, image_uri, is_favourite, created_at) 
-    VALUES (?, ?, ?, ?, ?, ?)
-    `,
-    [name, ingredients, instructions, image_uri || '', is_favourite, created_at]
+    `INSERT INTO recipes 
+      (name, ingredients, instructions, image_uri, category, area, tags, is_favourite, created_at) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [name, ingredients, instructions, image_uri, category, area, tags, is_favourite, created_at]
   );
 
   return true;
@@ -91,6 +114,7 @@ export async function saveRecipe(recipe) {
 /**
  * Deletes a recipe row from the database by ID.
  */
+
 export async function removeRecipe(recipeId) {
   const db = await getDb();
   await db.runAsync("DELETE FROM recipes WHERE id = ?;", [recipeId]);
@@ -101,6 +125,7 @@ export async function removeRecipe(recipeId) {
  * Toggles the `is_favourite` flag for a given recipe.
  * Updates the value between 1 (favourite) and 0 (not favourite).
  */
+
 export async function toggleFavourite(recipeId, currentValue) {
   const db = await getDb();
   const newValue = currentValue === 1 ? 0 : 1;
@@ -115,6 +140,7 @@ export async function toggleFavourite(recipeId, currentValue) {
  * Retrieves only recipes marked as favourites.
  * Sorted by creation date (newest first).
  */
+
 export async function getFavourites() {
   const db = await getDb();
   return await db.getAllAsync(

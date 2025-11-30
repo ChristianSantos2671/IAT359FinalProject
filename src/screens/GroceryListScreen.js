@@ -1,5 +1,9 @@
 import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+
+
 
 import globalStyles from '../utils/globalStyles';
 
@@ -14,6 +18,8 @@ import globalStyles from '../utils/globalStyles';
 export default function GroceryListScreen({ navigation, route }) {
   const [ingredients, setIngredients] = useState([]);
   const [ingredient, setIngredient] = useState('');
+  const insets = useSafeAreaInsets();
+  
 
   /**
    * If this screen was opened with a list of ingredients (via route.params),
@@ -66,146 +72,161 @@ export default function GroceryListScreen({ navigation, route }) {
     setIngredients(newIngredients);
   };
   
-  return (
-    <View style={globalStyles.mainView}>
-      <ScrollView>
-        {/* Placeholder section for potential camera or image upload */}
-        <View>
-          {/* Camera access or upload photo here */}
-        </View>
+return (
+  <View style={globalStyles.container}>
+    
+    {/* Top Header */}
+    <View style={[globalStyles.topContainer, globalStyles.paddingHorizontal, { paddingTop: insets.top + 5 }]}>
+      <Text style={[globalStyles.h1, globalStyles.textMargins]}>Grocery List</Text>
+      <Text style={[globalStyles.subheadingstyles, globalStyles.textMargins]}>
+        Add, check off, and manage your recipe ingredients.
+      </Text>
 
-        {/* Add ingredient input and "+" button */}
-        <View style={[globalStyles.view, styles.addIngriedientSection]}>
-          <TextInput 
-            style={[globalStyles.textInput, styles.enterIngridientInput]} 
-            placeholder="Enter Ingredient"
-            value={ingredient}
-            onChangeText={setIngredient}
-            onSubmitEditing={addIngredient}
-          />
-          <TouchableOpacity 
-            style={styles.ingridientButton}
-            onPress={addIngredient}
-          >
-            <Text style={globalStyles.headerText2}>+</Text>
-          </TouchableOpacity>
-        </View>
+      {/* Ingredients input field */}
+      <View style={styles.addIngredientContainer}>
+        <TextInput
+          placeholder="Enter Ingredient"
+          style={[globalStyles.input, styles.enterIngredientInput]}
+          value={ingredient}
+          onChangeText={setIngredient}
+          onSubmitEditing={addIngredient}
+        />
+        {/* Button to add ingredients from input */}
+        <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
+          <Text style={[globalStyles.h2, { color: "#fff" }]}>+</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
 
-        {/* Ingredient list display */}
-        <View style={globalStyles.view}>
-          <Text style={globalStyles.headerText2}>Recipe Ingredients</Text>
-          <FlatList
-            style={styles.ingredientsList}
-            scrollEnabled={false}
-            data={ingredients}
-            renderItem={({item, index}) => (
-              <View style={styles.tag}>
-                {/* Checkbox button (toggles checked/unchecked state) */}
-                <TouchableOpacity
-                  style={styles.checkButton}
-                  onPress={() => toggleIngredient(index)}
-                >
-                  <Text style={styles.checkmark}>{item.checked ? '✓' : ''}</Text>
-                </TouchableOpacity>
+    {/* Ingredient List display */}
+    <ScrollView style={globalStyles.paddingHorizontal}>
+      <Text style={[globalStyles.h3, { marginVertical: 10 }]}>Recipe Ingredients</Text>
 
-                {/* Ingredient title (crossed out if checked) */}
-                <Text style={[
-                  styles.ingridientName,
-                  item.checked && styles.checkedText
-                ]}>
-                  {item.title}
-                </Text>
+      <View>
+        <FlatList
+          scrollEnabled={false}
+          data={ingredients}
+          renderItem={({ item, index }) => (
+            <View style={styles.tag}>
+              {/* Checkbox button (toggles checked/unchecked state) */}
+              <TouchableOpacity
+                style={styles.checkButton}
+                onPress={() => toggleIngredient(index)}
+              >
+                <Text style={styles.checkmark}>{item.checked ? "●" : ""}</Text>
+              </TouchableOpacity>
 
-                {/* Delete ingredient (✕) */}
-                <TouchableOpacity onPress={() => deleteIngredient(index)}>
-                  <Text style={styles.closeButton}>✕</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          />
-        </View>
-      </ScrollView>
+              {/* Ingredient title (crossed out if checked) */}
+              <Text style={[styles.ingredientName, item.checked && styles.checkedText]}>
+                {item.title}
+              </Text>
+
+              {/* Delete ingredient (✕) */}
+              <TouchableOpacity onPress={() => deleteIngredient(index)}>
+                <Text style={styles.h3}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      </View>
+    </ScrollView>
 
       {/* Floating button (bottom right) — navigates to Log Meal screen */}
       <TouchableOpacity
         style={globalStyles.logMealButton}
-        onPress={() => navigation.navigate('Log Meal')}
+        onPress={() => navigation.navigate('Log Meal', {previousScreen: 'Home', photo: '../../assets/adaptive-icon.png'})}
       >
-        <Image
-          style={globalStyles.logMealImage}
-          source={require('../../assets/adaptive-icon.png')}
+        <Ionicons 
+          name="journal-outline" 
+          size={32} 
+          color="#ffffff"
         />
+        <Text style={[globalStyles.h3, {color: "white"}]}>+</Text>
       </TouchableOpacity>
-    </View>
-  );
+  </View>
+);
 }
 
+
 const styles = StyleSheet.create({
-  addIngriedientSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 0,
-  },
-  enterIngridientInput: {
-    flex: 1,
-  },
-  ingridientButton: {
-    backgroundColor: globalStyles.colors.primary,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    padding: globalStyles.buttonValues.buttonPadding,
-    margin: globalStyles.buttonValues.buttonMargin,
-  },
-  ingredientsList: {
-    borderWidth: globalStyles.sectionValues.sectionBorderWidth,
-    backgroundColor: globalStyles.colors.backgroundSecondary,
+
+  // spacing for adding an ingredient
+  addIngredientContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
-    padding: globalStyles.sectionValues.sectionPadding,
+    marginBottom: 15,
   },
-  tag: {
+
+  // spacing for ingredient input
+  enterIngredientInput: {
+    flex: 9,
+  },
+
+  // styling + spacing for adding an ingredient button
+  addButton: {
     backgroundColor: globalStyles.colors.primary,
-    borderRadius: 16,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 10,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '95%',
-    paddingHorizontal: 10,
+    alignSelf: 'center'
+  },
+
+  // styling + layout of the ingredient tags / outputs
+  tag: {
+    backgroundColor: globalStyles.colors.secondary,
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
     paddingVertical: 8,
     marginVertical: 6,
-    marginHorizontal: 10,
   },
+
+  // styling for checked button
   checkButton: {
     width: 24,
     height: 24,
-    borderWidth: 2,
-    borderColor: globalStyles.colors.text,
+    borderWidth: 1,
+    borderColor: globalStyles.colors.primary,
     borderRadius: 12,
     marginRight: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: globalStyles.colors.background,
   },
+
+  // styling one item as been checked
   checkmark: {
     color: globalStyles.colors.primary,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    alignSelf: "center",
+    justifyContent: "center"
   },
-  checkedText: {
-    textDecorationLine: 'line-through',
-    opacity: 0.7,
-  },
-  ingridientName: {
+
+  // Ingredient name styling
+  ingredientName: {
     flex: 1,
-    flexShrink: 1,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
     fontSize: globalStyles.tagText.fontSize,
     marginRight: 8,
     color: globalStyles.colors.text,
-    textAlignVertical: 'top',
   },
+
+  // checked text styling
+  checkedText: {
+    textDecorationLine: "line-through",
+    opacity: 0.7,
+  },
+
+  // styling for the X or delete button
   closeButton: {
-    alignSelf: 'center',
-    paddingLeft: 8,
+    fontSize: 18,
+    paddingLeft: 10,
+    color: globalStyles.colors.primary,
   },
 });

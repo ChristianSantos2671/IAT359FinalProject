@@ -32,16 +32,12 @@ export default function CameraScreen({ navigation, route }) {
   if (!permission.granted) {
     return (
       <View style={[globalStyles.mainView, styles.permissionSection]}>
-        <Text style={[styles.permissionMessage, globalStyles.headerText2]}>
-          We need your permission to show the camera
-        </Text>
+        <Text style={[styles.permissionMessage, globalStyles.h3]}>We need your permission to show the camera</Text>
         <TouchableOpacity
-          style={styles.permissionButton}
+          style={[globalStyles.primaryButton, {flex:0}]}
           onPress={requestPermission}
         >
-          <Text style={[styles.permissionButtonText, globalStyles.headerText2]}>
-            Grant Permission
-          </Text>
+          <Text style={globalStyles.primaryButtonText}>Grant Permission</Text>
         </TouchableOpacity>
       </View>
     );
@@ -76,18 +72,14 @@ export default function CameraScreen({ navigation, route }) {
 
   return (
     <View style={styles.cameraSection}>
-      {/* Displays the live camera feed */}
-      <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
+      <CameraView ref={cameraRef} style={styles.camera} facing={facing} /> 
 
-      {/* Bottom overlay with flip and capture buttons */}
-      <View style={[styles.cameraButtonSection, { paddingBottom: insets.bottom * 2 }]}>
-        {/* Flip camera button (front/back) */}
-        <TouchableOpacity style={styles.flipCameraButton} onPress={toggleCameraFacing}>
-          <Text style={[globalStyles.headerText, styles.text]}>Flip</Text>
+      <View style={[styles.cameraButtonSection, { paddingBottom: insets.bottom*2 }]}>
+        <TouchableOpacity style={styles.cameraButton} onPress={toggleCameraFacing}>
+          <Ionicons name="sync" size={30} color={globalStyles.colors.background} />
         </TouchableOpacity>
 
-        {/* Capture button (takes photo) */}
-        <TouchableOpacity style={styles.captureButton} onPress={takePhoto}>
+        <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
           <Ionicons name="camera" size={30} color={globalStyles.colors.background} />
         </TouchableOpacity>
       </View>
@@ -96,29 +88,29 @@ export default function CameraScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+
+// perm message styling
   permissionMessage: {
     textAlign: 'center',
     paddingBottom: globalStyles.sectionValues.sectionPadding,
   },
+
+  // layout for permissions section
   permissionSection: {
     justifyContent: 'center',
     padding: globalStyles.sectionValues.sectionPadding,
   },
-  permissionButton: {
-    backgroundColor: globalStyles.colors.primary,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    paddingVertical: globalStyles.buttonValues.buttonPadding,
-    paddingHorizontal: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
+  // camera spacing
   cameraSection: {
     flex: 1,
   },
+
   camera: {
     flex: 1,
   },
+  
+  // layout for camera buttons
   cameraButtonSection: {
     position: 'absolute',
     bottom: 0,
@@ -126,19 +118,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     width: '100%',
   },
-  flipCameraButton: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    padding: globalStyles.sectionValues.sectionPadding,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius * 1.5,
-  },
-  captureButton: {
-    padding: globalStyles.buttonValues.buttonPadding * 2,
+
+  // styling for camera buttons
+  cameraButton: {
+    padding: globalStyles.buttonValues.buttonPadding*2,
     borderWidth: globalStyles.buttonValues.buttonBorderWidth,
     borderColor: globalStyles.colors.background,
     borderRadius: globalStyles.buttonValues.buttonBorderRadius * 1.5,
   },
-  text: {
-    color: globalStyles.colors.background,
-  },
+
 });
