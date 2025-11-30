@@ -152,7 +152,7 @@ export default function RecipeDetailsScreen({navigation, route}) {
      </ScrollView>
 
         {/* Bottom buttons for Grocery List and Log Meal */}
-         <View style={styles.bottomButtons}>
+         <View style={[styles.bottomButtons, {paddingBottom: insets.bottom}]}>
           {/* Shop ingredients will pass the recipe ingredients to the Grocery list screen */}
             <TouchableOpacity 
             style={globalStyles.secondaryButton}
@@ -189,11 +189,10 @@ const styles = StyleSheet.create({
 
   // spacing for the bottom buttons
   bottomButtons: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  marginVertical: 20,
-  paddingHorizontal: 16,
-  gap: 10
-},
-
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+    paddingHorizontal: 16,
+    gap: 10
+  },
 });

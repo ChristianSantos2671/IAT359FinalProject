@@ -5,14 +5,10 @@ import {firebase_auth} from  '../utils/firebaseConfig.js';
 import globalStyles from '../utils/globalStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-
-
 export default function SignInScreen({navigation}) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false);
-  const insets = useSafeAreaInsets();
-
 
   // function that handles logging in the user by checking if the credentials are correct to what is on firebase
   const handleLogin = async () => {
@@ -34,7 +30,7 @@ return (
     {/* Logo + App Name */}
     <View style={[styles.logoSection, { paddingTop: insets.top + 100 }]}>
       <Image
-        source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
+        source={ require('../../assets/myCookbook_logo.png') }
         style={[globalStyles.textMargins, globalStyles.logo] }
       />
       <Text style={ globalStyles.h1}>My Cookbook</Text>
