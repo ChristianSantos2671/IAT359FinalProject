@@ -42,10 +42,6 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
             {recipe.name}
           </Text>
 
-          <Text style={[globalStyles.subheadingstyles, globalStyles.textMargins]}>
-            A delightful dish that combines flavors and textures to create a memorable culinary experience.
-          </Text>
-
           {/* tags */}
           <View style={globalStyles.tagContainer}>
             {recipe.category ? (
@@ -157,7 +153,7 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
       </ScrollView>
 
       {/* Bottom buttons for Grocery List and Log Meal */}
-      <View style={styles.bottomButtons}>
+      <View style={[styles.bottomButtons, {paddingBottom: insets.bottom}]}>
         {/* Shop ingredients will pass the recipe ingredients to the Grocery list screen */}
         <TouchableOpacity
           style={globalStyles.secondaryButton}

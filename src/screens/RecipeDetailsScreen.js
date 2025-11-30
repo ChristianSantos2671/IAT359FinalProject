@@ -55,9 +55,6 @@ export default function RecipeDetailsScreen({navigation, route}) {
       />
       {/* recipe name */}
       <Text style={[globalStyles.h2, globalStyles.textMargins]}>{meal.strMeal}</Text>
-
-      {/* Later use Gemini to create a short text description of the recipe*/}
-      <Text style={[globalStyles.subheading, globalStyles.textMargins]}>A delightful dish that combines flavors and textures to create a memorable culinary experience.</Text>
        
        {/* tags  */}
         <View style={globalStyles.tagContainer}>
