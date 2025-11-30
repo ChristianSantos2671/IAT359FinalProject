@@ -1,10 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Store JSON data.
-
-// Store JSON data.
-
-// Store JSON data.
 export async function storeData(key, value) {
   try {
     const jsonValue = JSON.stringify(value);
@@ -15,10 +11,6 @@ export async function storeData(key, value) {
     return false;
   }
 }
-
-// Retrieve all meals.
-
-// Retrieve all meals.
 
 // Retrieve all meals.
 export async function getMeals() {
@@ -32,10 +24,6 @@ export async function getMeals() {
 }
 
 // Save a new meal.
-
-// Save a new meal.
-
-// Save a new meal.
 export async function saveMeal(meal) {
   try {
     const meals = await getMeals();
@@ -47,10 +35,6 @@ export async function saveMeal(meal) {
     return false;
   }
 }
-
-// Remove a meal by its timestamp.
-
-// Remove a meal by its timestamp.
 
 // Remove a meal by its timestamp.
 export async function removeMeal(mealId) {
