@@ -6,7 +6,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  * It sends a predefined prompt along with the base64-encoded image to the
  * Gemini model, then returns the model's raw text response.
  */
-const API_KEY = "AIzaSyDIBQ_-II_C4DUzVGBEWMy2uOOdYGO4dOg";
+const API_KEY = "";
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
