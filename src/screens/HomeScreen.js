@@ -249,7 +249,7 @@ return (
         />
 
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery("")}>
+          <TouchableOpacity style={{marginLeft: 4}} onPress={() => setSearchQuery("")}>
             <Ionicons name="close-circle" size={22}  />
           </TouchableOpacity>
         )}
