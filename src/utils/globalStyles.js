@@ -151,8 +151,9 @@ const globalStyles = StyleSheet.create({
   // logo 
 
   logo: {
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 60,
+    borderRadius: sectionValues.sectionRadius
   },
 
   // option bars / tabs
