@@ -9,6 +9,8 @@ export default function SignInScreen({navigation}) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false);
+  const insets = useSafeAreaInsets();
+  
 
   // function that handles logging in the user by checking if the credentials are correct to what is on firebase
   const handleLogin = async () => {
