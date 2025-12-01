@@ -76,7 +76,7 @@ const [recipeName, setRecipeName] = useState(mealName || '');
         Alert.alert('Success', 'Meal uploaded successfully!');
         
         // Redirect user to the "My Logged Meals" tab in Profile.
-        navigation.navigate("Profile", { activeTab: "My Logged Meals" });
+        navigation.navigate("Profile", { activeTab: "My Logs" });
       } else {
         setError('Failed to save meal. Please try again.');
       }
