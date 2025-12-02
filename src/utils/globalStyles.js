@@ -245,6 +245,7 @@ const globalStyles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 3,
+    includeFontPadding: false,
   },
 
   categoryTag: {
