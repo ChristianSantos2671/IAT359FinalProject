@@ -66,7 +66,9 @@ const styles = StyleSheet.create({
   buttonSection: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    padding: globalStyles.sectionValues.sectionPadding,
+    marginVertical: 20,
+    paddingHorizontal: 16,
+    gap: 10
   },
 
 });

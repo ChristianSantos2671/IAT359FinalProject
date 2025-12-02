@@ -176,10 +176,10 @@ export default function SuggestedRecipesScreen({ route, navigation }) {
       {/* Retake button (bottom of screen) */}
       <View>
         <TouchableOpacity
-          style={[styles.button, { marginBottom: insets.bottom }]}
+          style={[globalStyles.primaryButton, { marginBottom: insets.bottom + 10, flex: 0 }]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={globalStyles.headerText2}>Retake</Text>
+          <Text style={globalStyles.primaryButtonText}>Retake</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -198,34 +198,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
   },
-  itemContainer: {
-    alignItems: "flex-start",
-    flexDirection: "row",
-    marginTop: 10,
-    gap: 15,
-    backgroundColor: globalStyles.colors.backgroundSecondary,
-    padding: 10,
-    borderRadius: globalStyles.sectionValues.sectionRadius,
-    borderWidth: 1,
-    borderColor: globalStyles.colors.primary,
-  },
+
   mealCardTextContainer: {
     flex: 1,
     justifyContent: "space-between",
-  },
-  thumbnail: {
-    width: 100,
-    height: 100,
-    borderRadius: 12,
-  },
-  button: {
-    backgroundColor: globalStyles.colors.primary,
-    borderWidth: globalStyles.buttonValues.buttonBorderWidth,
-    borderRadius: globalStyles.buttonValues.buttonBorderRadius,
-    paddingVertical: globalStyles.buttonValues.buttonPadding,
-    paddingHorizontal: 100,
-    marginHorizontal: globalStyles.sectionValues.sectionMargin,
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
