@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     borderRadius: 10,
-    marginBottom: 10,
+    marginVertical: 20,
   },
 
   // spacing for the bottom buttons

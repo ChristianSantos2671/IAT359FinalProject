@@ -183,6 +183,7 @@ export default function FaveRecipeDetailsScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   // image styling
   image: {
+    marginVertical: 20,
     width: "100%",
     height: 200,
     borderRadius: 10,
